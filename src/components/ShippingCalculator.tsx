@@ -12,9 +12,11 @@ import {
   Send,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { translations } from '../data/translations';
 
 export const ShippingCalculator: React.FC = () => {
-  const { destinations, agencies, pricingRules } = useApp();
+  const { destinations, agencies, pricingRules, language } = useApp();
+  const t = translations[language].calculator;
 
   const [originAgencyId, setOriginAgencyId] = useState(agencies[0]?.id || '');
   const [destinationId, setDestinationId] = useState(destinations[0]?.id || '');
@@ -44,24 +46,30 @@ export const ShippingCalculator: React.FC = () => {
   };
 
   const totalGnf = calculateTotalGnf();
-  // Approximate exchange rates for diaspora convenience:
-  // 1 USD ~ 8,600 GNF
-  // 1 CAD ~ 6,300 GNF
   const totalUsd = Math.round(totalGnf / 8600);
   const totalCad = Math.round(totalGnf / 6300);
 
   const formatGnf = (amount: number) => {
-    return new Intl.NumberFormat('fr-GN').format(amount) + ' GNF';
+    return new Intl.NumberFormat(language === 'fr' ? 'fr-GN' : 'en-US').format(amount) + ' GNF';
   };
 
   const generateWhatsAppMessage = () => {
-    const text = `Bonjour Thiaguil Multi-services, je souhaite réserver un envoi :
+    const text = language === 'fr'
+      ? `Bonjour Thiaguil Multi-services, je souhaite réserver un envoi :
 - Départ : ${selectedAgency?.name || 'Conakry'}
 - Destination : ${selectedDestination?.name} (${selectedDestination?.country})
 - Type : ${packageType === 'envelope' ? 'Enveloppe express' : `Colis de ${weightKg} kg`}
 - Mode : ${transitMode === 'air' ? 'Fret Aérien Express' : 'Fret Maritime'}
 - Estimation calculée : ~${formatGnf(totalGnf)}
-Pouvez-vous me confirmer les modalités de dépôt ?`;
+Pouvez-vous me confirmer les modalités de dépôt ?`
+      : `Hello Thiaguil Multi-services, I would like to book a shipment:
+- Departure: ${selectedAgency?.name || 'Conakry'}
+- Destination: ${selectedDestination?.name} (${selectedDestination?.country})
+- Type: ${packageType === 'envelope' ? 'Express Envelope' : `Parcel of ${weightKg} kg`}
+- Mode: ${transitMode === 'air' ? 'Air Freight Express' : 'Sea Freight'}
+- Estimated quote: ~${formatGnf(totalGnf)}
+Could you confirm the branch deposit details?`;
+
     return encodeURIComponent(text);
   };
 
@@ -72,13 +80,13 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#C8102E] font-bold text-xs uppercase tracking-wider border border-red-200">
             <Calculator className="w-3.5 h-3.5" />
-            <span>Transparence Tarifaire</span>
+            <span>{t.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Simulateur de tarif d'expédition
+            {t.title}
           </h2>
           <p className="text-slate-600 text-base">
-            Obtenez une estimation immédiate de votre envoi vers l'international selon le poids, l'agence de dépôt et le mode d'acheminement.
+            {t.subtitle}
           </p>
         </div>
 
@@ -87,10 +95,10 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column: Form Controls */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Type selection: Enveloppe vs Colis */}
+              {/* Type selection: Enveloppe vs Colis (Segmented controls with clean active state) */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                  1. Format de l'envoi
+                  {t.step1}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -101,11 +109,11 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                     }}
                     className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
                       packageType === 'envelope'
-                        ? 'bg-[#C8102E] text-white border-[#C8102E] shadow-sm'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <span>✉️ Enveloppe / Documents (&lt; 1 kg)</span>
+                    <span>{t.typeEnvelope}</span>
                   </button>
 
                   <button
@@ -113,11 +121,11 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                     onClick={() => setPackageType('parcel')}
                     className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
                       packageType === 'parcel'
-                        ? 'bg-[#C8102E] text-white border-[#C8102E] shadow-sm'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <span>📦 Colis / Bagages (kg)</span>
+                    <span>{t.typeParcel}</span>
                   </button>
                 </div>
               </div>
@@ -126,7 +134,7 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
               {packageType === 'parcel' && (
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    2. Mode d'acheminement
+                    {t.step2}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -140,10 +148,10 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                     >
                       <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
                         <Plane className="w-4 h-4 text-[#C8102E]" />
-                        <span>Fret Aérien Express</span>
+                        <span>{t.airFreight}</span>
                       </div>
                       <span className="text-[11px] text-slate-600 mt-1 block">
-                        Rapide • 3 à 5 jours ouvrés
+                        {t.airDelay}
                       </span>
                     </button>
 
@@ -158,10 +166,10 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                     >
                       <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
                         <Ship className="w-4 h-4 text-cyan-600" />
-                        <span>Fret Maritime Éco</span>
+                        <span>{t.seaFreight}</span>
                       </div>
                       <span className="text-[11px] text-slate-600 mt-1 block">
-                        Économique • 25 à 35 jours
+                        {t.seaDelay}
                       </span>
                     </button>
                   </div>
@@ -172,7 +180,7 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Agence de dépôt (Guinée)
+                    {t.originAgency}
                   </label>
                   <select
                     value={originAgencyId}
@@ -191,7 +199,7 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Ville de destination
+                    {t.destinationCity}
                   </label>
                   <select
                     value={destinationId}
@@ -213,7 +221,7 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                       <Weight className="w-3.5 h-3.5 text-[#C8102E]" />
-                      Poids estimé du colis :
+                      {t.estimatedWeight} :
                     </label>
                     <div className="flex items-center gap-1 bg-red-50 border border-red-200 px-3 py-1 rounded-lg">
                       <input
@@ -254,17 +262,17 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                 <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                   <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
-                    Estimation Instantanée
+                    {t.instantEstimate}
                   </span>
                   <span className="text-[11px] bg-slate-800 px-2.5 py-0.5 rounded text-slate-300 font-mono">
-                    Devis indicatif
+                    {t.indicativeQuote}
                   </span>
                 </div>
 
                 {/* Price Display */}
                 <div className="py-6 text-center space-y-1">
                   <span className="text-xs font-semibold text-slate-300 block uppercase">
-                    Montant estimé de l'envoi
+                    {t.estimatedAmount}
                   </span>
                   <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
                     {formatGnf(totalGnf)}
@@ -279,48 +287,48 @@ Pouvez-vous me confirmer les modalités de dépôt ?`;
                 {/* Breakdown specs */}
                 <div className="space-y-2.5 text-xs text-slate-300 bg-slate-950/80 p-4 rounded-xl border border-slate-800/80">
                   <div className="flex justify-between">
-                    <span className="text-slate-300">Destination :</span>
+                    <span className="text-slate-300">{t.destinationCity} :</span>
                     <span className="text-white font-bold">
                       {selectedDestination?.name} ({selectedDestination?.country})
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">Délai indicatif :</span>
+                    <span className="text-slate-300">{t.indicativeDelay} :</span>
                     <span className="text-emerald-400 font-bold">
                       {transitMode === 'air' ? selectedDestination?.estimatedAirDays : selectedDestination?.estimatedSeaDays}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">Prochain vol prévu :</span>
+                    <span className="text-slate-300">{t.nextFlight} :</span>
                     <span className="text-amber-300 font-bold">
-                      {selectedDestination?.nextScheduledFlight || 'Hebdomadaire'}
+                      {selectedDestination?.nextScheduledFlight || (language === 'fr' ? 'Hebdomadaire' : 'Weekly')}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">Retrait sur place :</span>
+                    <span className="text-slate-300">{t.localPickup} :</span>
                     <span className="text-white font-bold truncate max-w-[170px]" title={selectedDestination?.localAddress}>
-                      {selectedDestination?.localAddress || 'Bureau local Thiaguil'}
+                      {selectedDestination?.localAddress || (language === 'fr' ? 'Bureau local Thiaguil' : 'Local Thiaguil Hub')}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Action Button: Book via WhatsApp */}
+              {/* Action Button: Solitary Primary CTA of this section */}
               <div className="space-y-2 pt-2">
                 <a
                   href={`https://wa.me/224611835683?text=${generateWhatsAppMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 px-4 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Réserver ce tarif sur WhatsApp</span>
+                  <span>{t.bookOnWhatsapp}</span>
                 </a>
                 <p className="text-[10px] text-slate-300 text-center">
-                  Tarif final pesé et certifié en agence avant scellement. Pas de frais cachés.
+                  {t.disclaimer}
                 </p>
               </div>
             </div>

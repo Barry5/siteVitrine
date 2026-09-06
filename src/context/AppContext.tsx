@@ -28,6 +28,8 @@ interface AppContextType {
   activeTrackedItem: TrackingItem | null;
   activeSearchCode: string;
   trackingError: string | null;
+  language: 'fr' | 'en';
+  setLanguage: (lang: 'fr' | 'en') => void;
 
   // Navigation & Auth
   setCurrentView: (view: 'public' | 'admin') => void;
@@ -107,6 +109,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTrackedItem, setActiveTrackedItem] = useState<TrackingItem | null>(null);
   const [activeSearchCode, setActiveSearchCode] = useState<string>('');
   const [trackingError, setTrackingError] = useState<string | null>(null);
+  const [language, setLanguage] = useState<'fr' | 'en'>(() => {
+    return (localStorage.getItem('thg_language') as 'fr' | 'en') || 'fr';
+  });
+
+  const handleSetLanguage = (lang: 'fr' | 'en') => {
+    setLanguage(lang);
+    localStorage.setItem('thg_language', lang);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -341,6 +351,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         activeTrackedItem,
         activeSearchCode,
         trackingError,
+        language,
+        setLanguage: handleSetLanguage,
         setCurrentView,
         loginAdmin,
         logoutAdmin,

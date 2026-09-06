@@ -10,6 +10,7 @@ import { DestinationsSection } from './components/DestinationsSection';
 import { HowItWorks } from './components/HowItWorks';
 import { AgenciesSection } from './components/AgenciesSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
+import { FAQSection } from './components/FAQSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -55,6 +56,9 @@ const MainLayout: React.FC = () => {
 
         {/* Verified Customer Testimonials */}
         <TestimonialsSection />
+
+        {/* Frequently Asked Questions (FAQ Accordion) */}
+        <FAQSection />
 
         {/* Direct Contact & Quote Form */}
         <ContactSection />

@@ -76,6 +76,11 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
+                <a href="#faq" className="hover:text-[#C8102E] transition-colors">
+                  Questions fréquentes (FAQ)
+                </a>
+              </li>
+              <li>
                 <a href="#contact" className="hover:text-[#C8102E] transition-colors">
                   Contactez-nous
                 </a>
@@ -116,7 +121,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* International Bureaux & Admin Access */}
+          {/* International Bureaux */}
           <div className="lg:col-span-3 space-y-4">
             <h4 className="font-extrabold uppercase tracking-wider text-white text-xs">
               Bureaux Internationaux
@@ -135,29 +140,22 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            {/* Admin shortcut button */}
-            <div className="pt-2">
-              <button
-                onClick={() => {
-                  setCurrentView('admin');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center gap-2 border border-slate-700 transition-colors font-bold cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5 text-[#C8102E]" />
-                <span>Accès Gestionnaire / Espace Admin</span>
-              </button>
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-300">
+              <span className="text-slate-300 font-semibold block mb-0.5">Assistance Centrale :</span>
+              <a href="tel:+224611835683" className="text-white font-mono font-bold hover:text-red-400 transition-colors">
+                +224 611 83 56 83
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Bottom copyright and legal line */}
+        {/* Bottom copyright and discreet legal/admin line */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-300 text-[11px]">
           <p>
             © {new Date().getFullYear()} Thiaguil Multi-services. Tous droits réservés. Agrément transitaire & fret international.
           </p>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <a
               href="https://www.facebook.com/people/Thiaguil-multi-services/61566989230221/"
               target="_blank"
@@ -173,6 +171,19 @@ export const Footer: React.FC = () => {
             >
               <span>Haut de page</span>
               <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+            <span>•</span>
+            {/* Discreet admin link as requested */}
+            <button
+              onClick={() => {
+                setCurrentView('admin');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-slate-300 hover:text-slate-300 inline-flex items-center gap-1 transition-colors cursor-pointer"
+              title="Portail Interne Gestionnaire"
+            >
+              <Lock className="w-3 h-3 text-slate-300" />
+              <span>Accès Espace Interne</span>
             </button>
           </div>
         </div>

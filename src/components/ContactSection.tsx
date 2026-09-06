@@ -116,10 +116,10 @@ export const ContactSection: React.FC = () => {
                   href="https://www.facebook.com/people/Thiaguil-multi-services/61566989230221/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <span>Visiter</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <span>Visiter la page</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400" />
                 </a>
               </div>
             </div>

@@ -5,19 +5,19 @@ import {
   ShieldCheck,
   CheckCircle2,
   Calendar,
-  Clock,
-  MapPin,
   Sparkles,
   Plane,
   Ship,
-  Box,
   ChevronRight,
   PhoneCall,
+  MapPin,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { translations } from '../data/translations';
 
 export const Hero: React.FC = () => {
-  const { searchPackage, announcements } = useApp();
+  const { searchPackage, announcements, language } = useApp();
+  const t = translations[language].hero;
   const [searchInput, setSearchInput] = useState('');
   const activeAnnouncement = announcements.find((a) => a.isActive) || announcements[0];
 
@@ -55,35 +55,33 @@ export const Hero: React.FC = () => {
             {/* Tagline pill */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-[#C8102E] text-xs font-bold tracking-wide">
               <span className="w-2 h-2 rounded-full bg-[#C8102E] animate-pulse"></span>
-              <span>TRANSITAIRE & FRET INTERNATIONAL • GUINÉE ➔ AMÉRIQUE & EUROPE</span>
+              <span>{t.tagline}</span>
             </div>
 
             {/* Main Punchy Heading */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-              Expédiez vos colis vers{' '}
+              {t.titleStart}{' '}
               <span className="text-[#C8102E] underline decoration-[#C8102E]/30 decoration-4 underline-offset-6">
-                New York, Montréal
+                {t.destinations}
               </span>{' '}
-              et l'international en toute confiance.
+              {t.titleEnd}
             </h1>
 
             {/* Subtitle with authentic brand philosophy */}
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Vols réguliers et fret maritime programmés depuis Conakry, Coyah et Kindia.
-              <strong className="text-slate-800 font-semibold"> Chaque colis est enregistré, vérifié et préparé avec méthode </strong> 
-              avant son départ pour garantir une livraison irréprochable.
+              {t.description}
             </p>
 
-            {/* HERO TRACKING INPUT BOX (Immediate utility) */}
+            {/* HERO TRACKING INPUT BOX (Immediate utility & single primary CTA of this zone) */}
             <div className="pt-2 max-w-xl mx-auto lg:mx-0">
               <div className="bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl border border-slate-200/90 ring-4 ring-slate-100/80 transition-all hover:border-[#C8102E]/40">
                 <div className="flex items-center justify-between px-2 pb-2 border-b border-slate-100 text-xs text-slate-600 font-bold uppercase tracking-wider">
                   <span className="flex items-center gap-1.5 text-[#C8102E]">
                     <Search className="w-3.5 h-3.5" />
-                    Suivi instantané de colis
+                    {t.trackingTitle}
                   </span>
                   <span className="text-[11px] text-slate-600 font-normal">
-                    Mise à jour en temps réel
+                    {t.trackingRealtime}
                   </span>
                 </div>
 
@@ -93,22 +91,23 @@ export const Hero: React.FC = () => {
                       type="text"
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      placeholder="Entrez votre numéro (ex: THG-NY-8910)..."
+                      placeholder={t.trackingPlaceholder}
                       className="w-full pl-4 pr-3 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900 placeholder:text-slate-600 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
                     />
                   </div>
+                  {/* Primary solid red CTA */}
                   <button
                     type="submit"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
                   >
-                    <span>Rechercher</span>
+                    <span>{t.searchButton}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
 
                 {/* Quick click demo codes */}
                 <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-xs text-slate-600 px-1">
-                  <span className="font-semibold text-slate-600 text-[11px]">Exemples à tester :</span>
+                  <span className="font-semibold text-slate-600 text-[11px]">{t.sampleCodesLabel}</span>
                   <button
                     type="button"
                     onClick={() => handleQuickSearch('THG-NY-8910')}
@@ -138,52 +137,50 @@ export const Hero: React.FC = () => {
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-semibold text-slate-700">
               <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <ShieldCheck className="w-4 h-4 text-[#C8102E]" />
-                <span>Scellement & Pesée certifiée</span>
+                <span>{t.trust1}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <Plane className="w-4 h-4 text-slate-900" />
-                <span>Départs Aériens Réguliers</span>
+                <span>{t.trust2}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Retrait direct au Bronx & Montréal</span>
+                <span>{t.trust3}</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Dynamic Visual Showcase Card */}
+          {/* Right Column: Visual Showcase Card - Lightened & Harmonized */}
           <div className="lg:col-span-5">
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              {/* Outer decorative layered backdrop */}
-              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-[#C8102E] to-slate-900 opacity-20 blur-lg"></div>
+              {/* Outer subtle glow */}
+              <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-[#C8102E]/20 to-slate-200 opacity-70 blur-md pointer-events-none"></div>
 
-              {/* Main Card */}
-              <div className="relative bg-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-800 overflow-hidden">
-                {/* Visual flight trajectories diagram */}
-                <div className="relative pb-6 border-b border-slate-800">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Liaisons Internationales
+              {/* Main Refined Card: Crisp light container */}
+              <div className="relative bg-white text-slate-900 rounded-3xl p-6 sm:p-7 shadow-xl border border-slate-200/90 overflow-hidden space-y-5">
+                {/* Header: Liaisons Internationales */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#C8102E]" />
+                      {t.networkTitle}
                     </span>
-                    <span className="px-2.5 py-1 rounded-full bg-[#C8102E] text-white text-[11px] font-extrabold uppercase">
-                      Direct Hub
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#C8102E] border border-red-200 text-[11px] font-extrabold uppercase">
+                      {t.directHub}
                     </span>
                   </div>
 
-                  {/* Stylized Flight Network Map */}
-                  <div className="relative h-44 bg-slate-950/80 rounded-2xl p-4 border border-slate-800 flex flex-col justify-between overflow-hidden">
-                    {/* SVG trajectory arcs */}
+                  {/* Stylized Flight Network Map with high contrast and refined arcs */}
+                  <div className="relative h-44 bg-slate-900 text-white rounded-2xl p-4 border border-slate-800 flex flex-col justify-between overflow-hidden shadow-inner">
                     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 160" preserveAspectRatio="none">
-                      {/* Grid dots */}
                       <defs>
-                        <pattern id="dotGrid" width="16" height="16" patternUnits="userSpaceOnUse">
-                          <circle cx="2" cy="2" r="1" fill="#334155" opacity="0.4" />
+                        <pattern id="heroDotGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+                          <circle cx="2" cy="2" r="1" fill="#475569" opacity="0.4" />
                         </pattern>
                       </defs>
-                      <rect width="100%" height="100%" fill="url(#dotGrid)" />
+                      <rect width="100%" height="100%" fill="url(#heroDotGrid)" />
 
-                      {/* Flight Arc 1: Conakry (left bottom) to New York (top left) */}
+                      {/* Flight Arc 1: Conakry to New York */}
                       <path
                         d="M 60 130 Q 110 30 250 45"
                         fill="none"
@@ -198,31 +195,27 @@ export const Hero: React.FC = () => {
                         fill="none"
                         stroke="#FFFFFF"
                         strokeWidth="2"
-                        strokeOpacity="0.5"
+                        strokeOpacity="0.6"
                         strokeDasharray="4 4"
                       />
 
-                      {/* Origin Dot: Conakry */}
                       <circle cx="60" cy="130" r="6" fill="#C8102E" />
                       <circle cx="60" cy="130" r="12" fill="#C8102E" opacity="0.25" />
-
-                      {/* Destination 1: New York */}
                       <circle cx="250" cy="45" r="5" fill="#FFFFFF" />
-                      {/* Destination 2: Montreal */}
                       <circle cx="260" cy="85" r="5" fill="#EF4444" />
                     </svg>
 
                     {/* Nodes annotations */}
                     <div className="relative z-10 flex justify-between items-start">
-                      <div className="bg-slate-900/90 border border-slate-700 px-2.5 py-1 rounded-lg text-left">
-                        <span className="text-[10px] text-slate-300 font-bold block uppercase">Hub Départ</span>
+                      <div className="bg-slate-950/90 border border-slate-700 px-2.5 py-1 rounded-lg text-left">
+                        <span className="text-[10px] text-slate-300 font-bold block uppercase">{t.originLabel}</span>
                         <span className="text-xs font-bold text-white flex items-center gap-1">
-                          🇬🇳 Conakry (CKY)
+                          🇬🇳 {t.originCity}
                         </span>
                       </div>
 
                       <div className="space-y-1 text-right">
-                        <div className="bg-[#C8102E] text-white px-2 py-0.5 rounded text-[11px] font-bold inline-block shadow-sm">
+                        <div className="bg-[#C8102E] text-white px-2 py-0.5 rounded text-[11px] font-bold inline-block shadow-xs">
                           🇺🇸 New York JFK
                         </div>
                         <div className="bg-slate-800 text-white/90 px-2 py-0.5 rounded text-[10px] font-bold block">
@@ -242,64 +235,65 @@ export const Hero: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Featured Next Departure Poster block (reflects the Facebook flyers) */}
+                {/* Featured Next Departure Poster - Light & Elegant */}
                 {activeAnnouncement && (
-                  <div className="mt-5 bg-gradient-to-r from-[#991B1B] to-[#C8102E] rounded-2xl p-4 text-white shadow-lg border border-red-400/30">
-                    <div className="flex items-center justify-between text-xs font-bold text-red-100 mb-1">
+                  <div className="bg-gradient-to-br from-red-50/90 via-white to-amber-50/60 rounded-2xl p-4 border border-red-200/90 text-slate-900 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#C8102E] mb-1">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" />
-                        PROCHAIN DÉPART CONFIRMÉ
+                        {t.nextFlightTitle}
                       </span>
-                      <span className="bg-black/30 px-2 py-0.5 rounded text-[10px] uppercase">
+                      <span className="bg-[#C8102E] text-white px-2 py-0.5 rounded text-[10px] uppercase font-extrabold shadow-2xs">
                         {activeAnnouncement.destinationCity}
                       </span>
                     </div>
 
-                    <div className="text-xl font-extrabold tracking-wide uppercase text-white drop-shadow-sm">
+                    <div className="text-lg font-extrabold tracking-tight uppercase text-slate-900">
                       {activeAnnouncement.departureDayLabel}
                     </div>
 
-                    <p className="text-xs text-red-100 mt-1 line-clamp-2 leading-snug">
+                    <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
                       {activeAnnouncement.urgencyNote}
                     </p>
 
-                    <div className="mt-3 pt-3 border-t border-white/20 flex items-center justify-between">
-                      <div className="text-[11px] text-red-100">
-                        <span className="font-bold">Agences :</span> Hamdallaye, Bentouraya, Kindia, Coyah...
+                    <div className="mt-3 pt-3 border-t border-red-100 flex items-center justify-between">
+                      <div className="text-[11px] text-slate-600">
+                        <span className="font-bold text-slate-800">Agences :</span> Hamdallaye, Bentouraya, Kindia, Coyah...
                       </div>
+                      {/* Secondary Action on this card */}
                       <a
                         href="https://wa.me/224611835683?text=Bonjour%20Thiaguil,%20je%20veux%20déposer%20un%20colis%20pour%20le%20départ%20du%20"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-white text-[#C8102E] rounded-lg font-bold text-xs hover:bg-slate-100 transition-colors shadow-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 rounded-lg font-bold text-xs transition-colors shadow-2xs"
                       >
-                        <span>Réserver</span>
-                        <ChevronRight className="w-3 h-3" />
+                        <span>{t.reserveButton}</span>
+                        <ChevronRight className="w-3 h-3 text-[#C8102E]" />
                       </a>
                     </div>
                   </div>
                 )}
 
-                {/* Quick Agency Strip (Identical to bottom banner in flyers) */}
-                <div className="mt-5 pt-4 border-t border-slate-800 text-xs">
-                  <div className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>Siège Central & Contacts Express</span>
-                    <span className="text-emerald-400 flex items-center gap-1 font-mono">
-                      <PhoneCall className="w-3 h-3" /> WhatsApp direct
+                {/* Quick Agency & WhatsApp Strip - Clean light design */}
+                <div className="pt-1 text-xs">
+                  <div className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span>{t.contactsTitle}</span>
+                    <span className="text-emerald-700 flex items-center gap-1 font-semibold">
+                      <PhoneCall className="w-3 h-3 text-emerald-600" /> {t.directWhatsApp}
                     </span>
                   </div>
-                  <div className="bg-slate-950 p-3 rounded-xl space-y-1.5 font-mono text-[11px] text-slate-300 border border-slate-800/80">
+                  <div className="bg-slate-50 p-3 rounded-xl space-y-1.5 font-mono text-[11px] text-slate-700 border border-slate-200">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-300">Hamdallaye (Concasseur) :</span>
-                      <span className="text-white font-bold">625 69 83 79 / 628 25 97 15</span>
+                      <span className="text-slate-600 font-medium">Hamdallaye (Siège) :</span>
+                      <span className="text-slate-900 font-bold">625 69 83 79 / 628 25 97 15</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-300">WhatsApp Entreprise :</span>
-                      <span className="text-emerald-400 font-bold">611 83 56 83</span>
+                      <span className="text-slate-600 font-medium">WhatsApp Entreprise :</span>
+                      <span className="text-emerald-700 font-bold">611 83 56 83</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-300">New York (Bronx) :</span>
-                      <span className="text-amber-300 font-bold">+1 (614) 254 2775</span>
+                      <span className="text-slate-600 font-medium">New York (Bronx) :</span>
+                      <span className="text-slate-900 font-bold">+1 (614) 254 2775</span>
                     </div>
                   </div>
                 </div>
