@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens — identité de marque Thiaguil Multi-services.
+ * Toute couleur de marque doit être déclarée ici une seule fois.
+ * Tailwind v4 génère automatiquement les utilitaires bg-*, text-*,
+ * border-*, ring-*, from-*, to-*, decoration-*, accent-*, fill-*, stroke-*
+ * à partir de ces variables --color-*.
+ */
+@theme {
+  --color-brand: #C8102E;
+  --color-brand-dark: #A60D25;
+  --color-brand-darker: #991B1B;
+  --color-canvas: #FAF9F6;
+  --color-canvas-soft: #FDFCFB;
+  --color-ink: #0B0F19;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-dark: #20BD5A;
+}
+
 @layer base {
   html {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -34,4 +52,13 @@
 
 .animate-pulse-subtle {
   animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.35s ease-out both;
 }

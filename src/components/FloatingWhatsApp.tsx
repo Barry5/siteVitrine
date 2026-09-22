@@ -25,7 +25,7 @@ export const FloatingWhatsApp: React.FC = () => {
       {isOpen && (
         <div className="mb-3 w-80 sm:w-88 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
           {/* Header */}
-          <div className="bg-[#25D366] text-white p-4 flex items-center justify-between">
+          <div className="bg-whatsapp text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">
                 <MessageCircle className="w-6 h-6 text-white" />
@@ -43,6 +43,7 @@ export const FloatingWhatsApp: React.FC = () => {
 
             <button
               onClick={() => setIsOpen(false)}
+              aria-label="Fermer la fenêtre de discussion"
               className="p-1 rounded-full text-white/80 hover:text-white hover:bg-black/10 cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -86,7 +87,7 @@ export const FloatingWhatsApp: React.FC = () => {
               </a>
               <button
                 onClick={() => handleSend('Bonjour Thiaguil Multi-services')}
-                className="text-[#25D366] font-bold hover:underline text-[11px] cursor-pointer"
+                className="text-whatsapp font-bold hover:underline text-[11px] cursor-pointer"
               >
                 Écrire librement ➔
               </button>
@@ -98,11 +99,11 @@ export const FloatingWhatsApp: React.FC = () => {
       {/* Main Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-emerald-300/40 relative group"
+        className="w-14 h-14 rounded-full bg-whatsapp hover:bg-whatsapp-dark text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-emerald-300/40 relative group"
         aria-label="Contacter sur WhatsApp"
       >
         <MessageCircle className="w-7 h-7 fill-white" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C8102E] border-2 border-white flex items-center justify-center text-[9px] font-bold text-white">
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand border-2 border-white flex items-center justify-center text-[9px] font-bold text-white">
           1
         </span>
       </button>

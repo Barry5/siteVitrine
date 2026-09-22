@@ -15,6 +15,7 @@ import {
   Testimonial,
   TrackingItem,
 } from '../types';
+import { adminLogin, adminLogout, checkAdminSession } from '../lib/api';
 
 interface AppContextType {
   announcements: DepartureAnnouncement[];
@@ -25,6 +26,7 @@ interface AppContextType {
   trackingItems: Record<string, TrackingItem>;
   currentView: 'public' | 'admin';
   isAdminAuthenticated: boolean;
+  isAdminAuthChecking: boolean;
   activeTrackedItem: TrackingItem | null;
   activeSearchCode: string;
   trackingError: string | null;
@@ -33,7 +35,7 @@ interface AppContextType {
 
   // Navigation & Auth
   setCurrentView: (view: 'public' | 'admin') => void;
-  loginAdmin: (password: string) => boolean;
+  loginAdmin: (password: string) => Promise<{ success: boolean; error?: string }>;
   logoutAdmin: () => void;
 
   // Tracking actions
@@ -102,9 +104,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [currentView, setCurrentView] = useState<'public' | 'admin'>('public');
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('thg_admin_auth') === 'true';
-  });
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
+  const [isAdminAuthChecking, setIsAdminAuthChecking] = useState<boolean>(true);
+
+  // Vérifie auprès du backend si une session admin valide existe déjà
+  // (cookie de session httpOnly signé côté serveur — plus de mot de
+  // passe stocké ou comparé côté client).
+  useEffect(() => {
+    checkAdminSession()
+      .then((authenticated) => setIsAdminAuthenticated(authenticated))
+      .finally(() => setIsAdminAuthChecking(false));
+  }, []);
 
   const [activeTrackedItem, setActiveTrackedItem] = useState<TrackingItem | null>(null);
   const [activeSearchCode, setActiveSearchCode] = useState<string>('');
@@ -143,19 +153,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('thg_tracking_items', JSON.stringify(trackingItems));
   }, [trackingItems]);
 
-  const loginAdmin = (password: string): boolean => {
-    // Default demo password is admin123 or thiaguil2026
-    if (password === 'admin123' || password === 'thiaguil2026' || password === 'admin') {
+  const loginAdmin = async (password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await adminLogin(password);
       setIsAdminAuthenticated(true);
-      localStorage.setItem('thg_admin_auth', 'true');
-      return true;
+      return { success: true };
+    } catch (err) {
+      setIsAdminAuthenticated(false);
+      return { success: false, error: (err as Error).message };
     }
-    return false;
   };
 
   const logoutAdmin = () => {
+    adminLogout().catch(() => {
+      /* la déconnexion locale prime même si l'appel réseau échoue */
+    });
     setIsAdminAuthenticated(false);
-    localStorage.removeItem('thg_admin_auth');
     setCurrentView('public');
   };
 
@@ -348,6 +361,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         trackingItems,
         currentView,
         isAdminAuthenticated,
+        isAdminAuthChecking,
         activeTrackedItem,
         activeSearchCode,
         trackingError,

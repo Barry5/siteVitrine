@@ -38,7 +38,7 @@ export const AnnouncementBar: React.FC = () => {
       aria-label="Annonces de départs"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="bg-[#C8102E] text-white border-b border-[#991B1B] relative z-40 text-xs sm:text-sm shadow-xs"
+      className="bg-brand text-white border-b border-brand-darker relative z-40 text-xs sm:text-sm shadow-xs"
     >
       <div className="max-w-7xl mx-auto px-4 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2.5">
         {/* Left: Badge, indicators & announcement copy */}
@@ -114,7 +114,7 @@ export const AnnouncementBar: React.FC = () => {
             href="https://wa.me/224611835683?text=Bonjour%20Thiaguil%20Multi-services,%20je%20souhaite%20réserver%20pour%20le%20prochain%20départ."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white hover:bg-slate-100 text-[#C8102E] font-bold text-xs transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white hover:bg-slate-100 text-brand font-bold text-xs transition-colors shadow-2xs"
           >
             <span>{t.reserveButton}</span>
             <ArrowRight className="w-3 h-3" />

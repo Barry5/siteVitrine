@@ -117,6 +117,123 @@ export interface Translations {
     helpPrompt: string;
     contactSupport: string;
   };
+  howItWorks: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    step1Title: string;
+    step1Subtitle: string;
+    step1Desc: string;
+    step1Badge: string;
+    step2Title: string;
+    step2Subtitle: string;
+    step2Desc: string;
+    step2Badge: string;
+    step3Title: string;
+    step3Subtitle: string;
+    step3Desc: string;
+    step3Badge: string;
+    step4Title: string;
+    step4Subtitle: string;
+    step4Desc: string;
+    step4Badge: string;
+    commitmentLabel: string;
+    commitmentQuote: string;
+    commitmentCta: string;
+  };
+  agencies: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    filterAll: string;
+    filterGuinea: string;
+    filterIntl: string;
+    badgeIntl: string;
+    badgeMain: string;
+    badgeLocal: string;
+    landmarkLabel: string;
+    phonesLabel: string;
+    copyLabel: string;
+    copiedLabel: string;
+    copyTitle: string;
+    callAction: string;
+    whatsappAction: string;
+    photoPlaceholder: string;
+  };
+  destinations: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    airShortLabel: string;
+    selectLabel: string;
+    lineLabel: string;
+    nextFlightLabel: string;
+    airFreightLabel: string;
+    airFreightNote: string;
+    seaFreightLabel: string;
+    seaFreightNote: string;
+    localOfficeLabel: string;
+    localOfficeTag: string;
+    addressFallback: string;
+    officeFallback: string;
+    localPhoneLabel: string;
+    simulateCta: string;
+    planCta: string;
+  };
+  contact: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    hqTitle: string;
+    hqLandmark: string;
+    whatsappTitle: string;
+    facebookTitle: string;
+    facebookSubtitle: string;
+    visitPage: string;
+    formTitle: string;
+    formSubtitle: string;
+    successTitle: string;
+    successDesc: string;
+    fullNameLabel: string;
+    fullNamePlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    agencyLabel: string;
+    destLabel: string;
+    messageLabel: string;
+    messagePlaceholder: string;
+    submitButton: string;
+    submitting: string;
+    errorGeneric: string;
+  };
+  footer: {
+    tagline: string;
+    mottoLabel: string;
+    mottoText: string;
+    navTitle: string;
+    linkHome: string;
+    linkServices: string;
+    linkDestinations: string;
+    linkTracking: string;
+    linkSimulator: string;
+    linkAgencies: string;
+    linkFaq: string;
+    linkContact: string;
+    localAgenciesTitle: string;
+    intlOfficesTitle: string;
+    centralAssistance: string;
+    copyright: string;
+    facebookLink: string;
+    backToTop: string;
+    adminAccess: string;
+  };
+  testimonials: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    verifiedLabel: string;
+    verifiedTitle: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -248,6 +365,138 @@ export const translations: Record<Language, Translations> = {
       helpPrompt: 'Vous avez une question spécifique ou un colis volumineux ?',
       contactSupport: 'Écrivez à notre équipe sur WhatsApp',
     },
+    howItWorks: {
+      badge: 'Processus Opérationnel',
+      title: 'Comment se déroule votre expédition ?',
+      subtitle:
+        "Un processus clair et rigoureux, conçu pour vous offrir une tranquillité d'esprit absolue du départ de Guinée jusqu'à la réception.",
+      step1Title: 'Dépôt & Enregistrement',
+      step1Subtitle: 'En agence ou enlèvement',
+      step1Desc:
+        "Déposez votre colis dans l'une de nos agences (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé). Nous vérifions la nature des articles pour garantir la conformité douanière.",
+      step1Badge: 'Contrôle minutieux',
+      step2Title: 'Pesée & Cerclage Sécurisé',
+      step2Subtitle: 'Préparation avec méthode',
+      step2Desc:
+        "Pesée certifiée devant vous. Application d'un film étanche et scellement au scotch de sécurité haute résistance Thiaguil avec bordereau de traçabilité.",
+      step2Badge: 'Scellé inviolable',
+      step3Title: 'Acheminement & Suivi Direct',
+      step3Subtitle: 'Vols réguliers & Fret maritime',
+      step3Desc:
+        "Votre colis est embarqué sur le vol programmé. Suivez son avancement en direct sur le site grâce à votre numéro de suivi unique (ex: THG-NY-8910).",
+      step3Badge: 'Traçabilité 24/7',
+      step4Title: 'Mise à disposition & Retrait',
+      step4Subtitle: 'Au bureau de New York ou Montréal',
+      step4Desc:
+        "Alerte SMS et WhatsApp envoyée au destinataire dès l'arrivée. Retrait simple et sécurisé en main propre au bureau local avec pièce d'identité.",
+      step4Badge: 'Remise garantie',
+      commitmentLabel: 'Engagement Qualité Thiaguil',
+      commitmentQuote:
+        '« Chaque colis est enregistré, vérifié et préparé avec méthode avant son départ. Votre confiance mérite le meilleur. »',
+      commitmentCta: 'Poser une question à un agent',
+    },
+    agencies: {
+      badge: 'Proximité & Dépôts Locaux',
+      title: "Notre réseau d'agences et bureaux internationaux",
+      subtitle:
+        'Déposez vos colis au plus près de chez vous dans nos agences de Conakry, Coyah ou Kindia, et vos proches les récupèrent directement à nos bureaux de New York ou Montréal.',
+      filterAll: 'Toutes nos agences',
+      filterGuinea: 'Agences Guinée',
+      filterIntl: 'Bureaux Internationaux',
+      badgeIntl: 'Bureau International',
+      badgeMain: 'Siège Central',
+      badgeLocal: 'Agence Locale',
+      landmarkLabel: 'Repère :',
+      phonesLabel: 'Téléphone(s) direct(s) :',
+      copyLabel: 'Copier',
+      copiedLabel: 'Copié',
+      copyTitle: "Copier les coordonnées de l'agence",
+      callAction: 'Appeler',
+      whatsappAction: 'WhatsApp',
+      photoPlaceholder: 'Photo à venir',
+    },
+    destinations: {
+      badge: 'Réseau & Lignes Internationales',
+      title: 'Des connexions directes vers vos métropoles clés',
+      subtitle:
+        'Thiaguil dispose de bureaux dédiés et de points de distribution établis en Amérique du Nord et en Europe pour garantir un retrait fluide à vos proches.',
+      airShortLabel: 'Aérien',
+      selectLabel: 'Sélectionnez une destination :',
+      lineLabel: 'Ligne régulière Conakry (CKY) ➔',
+      nextFlightLabel: 'Prochain vol',
+      airFreightLabel: 'Fret Aérien Express',
+      airFreightNote: 'Prise en charge prioritaire pour denrées fraîches, documents & colis urgents.',
+      seaFreightLabel: 'Fret Maritime Groupage',
+      seaFreightNote: 'Recommandé pour les fûts, gros cartons, mobilier et effets volumineux.',
+      localOfficeLabel: 'Point de retrait & contact local',
+      localOfficeTag: 'Équipe Thiaguil sur place',
+      addressFallback: "Adresse communiquée lors de la confirmation d'envoi",
+      officeFallback: 'Bureau Thiaguil',
+      localPhoneLabel: 'Ligne directe sur place :',
+      simulateCta: 'Simuler le prix vers',
+      planCta: 'Planifier un envoi',
+    },
+    contact: {
+      badge: 'Contact & Assistance',
+      title: 'À votre écoute 7 jours sur 7',
+      subtitle:
+        "Une question sur un départ en cours, un colis en transit ou un devis spécial pour du fret maritime lourd ? Nos équipes en Guinée et à l'international vous répondent rapidement.",
+      hqTitle: 'Siège Principal Guinée',
+      hqLandmark: 'Repère : En face de la station-service',
+      whatsappTitle: 'WhatsApp & Appels Directs',
+      facebookTitle: 'Page Officielle Facebook',
+      facebookSubtitle: 'Thiaguil multi-services (Annonces de départs)',
+      visitPage: 'Visiter la page',
+      formTitle: 'Envoyez-nous une demande d\'information',
+      formSubtitle:
+        "Remplissez ce formulaire pour recevoir un devis personnalisé ou convenir d'un enlèvement à domicile.",
+      successTitle: 'Message transmis avec succès !',
+      successDesc:
+        'Un agent Thiaguil vous contactera très rapidement par téléphone ou WhatsApp pour finaliser votre expédition.',
+      fullNameLabel: 'Nom complet *',
+      fullNamePlaceholder: 'Ex: Amadou Barry',
+      phoneLabel: 'Téléphone / WhatsApp *',
+      phonePlaceholder: '+224 6XX XX XX XX',
+      agencyLabel: 'Agence de dépôt souhaitée',
+      destLabel: 'Destination de réception',
+      messageLabel: "Détails de l'envoi (nature du colis, poids estimé, date souhaitée)",
+      messagePlaceholder:
+        "Précisez le type de colis (habits, denrées alimentaires, documents, fret commercial...)",
+      submitButton: "Envoyer ma demande d'expédition",
+      submitting: 'Envoi en cours...',
+      errorGeneric: 'Une erreur est survenue. Merci de réessayer ou de nous contacter par WhatsApp.',
+    },
+    footer: {
+      tagline:
+        "Votre partenaire de confiance pour le fret aérien, maritime et l'envoi de colis express entre la République de Guinée, l'Amérique du Nord (New York, Montréal) et l'Europe.",
+      mottoLabel: "Devise d'Entreprise",
+      mottoText:
+        "« L'organisation fait la différence : chaque colis est enregistré, vérifié et préparé avec méthode avant son départ. »",
+      navTitle: 'Navigation',
+      linkHome: 'Accueil',
+      linkServices: 'Nos Services Fret',
+      linkDestinations: 'Destinations & Vols',
+      linkTracking: 'Suivre un colis',
+      linkSimulator: 'Simulateur de tarifs',
+      linkAgencies: 'Toutes les Agences',
+      linkFaq: 'Questions fréquentes (FAQ)',
+      linkContact: 'Contactez-nous',
+      localAgenciesTitle: 'Agences Locales Guinée',
+      intlOfficesTitle: 'Bureaux Internationaux',
+      centralAssistance: 'Assistance Centrale :',
+      copyright: '© {year} Thiaguil Multi-services. Tous droits réservés. Agrément transitaire & fret international.',
+      facebookLink: 'Facebook Officiel',
+      backToTop: 'Haut de page',
+      adminAccess: 'Accès Espace Interne',
+    },
+    testimonials: {
+      badge: "Retours d'Expérience",
+      title: 'La voix de notre diaspora et de nos clients',
+      subtitle:
+        'De Conakry à Montréal et New York, découvrez pourquoi les familles et commerçants confient leurs colis précieux à Thiaguil.',
+      verifiedLabel: 'Vérifié',
+      verifiedTitle: 'Envoi tracé et validé',
+    },
   },
   en: {
     nav: {
@@ -376,6 +625,135 @@ export const translations: Record<Language, Translations> = {
         'Delivery times, customs rules, packaging, pickup locations, and payment methods: clear answers to all your questions.',
       helpPrompt: 'Have a custom inquiry or large commercial cargo?',
       contactSupport: 'Chat with our support team on WhatsApp',
+    },
+    howItWorks: {
+      badge: 'Operational Process',
+      title: 'How does your shipment work?',
+      subtitle:
+        'A clear, rigorous process designed to give you complete peace of mind from departure in Guinea through to delivery.',
+      step1Title: 'Drop-off & Registration',
+      step1Subtitle: 'At a branch or pickup',
+      step1Desc:
+        'Drop off your parcel at one of our branches (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé). We check the contents to ensure customs compliance.',
+      step1Badge: 'Careful inspection',
+      step2Title: 'Weighing & Secure Strapping',
+      step2Subtitle: 'Methodical preparation',
+      step2Desc:
+        'Certified weighing in front of you. Application of a tamper-proof wrap and heavy-duty Thiaguil security tape with a traceable receipt.',
+      step2Badge: 'Tamper-proof seal',
+      step3Title: 'Transit & Live Tracking',
+      step3Subtitle: 'Regular flights & sea freight',
+      step3Desc:
+        'Your parcel is loaded onto the scheduled flight. Track its progress live on the site with your unique tracking number (e.g. THG-NY-8910).',
+      step3Badge: '24/7 tracking',
+      step4Title: 'Availability & Pickup',
+      step4Subtitle: 'At our New York or Montreal office',
+      step4Desc:
+        'SMS and WhatsApp alert sent to the recipient upon arrival. Simple, secure hand-to-hand pickup at the local office with valid ID.',
+      step4Badge: 'Guaranteed handover',
+      commitmentLabel: 'Thiaguil Quality Commitment',
+      commitmentQuote:
+        '"Every parcel is logged, checked and methodically prepared before departure. Your trust deserves the best."',
+      commitmentCta: 'Ask an agent a question',
+    },
+    agencies: {
+      badge: 'Local Reach & Drop-off Points',
+      title: 'Our network of branches and international offices',
+      subtitle:
+        'Drop off your parcels close to home at our branches in Conakry, Coyah or Kindia, and your loved ones collect them directly at our New York or Montreal offices.',
+      filterAll: 'All our branches',
+      filterGuinea: 'Guinea Branches',
+      filterIntl: 'International Offices',
+      badgeIntl: 'International Office',
+      badgeMain: 'Head Office',
+      badgeLocal: 'Local Branch',
+      landmarkLabel: 'Landmark:',
+      phonesLabel: 'Direct phone number(s):',
+      copyLabel: 'Copy',
+      copiedLabel: 'Copied',
+      copyTitle: 'Copy branch contact details',
+      callAction: 'Call',
+      whatsappAction: 'WhatsApp',
+      photoPlaceholder: 'Photo coming soon',
+    },
+    destinations: {
+      badge: 'Network & International Routes',
+      title: 'Direct connections to your key destination cities',
+      subtitle:
+        'Thiaguil operates dedicated offices and established distribution points across North America and Europe to ensure smooth pickup for your loved ones.',
+      airShortLabel: 'Air',
+      selectLabel: 'Select a destination:',
+      lineLabel: 'Regular route Conakry (CKY) ➔',
+      nextFlightLabel: 'Next flight',
+      airFreightLabel: 'Express Air Freight',
+      airFreightNote: 'Priority handling for perishables, documents & urgent parcels.',
+      seaFreightLabel: 'Consolidated Sea Freight',
+      seaFreightNote: 'Recommended for drums, large boxes, furniture and bulky items.',
+      localOfficeLabel: 'Local pickup point & contact',
+      localOfficeTag: 'Thiaguil team on-site',
+      addressFallback: 'Address provided upon shipment confirmation',
+      officeFallback: 'Thiaguil Office',
+      localPhoneLabel: 'Direct local line:',
+      simulateCta: 'Estimate the price to',
+      planCta: 'Schedule a shipment',
+    },
+    contact: {
+      badge: 'Contact & Support',
+      title: 'Here for you, 7 days a week',
+      subtitle:
+        'A question about an upcoming departure, a parcel in transit, or a special quote for heavy sea freight? Our teams in Guinea and abroad respond quickly.',
+      hqTitle: 'Guinea Head Office',
+      hqLandmark: 'Landmark: Across from the gas station',
+      whatsappTitle: 'WhatsApp & Direct Calls',
+      facebookTitle: 'Official Facebook Page',
+      facebookSubtitle: 'Thiaguil multi-services (Departure announcements)',
+      visitPage: 'Visit the page',
+      formTitle: 'Send us an inquiry',
+      formSubtitle: 'Fill out this form to receive a custom quote or arrange a home pickup.',
+      successTitle: 'Message sent successfully!',
+      successDesc: 'A Thiaguil agent will contact you shortly by phone or WhatsApp to finalize your shipment.',
+      fullNameLabel: 'Full name *',
+      fullNamePlaceholder: 'e.g. Amadou Barry',
+      phoneLabel: 'Phone / WhatsApp *',
+      phonePlaceholder: '+224 6XX XX XX XX',
+      agencyLabel: 'Preferred drop-off branch',
+      destLabel: 'Receiving destination',
+      messageLabel: 'Shipment details (type of parcel, estimated weight, desired date)',
+      messagePlaceholder: 'Specify the type of parcel (clothing, food, documents, commercial freight...)',
+      submitButton: 'Send my shipping request',
+      submitting: 'Sending...',
+      errorGeneric: 'Something went wrong. Please try again or contact us on WhatsApp.',
+    },
+    footer: {
+      tagline:
+        'Your trusted partner for air freight, sea freight and express parcel shipping between the Republic of Guinea, North America (New York, Montreal) and Europe.',
+      mottoLabel: 'Company Motto',
+      mottoText:
+        '"Organization makes the difference: every parcel is logged, checked and methodically prepared before departure."',
+      navTitle: 'Navigation',
+      linkHome: 'Home',
+      linkServices: 'Our Freight Services',
+      linkDestinations: 'Destinations & Flights',
+      linkTracking: 'Track a Parcel',
+      linkSimulator: 'Rate Calculator',
+      linkAgencies: 'All Branches',
+      linkFaq: 'Frequently Asked Questions',
+      linkContact: 'Contact Us',
+      localAgenciesTitle: 'Local Branches in Guinea',
+      intlOfficesTitle: 'International Offices',
+      centralAssistance: 'Central Support:',
+      copyright: '© {year} Thiaguil Multi-services. All rights reserved. Licensed freight forwarder & international cargo agent.',
+      facebookLink: 'Official Facebook',
+      backToTop: 'Back to top',
+      adminAccess: 'Staff Portal Access',
+    },
+    testimonials: {
+      badge: 'Customer Feedback',
+      title: 'The voice of our diaspora and our customers',
+      subtitle:
+        'From Conakry to Montreal and New York, discover why families and merchants trust Thiaguil with their valuable parcels.',
+      verifiedLabel: 'Verified',
+      verifiedTitle: 'Tracked and verified shipment',
     },
   },
 };

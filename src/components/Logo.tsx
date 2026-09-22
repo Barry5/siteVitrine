@@ -79,7 +79,7 @@ export const Logo: React.FC<LogoProps> = ({
           >
             THIAGUIL
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C8102E]"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-brand"></span>
         </div>
         {showSubtitle && (
           <span

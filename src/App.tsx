@@ -24,7 +24,7 @@ const MainLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-slate-900 selection:bg-[#C8102E] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-canvas text-slate-900 selection:bg-brand selection:text-white">
       {/* Top dynamic announcements bar (Vol confirmation / Facebook posters) */}
       <AnnouncementBar />
 

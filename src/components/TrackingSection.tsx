@@ -89,7 +89,7 @@ export const TrackingSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header: Focused on Results display */}
         <div className="max-w-3xl mx-auto text-center space-y-2.5 mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#C8102E] font-bold text-xs uppercase tracking-wider border border-red-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
             <Package className="w-3.5 h-3.5" />
             <span>{t.badge}</span>
           </div>
@@ -146,6 +146,7 @@ export const TrackingSection: React.FC = () => {
                   onClick={() => window.print()}
                   className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
                   title={t.printReceipt}
+                  aria-label={t.printReceipt}
                 >
                   <Printer className="w-4 h-4" />
                 </button>
@@ -166,7 +167,7 @@ export const TrackingSection: React.FC = () => {
               <div className="space-y-1">
                 <span className="text-slate-600 block uppercase font-bold text-[10px]">{t.origin}</span>
                 <span className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#C8102E]" />
+                  <MapPin className="w-3.5 h-3.5 text-brand" />
                   {activeTrackedItem.senderCity}
                 </span>
               </div>
@@ -200,7 +201,7 @@ export const TrackingSection: React.FC = () => {
             <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between mb-6">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#C8102E]" />
+                  <Clock className="w-4 h-4 text-brand" />
                   {t.historyTitle}
                 </h4>
                 <span className="text-xs text-slate-600 font-medium">
@@ -216,7 +217,7 @@ export const TrackingSection: React.FC = () => {
                       className={`absolute -left-6 sm:-left-8 top-0.5 w-6 sm:w-7 h-6 sm:h-7 rounded-full flex items-center justify-center ring-4 ring-white transition-all ${
                         step.completed
                           ? step.current
-                            ? 'bg-[#C8102E] text-white ring-red-100 shadow-md'
+                            ? 'bg-brand text-white ring-red-100 shadow-md'
                             : 'bg-slate-900 text-white'
                           : 'bg-slate-200 text-slate-600'
                       }`}
@@ -233,7 +234,7 @@ export const TrackingSection: React.FC = () => {
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span
                           className={`font-bold text-sm sm:text-base ${
-                            step.current ? 'text-[#C8102E]' : step.completed ? 'text-slate-900' : 'text-slate-600'
+                            step.current ? 'text-brand' : step.completed ? 'text-slate-900' : 'text-slate-600'
                           }`}
                         >
                           {step.title}
@@ -244,7 +245,7 @@ export const TrackingSection: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                        <MapPin className="w-3 h-3 text-[#C8102E]" />
+                        <MapPin className="w-3 h-3 text-brand" />
                         <span>{step.location}</span>
                       </div>
 
@@ -280,7 +281,7 @@ export const TrackingSection: React.FC = () => {
         ) : (
           /* Empty / Initial State: Clean Results Hub with Quick Selectors */
           <div className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-sm space-y-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#C8102E] flex items-center justify-center mx-auto border border-red-100">
+            <div className="w-14 h-14 rounded-2xl bg-red-50 text-brand flex items-center justify-center mx-auto border border-red-100">
               <Package className="w-7 h-7" />
             </div>
 
@@ -319,7 +320,7 @@ export const TrackingSection: React.FC = () => {
                   onClick={() => searchPackage('THG-NY-8910')}
                   className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
                 >
-                  <div className="text-[11px] font-mono font-bold text-[#C8102E] group-hover:underline">
+                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
                     THG-NY-8910
                   </div>
                   <div className="text-xs font-bold text-slate-900 mt-0.5">New York JFK</div>
@@ -331,7 +332,7 @@ export const TrackingSection: React.FC = () => {
                   onClick={() => searchPackage('THG-MTL-2708')}
                   className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
                 >
-                  <div className="text-[11px] font-mono font-bold text-[#C8102E] group-hover:underline">
+                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
                     THG-MTL-2708
                   </div>
                   <div className="text-xs font-bold text-slate-900 mt-0.5">Montréal YUL</div>
@@ -343,7 +344,7 @@ export const TrackingSection: React.FC = () => {
                   onClick={() => searchPackage('THG-KND-0109')}
                   className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
                 >
-                  <div className="text-[11px] font-mono font-bold text-[#C8102E] group-hover:underline">
+                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
                     THG-KND-0109
                   </div>
                   <div className="text-xs font-bold text-slate-900 mt-0.5">Kindia</div>
@@ -360,7 +361,7 @@ export const TrackingSection: React.FC = () => {
                   value={quickInput}
                   onChange={(e) => setQuickInput(e.target.value)}
                   placeholder={language === 'fr' ? 'Ou saisir un autre code de suivi...' : 'Or enter another tracking code...'}
-                  className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:border-[#C8102E] focus:ring-2 focus:ring-red-100 focus:outline-none"
+                  className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
                 />
                 <button
                   type="submit"

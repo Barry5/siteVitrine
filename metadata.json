@@ -1,6 +1,0 @@
-{
-  "name": "Thiaguil Multi-services",
-  "description": "Site vitrine professionnel et moderne de transport, fret aérien/maritime et gestion de colis internationale (Guinée, Amérique du Nord, Europe) avec espace d'administration.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

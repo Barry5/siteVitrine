@@ -39,13 +39,13 @@ export const Hero: React.FC = () => {
   return (
     <section
       id="accueil"
-      className="relative overflow-hidden pt-8 pb-16 lg:pt-14 lg:pb-24 bg-gradient-to-b from-[#FDFCFB] via-[#FAF9F6] to-[#F1F5F9]"
+      className="relative overflow-hidden pt-8 pb-16 lg:pt-14 lg:pb-24 bg-gradient-to-b from-canvas-soft via-canvas to-slate-100"
     >
       {/* Subtle geometric background grid and circular motif */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#C8102E_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(var(--color-brand)_1px,transparent_1px)] [background-size:24px_24px]"></div>
       
       {/* Decorative red curve in background */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#C8102E]/5 blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-brand/5 blur-3xl pointer-events-none"></div>
       <div className="absolute top-1/2 -left-24 w-80 h-80 rounded-full bg-slate-900/5 blur-3xl pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -53,15 +53,15 @@ export const Hero: React.FC = () => {
           {/* Left Column: Value proposition & Hero Content */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             {/* Tagline pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-[#C8102E] text-xs font-bold tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-[#C8102E] animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-brand text-xs font-bold tracking-wide">
+              <span className="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
               <span>{t.tagline}</span>
             </div>
 
             {/* Main Punchy Heading */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
               {t.titleStart}{' '}
-              <span className="text-[#C8102E] underline decoration-[#C8102E]/30 decoration-4 underline-offset-6">
+              <span className="text-brand underline decoration-brand/30 decoration-4 underline-offset-6">
                 {t.destinations}
               </span>{' '}
               {t.titleEnd}
@@ -74,9 +74,9 @@ export const Hero: React.FC = () => {
 
             {/* HERO TRACKING INPUT BOX (Immediate utility & single primary CTA of this zone) */}
             <div className="pt-2 max-w-xl mx-auto lg:mx-0">
-              <div className="bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl border border-slate-200/90 ring-4 ring-slate-100/80 transition-all hover:border-[#C8102E]/40">
+              <div className="bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl border border-slate-200/90 ring-4 ring-slate-100/80 transition-all hover:border-brand/40">
                 <div className="flex items-center justify-between px-2 pb-2 border-b border-slate-100 text-xs text-slate-600 font-bold uppercase tracking-wider">
-                  <span className="flex items-center gap-1.5 text-[#C8102E]">
+                  <span className="flex items-center gap-1.5 text-brand">
                     <Search className="w-3.5 h-3.5" />
                     {t.trackingTitle}
                   </span>
@@ -92,13 +92,13 @@ export const Hero: React.FC = () => {
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       placeholder={t.trackingPlaceholder}
-                      className="w-full pl-4 pr-3 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900 placeholder:text-slate-600 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                      className="w-full pl-4 pr-3 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900 placeholder:text-slate-600 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
                     />
                   </div>
                   {/* Primary solid red CTA */}
                   <button
                     type="submit"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
                   >
                     <span>{t.searchButton}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -111,21 +111,21 @@ export const Hero: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleQuickSearch('THG-NY-8910')}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-[#C8102E] text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-brand text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
                   >
                     THG-NY-8910 (New York)
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickSearch('THG-MTL-2708')}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-[#C8102E] text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-brand text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
                   >
                     THG-MTL-2708 (Montréal)
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickSearch('THG-KND-0109')}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-[#C8102E] text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-red-50 hover:text-brand text-slate-700 font-mono text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
                   >
                     THG-KND-0109 (Kindia)
                   </button>
@@ -136,7 +136,7 @@ export const Hero: React.FC = () => {
             {/* Trust points row */}
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-semibold text-slate-700">
               <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-                <ShieldCheck className="w-4 h-4 text-[#C8102E]" />
+                <ShieldCheck className="w-4 h-4 text-brand" />
                 <span>{t.trust1}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
@@ -154,7 +154,7 @@ export const Hero: React.FC = () => {
           <div className="lg:col-span-5">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               {/* Outer subtle glow */}
-              <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-[#C8102E]/20 to-slate-200 opacity-70 blur-md pointer-events-none"></div>
+              <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-brand/20 to-slate-200 opacity-70 blur-md pointer-events-none"></div>
 
               {/* Main Refined Card: Crisp light container */}
               <div className="relative bg-white text-slate-900 rounded-3xl p-6 sm:p-7 shadow-xl border border-slate-200/90 overflow-hidden space-y-5">
@@ -162,10 +162,10 @@ export const Hero: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#C8102E]" />
+                      <Sparkles className="w-3.5 h-3.5 text-brand" />
                       {t.networkTitle}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#C8102E] border border-red-200 text-[11px] font-extrabold uppercase">
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-brand border border-red-200 text-[11px] font-extrabold uppercase">
                       {t.directHub}
                     </span>
                   </div>
@@ -215,7 +215,7 @@ export const Hero: React.FC = () => {
                       </div>
 
                       <div className="space-y-1 text-right">
-                        <div className="bg-[#C8102E] text-white px-2 py-0.5 rounded text-[11px] font-bold inline-block shadow-xs">
+                        <div className="bg-brand text-white px-2 py-0.5 rounded text-[11px] font-bold inline-block shadow-xs">
                           🇺🇸 New York JFK
                         </div>
                         <div className="bg-slate-800 text-white/90 px-2 py-0.5 rounded text-[10px] font-bold block">
@@ -238,12 +238,12 @@ export const Hero: React.FC = () => {
                 {/* Featured Next Departure Poster - Light & Elegant */}
                 {activeAnnouncement && (
                   <div className="bg-gradient-to-br from-red-50/90 via-white to-amber-50/60 rounded-2xl p-4 border border-red-200/90 text-slate-900 shadow-xs">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#C8102E] mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-brand mb-1">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" />
                         {t.nextFlightTitle}
                       </span>
-                      <span className="bg-[#C8102E] text-white px-2 py-0.5 rounded text-[10px] uppercase font-extrabold shadow-2xs">
+                      <span className="bg-brand text-white px-2 py-0.5 rounded text-[10px] uppercase font-extrabold shadow-2xs">
                         {activeAnnouncement.destinationCity}
                       </span>
                     </div>
@@ -268,7 +268,7 @@ export const Hero: React.FC = () => {
                         className="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 rounded-lg font-bold text-xs transition-colors shadow-2xs"
                       >
                         <span>{t.reserveButton}</span>
-                        <ChevronRight className="w-3 h-3 text-[#C8102E]" />
+                        <ChevronRight className="w-3 h-3 text-brand" />
                       </a>
                     </div>
                   </div>

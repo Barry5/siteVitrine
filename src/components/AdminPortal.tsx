@@ -29,6 +29,7 @@ import { Agency, DepartureAnnouncement, Destination, PricingRule, Testimonial } 
 export const AdminPortal: React.FC = () => {
   const {
     isAdminAuthenticated,
+    isAdminAuthChecking,
     loginAdmin,
     logoutAdmin,
     setCurrentView,
@@ -114,20 +115,19 @@ export const AdminPortal: React.FC = () => {
     verified: true,
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = loginAdmin(passwordInput);
-    if (success) {
+    setIsLoggingIn(true);
+    const result = await loginAdmin(passwordInput);
+    setIsLoggingIn(false);
+    if (result.success) {
       setAuthError(null);
       setPasswordInput('');
     } else {
-      setAuthError('Mot de passe incorrect. Astuce : utilisez "admin123".');
+      setAuthError(result.error || 'Mot de passe incorrect.');
     }
-  };
-
-  const handleQuickDemoLogin = () => {
-    loginAdmin('admin123');
-    setAuthError(null);
   };
 
   // Submit announcement
@@ -204,6 +204,15 @@ export const AdminPortal: React.FC = () => {
     });
   };
 
+  // 0. Vérification de la session en cours auprès du backend
+  if (isAdminAuthChecking) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <span className="text-xs text-slate-400">Vérification de la session…</span>
+      </div>
+    );
+  }
+
   // 1. If not authenticated, show modern login view
   if (!isAdminAuthenticated) {
     return (
@@ -227,15 +236,17 @@ export const AdminPortal: React.FC = () => {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label htmlFor="admin-password" className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
                 Mot de passe d'administration
               </label>
               <input
+                id="admin-password"
                 type="password"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Entrez votre mot de passe (ex: admin123)..."
-                className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white font-semibold text-sm focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E]"
+                placeholder="Entrez votre mot de passe..."
+                autoComplete="current-password"
+                className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white font-semibold text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand"
               />
             </div>
 
@@ -248,21 +259,14 @@ export const AdminPortal: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+              disabled={isLoggingIn}
+              className="w-full py-3 px-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition-all cursor-pointer"
             >
-              Se connecter à l'espace admin
+              {isLoggingIn ? 'Connexion en cours...' : "Se connecter à l'espace admin"}
             </button>
           </form>
 
           <div className="pt-4 border-t border-slate-800 space-y-3">
-            <button
-              onClick={handleQuickDemoLogin}
-              type="button"
-              className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
-            >
-              <span>⚡ Connexion Rapide Démo (admin123)</span>
-            </button>
-
             <button
               onClick={() => setCurrentView('public')}
               type="button"
@@ -318,7 +322,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'dashboard' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'dashboard' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
@@ -328,7 +332,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('announcements')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'announcements' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'announcements' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <Megaphone className="w-3.5 h-3.5" />
@@ -338,7 +342,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('destinations')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'destinations' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'destinations' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <Globe2 className="w-3.5 h-3.5" />
@@ -348,7 +352,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('agencies')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'agencies' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'agencies' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
@@ -358,7 +362,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('pricing')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'pricing' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'pricing' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <Coins className="w-3.5 h-3.5" />
@@ -368,7 +372,7 @@ export const AdminPortal: React.FC = () => {
             <button
               onClick={() => setActiveTab('testimonials')}
               className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'testimonials' ? 'bg-[#C8102E] text-white' : 'text-slate-300 hover:bg-slate-800'
+                activeTab === 'testimonials' ? 'bg-brand text-white' : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <MessageSquareHeart className="w-3.5 h-3.5" />
@@ -392,7 +396,7 @@ export const AdminPortal: React.FC = () => {
                   Annonces de Départs Actives
                 </span>
                 <div className="flex items-baseline justify-between mt-2">
-                  <span className="text-3xl font-extrabold text-[#C8102E] font-display">
+                  <span className="text-3xl font-extrabold text-brand font-display">
                     {announcements.filter((a) => a.isActive).length}
                   </span>
                   <span className="text-xs text-slate-600">Sur {announcements.length} total</span>
@@ -442,12 +446,12 @@ export const AdminPortal: React.FC = () => {
               <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <Megaphone className="w-4 h-4 text-[#C8102E]" />
+                    <Megaphone className="w-4 h-4 text-brand" />
                     <span>Derniers départs programmés sur le site</span>
                   </h3>
                   <button
                     onClick={() => setActiveTab('announcements')}
-                    className="text-xs font-bold text-[#C8102E] hover:underline"
+                    className="text-xs font-bold text-brand hover:underline"
                   >
                     Gérer tout ➔
                   </button>
@@ -512,7 +516,7 @@ export const AdminPortal: React.FC = () => {
                     }}
                     className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                   >
-                    <RefreshCcw className="w-3.5 h-3.5 text-[#C8102E]" />
+                    <RefreshCcw className="w-3.5 h-3.5 text-brand" />
                     <span>Réinitialiser aux valeurs d'origine</span>
                   </button>
 
@@ -542,7 +546,7 @@ export const AdminPortal: React.FC = () => {
 
               <button
                 onClick={() => setIsAddingAnnouncement(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Créer un avis de départ</span>
@@ -551,7 +555,7 @@ export const AdminPortal: React.FC = () => {
 
             {/* Creation Modal / Inline Drawer */}
             {isAddingAnnouncement && (
-              <div className="bg-white p-6 rounded-3xl border-2 border-[#C8102E] shadow-xl space-y-4 animate-fadeIn">
+              <div className="bg-white p-6 rounded-3xl border-2 border-brand shadow-xl space-y-4 animate-fadeIn">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <h4 className="font-extrabold text-sm text-slate-900">
                     Nouveau Départ Programmé
@@ -576,7 +580,7 @@ export const AdminPortal: React.FC = () => {
                         placeholder="Ex: ENVOI DE COLIS À NEW YORK"
                         value={newAnn.title}
                         onChange={(e) => setNewAnn({ ...newAnn, title: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-[#C8102E]"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
                       />
                     </div>
 
@@ -590,7 +594,7 @@ export const AdminPortal: React.FC = () => {
                         placeholder="Ex: JEUDI 27 AOÛT"
                         value={newAnn.departureDayLabel}
                         onChange={(e) => setNewAnn({ ...newAnn, departureDayLabel: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-[#C8102E]"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
                       />
                     </div>
                   </div>
@@ -657,7 +661,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold cursor-pointer"
+                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer"
                     >
                       Publier l'avis de départ
                     </button>
@@ -688,7 +692,7 @@ export const AdminPortal: React.FC = () => {
                         >
                           {ann.isActive ? 'En ligne' : 'Masqué'}
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-red-50 text-[#C8102E] text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-red-50 text-brand text-[10px] font-bold">
                           {ann.destinationCity}
                         </span>
                       </div>
@@ -713,6 +717,7 @@ export const AdminPortal: React.FC = () => {
                         onClick={() => deleteAnnouncement(ann.id)}
                         className="p-2 rounded-xl text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
                         title="Supprimer cette annonce"
+                        aria-label="Supprimer cette annonce"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -741,7 +746,7 @@ export const AdminPortal: React.FC = () => {
 
               <button
                 onClick={() => setIsAddingDest(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Ajouter une destination</span>
@@ -750,7 +755,7 @@ export const AdminPortal: React.FC = () => {
 
             {/* Add Destination Form */}
             {isAddingDest && (
-              <div className="bg-white p-6 rounded-3xl border-2 border-[#C8102E] shadow-xl space-y-4 animate-fadeIn text-xs">
+              <div className="bg-white p-6 rounded-3xl border-2 border-brand shadow-xl space-y-4 animate-fadeIn text-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <h4 className="font-extrabold text-sm text-slate-900">
                     Ajouter une nouvelle destination
@@ -844,7 +849,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold cursor-pointer"
+                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer"
                     >
                       Enregistrer la destination
                     </button>
@@ -874,6 +879,7 @@ export const AdminPortal: React.FC = () => {
                         onClick={() => deleteDestination(dest.id)}
                         className="p-1.5 rounded-lg text-slate-600 hover:text-red-600 hover:bg-red-50 cursor-pointer"
                         title="Supprimer cette destination"
+                        aria-label="Supprimer cette destination"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -919,7 +925,7 @@ export const AdminPortal: React.FC = () => {
 
               <button
                 onClick={() => setIsAddingAgency(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Ajouter une agence</span>
@@ -928,7 +934,7 @@ export const AdminPortal: React.FC = () => {
 
             {/* Agency Form */}
             {isAddingAgency && (
-              <div className="bg-white p-6 rounded-3xl border-2 border-[#C8102E] shadow-xl space-y-4 animate-fadeIn text-xs">
+              <div className="bg-white p-6 rounded-3xl border-2 border-brand shadow-xl space-y-4 animate-fadeIn text-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <h4 className="font-extrabold text-sm text-slate-900">
                     Ajouter une agence
@@ -1024,7 +1030,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold cursor-pointer"
+                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer"
                     >
                       Enregistrer l'agence
                     </button>
@@ -1046,6 +1052,8 @@ export const AdminPortal: React.FC = () => {
                       <button
                         onClick={() => deleteAgency(agency.id)}
                         className="p-1 rounded-lg text-slate-600 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                        title="Supprimer cette agence"
+                        aria-label="Supprimer cette agence"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1084,7 +1092,7 @@ export const AdminPortal: React.FC = () => {
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#C8102E]"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-brand"></span>
                       Ligne : {rule.destinationName}
                     </h4>
                     <span className="text-[11px] font-bold text-slate-600">
@@ -1123,7 +1131,7 @@ export const AdminPortal: React.FC = () => {
                           onChange={(e) =>
                             updatePricingRule(rule.id, { pricePerKgAirGnf: Number(e.target.value) })
                           }
-                          className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-[#C8102E]"
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-brand"
                         />
                         <span className="font-bold text-slate-600 text-[11px]">GNF/kg</span>
                       </div>
@@ -1170,7 +1178,7 @@ export const AdminPortal: React.FC = () => {
 
               <button
                 onClick={() => setIsAddingTestimonial(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-sm transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Ajouter un avis</span>
@@ -1179,7 +1187,7 @@ export const AdminPortal: React.FC = () => {
 
             {/* Testimonial Form */}
             {isAddingTestimonial && (
-              <div className="bg-white p-6 rounded-3xl border-2 border-[#C8102E] shadow-xl space-y-4 animate-fadeIn text-xs">
+              <div className="bg-white p-6 rounded-3xl border-2 border-brand shadow-xl space-y-4 animate-fadeIn text-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <h4 className="font-extrabold text-sm text-slate-900">
                     Ajouter un avis client
@@ -1246,7 +1254,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-bold cursor-pointer"
+                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer"
                     >
                       Publier l'avis
                     </button>
@@ -1268,6 +1276,8 @@ export const AdminPortal: React.FC = () => {
                       <button
                         onClick={() => deleteTestimonial(test.id)}
                         className="p-1 rounded-lg text-slate-600 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                        title="Supprimer ce témoignage"
+                        aria-label="Supprimer ce témoignage"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

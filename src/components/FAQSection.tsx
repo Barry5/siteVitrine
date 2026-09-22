@@ -115,7 +115,7 @@ export const FAQSection: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#C8102E] font-bold text-xs uppercase tracking-wider border border-red-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>{t.badge}</span>
           </div>
@@ -184,7 +184,7 @@ export const FAQSection: React.FC = () => {
                 key={item.id}
                 className={`border rounded-2xl transition-all overflow-hidden ${
                   isOpen
-                    ? 'border-[#C8102E]/40 bg-slate-50/60 shadow-sm'
+                    ? 'border-brand/40 bg-slate-50/60 shadow-sm'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
@@ -200,7 +200,7 @@ export const FAQSection: React.FC = () => {
                   <div
                     className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 ${
                       isOpen
-                        ? 'bg-red-50 text-[#C8102E] rotate-180'
+                        ? 'bg-red-50 text-brand rotate-180'
                         : 'bg-slate-100 text-slate-500'
                     }`}
                   >
@@ -219,7 +219,7 @@ export const FAQSection: React.FC = () => {
         </div>
 
         {/* Support Prompt Box with Secondary CTA */}
-        <div className="mt-12 p-6 rounded-2xl bg-[#FAF9F6] border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-12 p-6 rounded-2xl bg-canvas border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
             <h4 className="font-bold text-sm text-slate-900">
               {t.helpPrompt}
@@ -237,7 +237,7 @@ export const FAQSection: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
           >
-            <Phone className="w-3.5 h-3.5 text-[#C8102E]" />
+            <Phone className="w-3.5 h-3.5 text-brand" />
             <span>{t.contactSupport}</span>
           </a>
         </div>

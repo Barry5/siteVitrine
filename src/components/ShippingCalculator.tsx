@@ -78,7 +78,7 @@ Could you confirm the branch deposit details?`;
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#C8102E] font-bold text-xs uppercase tracking-wider border border-red-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
             <Calculator className="w-3.5 h-3.5" />
             <span>{t.badge}</span>
           </div>
@@ -91,7 +91,7 @@ Could you confirm the branch deposit details?`;
         </div>
 
         {/* Calculator Interactive Box */}
-        <div className="max-w-5xl mx-auto bg-[#FAF9F6] border-2 border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl">
+        <div className="max-w-5xl mx-auto bg-canvas border-2 border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column: Form Controls */}
             <div className="lg:col-span-7 space-y-6">
@@ -142,12 +142,12 @@ Could you confirm the branch deposit details?`;
                       onClick={() => setTransitMode('air')}
                       className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
                         transitMode === 'air'
-                          ? 'bg-white border-[#C8102E] ring-2 ring-red-100 shadow-sm'
+                          ? 'bg-white border-brand ring-2 ring-red-100 shadow-sm'
                           : 'bg-white border-slate-300 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
-                        <Plane className="w-4 h-4 text-[#C8102E]" />
+                        <Plane className="w-4 h-4 text-brand" />
                         <span>{t.airFreight}</span>
                       </div>
                       <span className="text-[11px] text-slate-600 mt-1 block">
@@ -160,7 +160,7 @@ Could you confirm the branch deposit details?`;
                       onClick={() => setTransitMode('sea')}
                       className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
                         transitMode === 'sea'
-                          ? 'bg-white border-[#C8102E] ring-2 ring-red-100 shadow-sm'
+                          ? 'bg-white border-brand ring-2 ring-red-100 shadow-sm'
                           : 'bg-white border-slate-300 hover:bg-slate-50'
                       }`}
                     >
@@ -185,7 +185,7 @@ Could you confirm the branch deposit details?`;
                   <select
                     value={originAgencyId}
                     onChange={(e) => setOriginAgencyId(e.target.value)}
-                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-[#C8102E] focus:outline-none"
+                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
                   >
                     {agencies
                       .filter((a) => !a.isInternational)
@@ -204,7 +204,7 @@ Could you confirm the branch deposit details?`;
                   <select
                     value={destinationId}
                     onChange={(e) => setDestinationId(e.target.value)}
-                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-[#C8102E] focus:outline-none"
+                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
                   >
                     {destinations.map((dest) => (
                       <option key={dest.id} value={dest.id}>
@@ -220,7 +220,7 @@ Could you confirm the branch deposit details?`;
                 <div className="space-y-3 p-4 rounded-2xl bg-white border border-slate-200">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                      <Weight className="w-3.5 h-3.5 text-[#C8102E]" />
+                      <Weight className="w-3.5 h-3.5 text-brand" />
                       {t.estimatedWeight} :
                     </label>
                     <div className="flex items-center gap-1 bg-red-50 border border-red-200 px-3 py-1 rounded-lg">
@@ -230,9 +230,9 @@ Could you confirm the branch deposit details?`;
                         max="500"
                         value={weightKg}
                         onChange={(e) => setWeightKg(Math.max(1, Number(e.target.value)))}
-                        className="w-16 font-extrabold text-[#C8102E] text-base text-right bg-transparent focus:outline-none"
+                        className="w-16 font-extrabold text-brand text-base text-right bg-transparent focus:outline-none"
                       />
-                      <span className="font-extrabold text-xs text-[#C8102E]">KG</span>
+                      <span className="font-extrabold text-xs text-brand">KG</span>
                     </div>
                   </div>
 
@@ -243,7 +243,7 @@ Could you confirm the branch deposit details?`;
                     step="1"
                     value={weightKg}
                     onChange={(e) => setWeightKg(Number(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#C8102E]"
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand"
                   />
 
                   <div className="flex justify-between text-[11px] text-slate-600 font-semibold">
@@ -322,7 +322,7 @@ Could you confirm the branch deposit details?`;
                   href={`https://wa.me/224611835683?text=${generateWhatsAppMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#C8102E] hover:bg-[#A60D25] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="w-full py-3.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>{t.bookOnWhatsapp}</span>
