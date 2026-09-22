@@ -37,6 +37,12 @@ export interface Agency {
   isInternational: boolean;
   hours: string;
   isMainAgency?: boolean;
+  /**
+   * Chemin ou URL d'une vraie photo de l'agence (ex: '/photos/agences/ag-hamdallaye.jpg').
+   * Optionnel : tant qu'aucune photo n'est fournie, ou si le fichier référencé est
+   * introuvable, l'interface affiche un emplacement réservé (PlaceholderImage) à la place.
+   */
+  photoUrl?: string;
 }
 
 export interface Destination {

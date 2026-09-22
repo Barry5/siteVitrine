@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
-import { PlaceholderImage } from './PlaceholderImage';
+import { AgencyPhoto } from './AgencyPhoto';
 import { submitContactRequest } from '../lib/api';
 
 type SubmitStatus = 'idle' | 'submitting' | 'success' | 'error';
@@ -72,7 +72,9 @@ export const ContactSection: React.FC = () => {
               </p>
             </div>
 
-            <PlaceholderImage
+            <AgencyPhoto
+              photoUrl={agencies.find((a) => a.isMainAgency)?.photoUrl}
+              alt={t.hqTitle}
               label={tAgencies.photoPlaceholder}
               caption={t.hqTitle}
               dark

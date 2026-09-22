@@ -11,7 +11,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { Agency } from '../types';
 import { translations } from '../data/translations';
-import { PlaceholderImage } from './PlaceholderImage';
+import { AgencyPhoto } from './AgencyPhoto';
 
 export const AgenciesSection: React.FC = () => {
   const { agencies, language } = useApp();
@@ -97,7 +97,9 @@ export const AgenciesSection: React.FC = () => {
               }`}
             >
               <div>
-                <PlaceholderImage
+                <AgencyPhoto
+                  photoUrl={agency.photoUrl}
+                  alt={agency.name}
                   label={t.photoPlaceholder}
                   caption={agency.name}
                   dark={agency.isInternational}
