@@ -35,6 +35,13 @@ export interface Translations {
     goToLabel: string;
     emptyState: string;
   };
+  trustStats: {
+    badge: string;
+    localAgencies: string;
+    internationalOffices: string;
+    destinationsServed: string;
+    qualityCharter: string;
+  };
   hero: {
     tagline: string;
     titleStart: string;
@@ -242,6 +249,18 @@ export interface Translations {
     backToTop: string;
     adminAccess: string;
   };
+  paymentMethods: {
+    title: string;
+    localTitle: string;
+    internationalTitle: string;
+    orangeMoney: string;
+    mtnMoney: string;
+    bankTransferLocal: string;
+    cash: string;
+    zelle: string;
+    interac: string;
+    bankTransferIntl: string;
+  };
   testimonials: {
     badge: string;
     title: string;
@@ -290,6 +309,13 @@ export const translations: Record<Language, Translations> = {
       nextLabel: 'Départ suivant',
       goToLabel: 'Aller au départ',
       emptyState: 'Aucun départ programmé pour le moment. Contactez-nous pour connaître le prochain vol.',
+    },
+    trustStats: {
+      badge: 'En quelques chiffres',
+      localAgencies: 'Agences en Guinée',
+      internationalOffices: 'Bureaux internationaux',
+      destinationsServed: 'Destinations desservies',
+      qualityCharter: 'Charte qualité à chaque dépôt',
     },
     hero: {
       tagline: 'TRANSITAIRE & FRET INTERNATIONAL • GUINÉE ➔ AMÉRIQUE & EUROPE',
@@ -523,6 +549,18 @@ export const translations: Record<Language, Translations> = {
       backToTop: 'Haut de page',
       adminAccess: 'Accès Espace Interne',
     },
+    paymentMethods: {
+      title: 'Moyens de paiement acceptés',
+      localTitle: 'En Guinée',
+      internationalTitle: "À l'international",
+      orangeMoney: 'Orange Money',
+      mtnMoney: 'MTN Mobile Money',
+      bankTransferLocal: 'Virement bancaire',
+      cash: 'Espèces (au guichet)',
+      zelle: 'Zelle (USA)',
+      interac: 'Interac (Canada)',
+      bankTransferIntl: 'Virement bancaire direct',
+    },
     testimonials: {
       badge: "Retours d'Expérience",
       title: 'La voix de notre diaspora et de nos clients',
@@ -571,6 +609,13 @@ export const translations: Record<Language, Translations> = {
       nextLabel: 'Next departure',
       goToLabel: 'Go to departure',
       emptyState: 'No departure scheduled right now. Contact us to find out about the next flight.',
+    },
+    trustStats: {
+      badge: 'At a glance',
+      localAgencies: 'Branches in Guinea',
+      internationalOffices: 'International offices',
+      destinationsServed: 'Destinations served',
+      qualityCharter: 'Quality checks on every drop-off',
     },
     hero: {
       tagline: 'INTERNATIONAL FREIGHT FORWARDING • GUINEA ➔ NORTH AMERICA & EUROPE',
@@ -800,6 +845,18 @@ export const translations: Record<Language, Translations> = {
       facebookLink: 'Official Facebook',
       backToTop: 'Back to top',
       adminAccess: 'Staff Portal Access',
+    },
+    paymentMethods: {
+      title: 'Accepted payment methods',
+      localTitle: 'In Guinea',
+      internationalTitle: 'Internationally',
+      orangeMoney: 'Orange Money',
+      mtnMoney: 'MTN Mobile Money',
+      bankTransferLocal: 'Bank transfer',
+      cash: 'Cash (in branch)',
+      zelle: 'Zelle (USA)',
+      interac: 'Interac e-Transfer (Canada)',
+      bankTransferIntl: 'Direct wire transfer',
     },
     testimonials: {
       badge: 'Customer Feedback',
