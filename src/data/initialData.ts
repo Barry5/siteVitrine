@@ -337,48 +337,10 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
   },
 ];
 
-export const INITIAL_TESTIMONIALS: Testimonial[] = [
-  {
-    id: 'test-1',
-    author: 'Mamadou Oury Bah',
-    city: 'Montréal (Saint-Léonard)',
-    destination: 'Guinée ➔ Montréal',
-    rating: 5,
-    comment: 'J\'ai reçu mon colis envoyé depuis l\'agence de Hamdallaye en seulement 4 jours ! Rien n\'était endommagé, les denrées étaient emballées sous film étanche avec un soin exemplaire. Thiaguil est devenu notre transitaire de référence.',
-    date: 'Il y a 1 semaine',
-    verified: true,
-  },
-  {
-    id: 'test-2',
-    author: 'Aïssatou Diallo',
-    city: 'New York (Bronx)',
-    destination: 'Kindia ➔ New York',
-    rating: 5,
-    comment: 'Mon frère a déposé le colis à Kindia, et je l\'ai récupéré directement au bureau du Bronx sur Brook Avenue. Le numéro de suivi fonctionnait en temps réel et le responsable WhatsApp m\'a alerté dès que le vol a atterri.',
-    date: 'Il y a 2 semaines',
-    verified: true,
-  },
-  {
-    id: 'test-3',
-    author: 'Ibrahima Sory Camara',
-    city: 'Conakry (Kipé)',
-    destination: 'Conakry ➔ Montréal',
-    rating: 5,
-    comment: 'Ce qui fait la différence chez Thiaguil, c\'est le sérieux au moment de l\'enregistrement. Ils vérifient chaque article devant vous, pèsent avec précision et fournissent immédiatement un reçu clair.',
-    date: 'Il y a 3 semaines',
-    verified: true,
-  },
-  {
-    id: 'test-4',
-    author: 'Fatoumata Binta Barry',
-    city: 'New York (Manhattan)',
-    destination: 'Bentouraya ➔ New York',
-    rating: 5,
-    comment: 'Expédition pour le vol du 1er septembre impeccable. Les tarifs au kilo sont honnêtes et il n\'y a pas de frais cachés à la récupération. Je recommande à 100% à toute la communauté.',
-    date: 'Il y a 1 mois',
-    verified: true,
-  },
-];
+// Aucun témoignage fictif par défaut : afficher un faux avis "vérifié"
+// serait trompeur. Les vrais avis clients sont ajoutés depuis l'espace
+// admin (onglet Témoignages) au fur et à mesure qu'ils arrivent.
+export const INITIAL_TESTIMONIALS: Testimonial[] = [];
 
 export const INITIAL_TRACKING_ITEMS: Record<string, TrackingItem> = {
   'THG-NY-8910': {

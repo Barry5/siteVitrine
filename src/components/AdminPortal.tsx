@@ -112,7 +112,9 @@ export const AdminPortal: React.FC = () => {
     destination: 'Guinée ➔ International',
     rating: 5,
     comment: '',
-    verified: true,
+    // Non coché par défaut : ne cocher "vérifié" que si l'avis est
+    // confirmé authentique (client réel, envoi retrouvé/tracé).
+    verified: false,
   });
 
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -200,7 +202,7 @@ export const AdminPortal: React.FC = () => {
       destination: 'Guinée ➔ International',
       rating: 5,
       comment: '',
-      verified: true,
+      verified: false,
     });
   };
 
@@ -1244,6 +1246,37 @@ export const AdminPortal: React.FC = () => {
                     ></textarea>
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                    <div>
+                      <label className="block font-bold uppercase text-slate-700 mb-1">
+                        Note donnée par le client
+                      </label>
+                      <select
+                        value={newTest.rating}
+                        onChange={(e) => setNewTest({ ...newTest, rating: Number(e.target.value) })}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold bg-white"
+                      >
+                        <option value={5}>5 étoiles — Excellent</option>
+                        <option value={4}>4 étoiles — Très bien</option>
+                        <option value={3}>3 étoiles — Correct</option>
+                        <option value={2}>2 étoiles — Décevant</option>
+                        <option value={1}>1 étoile — Insatisfaisant</option>
+                      </select>
+                    </div>
+
+                    <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newTest.verified}
+                        onChange={(e) => setNewTest({ ...newTest, verified: e.target.checked })}
+                        className="w-4 h-4 accent-brand cursor-pointer"
+                      />
+                      <span className="font-bold text-slate-700 normal-case text-[11px] leading-tight">
+                        Avis vérifié — à cocher uniquement si le client et son envoi sont confirmés authentiques
+                      </span>
+                    </label>
+                  </div>
+
                   <div className="flex justify-end gap-2 pt-2">
                     <button
                       type="button"
@@ -1283,6 +1316,18 @@ export const AdminPortal: React.FC = () => {
                       </button>
                     </div>
                     <span className="text-[11px] text-slate-600 block">{test.city}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-amber-500 font-bold">{'★'.repeat(test.rating)}{'☆'.repeat(5 - test.rating)}</span>
+                      {test.verified ? (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          Vérifié
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                          Non vérifié
+                        </span>
+                      )}
+                    </div>
                     <p className="text-slate-700 italic">« {test.comment} »</p>
                   </div>
                 </div>
