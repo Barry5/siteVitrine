@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, CheckCircle2, MessageSquareHeart } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquareHeart, MessageCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
 
@@ -24,6 +24,24 @@ export const TestimonialsSection: React.FC = () => {
           </p>
         </div>
 
+        {/* Empty state: shown honestly until real reviews come in via the admin panel */}
+        {testimonials.length === 0 && (
+          <div className="max-w-xl mx-auto text-center bg-canvas border-2 border-dashed border-slate-300 rounded-3xl p-10 space-y-3">
+            <MessageSquareHeart className="w-8 h-8 text-slate-400 mx-auto" />
+            <h3 className="font-extrabold text-slate-900 text-base">{t.emptyTitle}</h3>
+            <p className="text-slate-600 text-sm leading-relaxed">{t.emptyBody}</p>
+            <a
+              href="https://wa.me/224611835683?text=Bonjour%20Thiaguil%20Multi-services%2C%20je%20souhaite%20partager%20mon%20avis%20sur%20votre%20service."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-whatsapp hover:bg-whatsapp-dark text-white font-bold text-xs transition-colors shadow-sm"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>{t.emptyCta}</span>
+            </a>
+          </div>
+        )}
+
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {testimonials.map((item) => (
@@ -37,7 +55,7 @@ export const TestimonialsSection: React.FC = () => {
                   {[...Array(item.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-amber-400" />
                   ))}
-                  <span className="text-xs font-bold text-slate-700 ml-1">5.0</span>
+                  <span className="text-xs font-bold text-slate-700 ml-1">{item.rating.toFixed(1)}</span>
                 </div>
 
                 {/* Route pill */}

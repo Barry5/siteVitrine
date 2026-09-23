@@ -248,6 +248,9 @@ export interface Translations {
     subtitle: string;
     verifiedLabel: string;
     verifiedTitle: string;
+    emptyTitle: string;
+    emptyBody: string;
+    emptyCta: string;
   };
 }
 
@@ -527,6 +530,10 @@ export const translations: Record<Language, Translations> = {
         'De Conakry à Montréal et New York, découvrez pourquoi les familles et commerçants confient leurs colis précieux à Thiaguil.',
       verifiedLabel: 'Vérifié',
       verifiedTitle: 'Envoi tracé et validé',
+      emptyTitle: 'Soyez parmi les premiers à partager votre avis',
+      emptyBody:
+        'Nous affichons ici les avis authentiques de nos clients, dès qu\'ils nous parviennent. Vous avez expédié un colis avec Thiaguil ? Faites-le nous savoir.',
+      emptyCta: 'Laisser un avis sur WhatsApp',
     },
   },
   en: {
@@ -801,6 +808,10 @@ export const translations: Record<Language, Translations> = {
         'From Conakry to Montreal and New York, discover why families and merchants trust Thiaguil with their valuable parcels.',
       verifiedLabel: 'Verified',
       verifiedTitle: 'Tracked and verified shipment',
+      emptyTitle: 'Be among the first to share your experience',
+      emptyBody:
+        'We only display authentic customer reviews, as they come in. Shipped a parcel with Thiaguil? Let us know.',
+      emptyCta: 'Leave a review on WhatsApp',
     },
   },
 };
