@@ -30,7 +30,7 @@ export const Header: React.FC = () => {
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
-    if (currentView === 'admin') {
+    if (currentView !== 'public') {
       setCurrentView('public');
       setTimeout(() => {
         const element = document.querySelector(href);
@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
           <a
             href="#accueil"
             onClick={() => {
-              if (currentView === 'admin') setCurrentView('public');
+              if (currentView !== 'public') setCurrentView('public');
             }}
             className="flex items-center gap-2 group cursor-pointer focus:outline-none"
           >

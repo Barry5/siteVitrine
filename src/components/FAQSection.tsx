@@ -84,6 +84,16 @@ const FAQ_DATA: FAQItem[] = [
       'Yes, absolutely. Our regional branches in Kindia (Central Bus Station) and Coyah (Somayah Junction) run daily secure shuttles connecting directly to our Conakry flight consolidation hub in time for scheduled international departures.',
   },
   {
+    id: 'colis-perdu-endommage',
+    category: 'packaging',
+    questionFr: 'Que se passe-t-il en cas de colis perdu ou endommagé ?',
+    questionEn: 'What happens if my parcel is lost or damaged?',
+    answerFr:
+      'Chaque colis est pesé, numéroté et suivi par SMS/WhatsApp dès le dépôt, ce qui facilite toute recherche en cas de problème. Si vous constatez une anomalie à la réception ou pendant l’acheminement, contactez immédiatement l’agence de dépôt et notre service WhatsApp avec votre numéro de suivi : chaque signalement est étudié au cas par cas. Nous n’avons pas encore de police d’assurance formalisée sur les envois — n’hésitez pas à nous interroger directement sur la prise en charge avant d’expédier si cela conditionne votre décision.',
+    answerEn:
+      'Every parcel is weighed, numbered, and tracked by SMS/WhatsApp from drop-off, which helps with any investigation if something goes wrong. If you notice an issue on arrival or during transit, contact the drop-off branch and our WhatsApp support right away with your tracking number — every report is reviewed case by case. We don’t yet have a formal insurance policy on shipments — feel free to ask us directly about coverage before sending if that matters for your decision.',
+  },
+  {
     id: 'achats-usa-guinee',
     category: 'delays',
     questionFr: 'Faites-vous également l’envoi dans le sens inverse (USA/Canada vers la Guinée) ?',

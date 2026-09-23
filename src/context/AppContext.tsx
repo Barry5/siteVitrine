@@ -24,7 +24,7 @@ interface AppContextType {
   pricingRules: PricingRule[];
   testimonials: Testimonial[];
   trackingItems: Record<string, TrackingItem>;
-  currentView: 'public' | 'admin';
+  currentView: 'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv';
   isAdminAuthenticated: boolean;
   isAdminAuthChecking: boolean;
   activeTrackedItem: TrackingItem | null;
@@ -34,7 +34,7 @@ interface AppContextType {
   setLanguage: (lang: 'fr' | 'en') => void;
 
   // Navigation & Auth
-  setCurrentView: (view: 'public' | 'admin') => void;
+  setCurrentView: (view: 'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv') => void;
   loginAdmin: (password: string) => Promise<{ success: boolean; error?: string }>;
   logoutAdmin: () => void;
 
@@ -103,7 +103,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_TRACKING_ITEMS;
   });
 
-  const [currentView, setCurrentView] = useState<'public' | 'admin'>('public');
+  const [currentView, setCurrentView] = useState<
+    'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv'
+  >('public');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
   const [isAdminAuthChecking, setIsAdminAuthChecking] = useState<boolean>(true);
 

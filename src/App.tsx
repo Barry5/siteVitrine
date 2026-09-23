@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { TrustStatsStrip } from './components/TrustStatsStrip';
 import { NextDeparturesSection } from './components/NextDeparturesSection';
 import { TrackingSection } from './components/TrackingSection';
 import { ServicesSection } from './components/ServicesSection';
@@ -16,12 +17,32 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { AdminPortal } from './components/AdminPortal';
+import { LegalPage } from './components/LegalPage';
+import { Analytics } from './components/Analytics';
 
 const MainLayout: React.FC = () => {
   const { currentView } = useApp();
 
   if (currentView === 'admin') {
     return <AdminPortal />;
+  }
+
+  const isLegalPage =
+    currentView === 'mentions-legales' ||
+    currentView === 'confidentialite' ||
+    currentView === 'cgv';
+
+  if (isLegalPage) {
+    return (
+      <div className="min-h-screen flex flex-col bg-canvas text-slate-900 selection:bg-brand selection:text-white">
+        <Header />
+        <main className="flex-1">
+          <LegalPage page={currentView} />
+        </main>
+        <Footer />
+        <FloatingWhatsApp />
+      </div>
+    );
   }
 
   return (
@@ -36,6 +57,9 @@ const MainLayout: React.FC = () => {
       <main className="flex-1">
         {/* Hero Section with Quick Tracker & Departure Showcase */}
         <Hero />
+
+        {/* Trust bar with real, computed figures (agencies/destinations) — never invented stats */}
+        <TrustStatsStrip />
 
         {/* Auto-playing carousel of upcoming departures (dates highlighted, mirrors the Facebook page's departure posters) */}
         <NextDeparturesSection />
@@ -80,6 +104,8 @@ const MainLayout: React.FC = () => {
 export default function App() {
   return (
     <AppProvider>
+      {/* No-op unless VITE_GA_MEASUREMENT_ID is set — never loads tracking without a real, user-provided ID */}
+      <Analytics />
       <MainLayout />
     </AppProvider>
   );

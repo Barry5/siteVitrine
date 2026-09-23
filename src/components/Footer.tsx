@@ -3,6 +3,7 @@ import { ArrowUp, Lock } from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
+import { PaymentMethodsStrip } from './PaymentMethodsStrip';
 
 export const Footer: React.FC = () => {
   const { agencies, setCurrentView, language } = useApp();
@@ -128,6 +129,9 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
+        {/* Accepted payment methods (generic icons, not protected brand logos) */}
+        <PaymentMethodsStrip />
+
         {/* Bottom copyright and discreet legal/admin line */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-300 text-[11px]">
           <p>{copyrightText}</p>
@@ -148,6 +152,36 @@ export const Footer: React.FC = () => {
             >
               <span>{t.backToTop}</span>
               <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => {
+                setCurrentView('mentions-legales');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              {language === 'fr' ? 'Mentions légales' : 'Legal Notice'}
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => {
+                setCurrentView('confidentialite');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              {language === 'fr' ? 'Confidentialité' : 'Privacy Policy'}
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => {
+                setCurrentView('cgv');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              CGV
             </button>
             <span>•</span>
             {/* Discreet admin link as requested */}
