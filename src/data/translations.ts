@@ -34,6 +34,7 @@ export interface Translations {
     nextLabel: string;
     goToLabel: string;
     emptyState: string;
+    posterAlt: string;
   };
   trustStats: {
     badge: string;
@@ -309,6 +310,7 @@ export const translations: Record<Language, Translations> = {
       nextLabel: 'Départ suivant',
       goToLabel: 'Aller au départ',
       emptyState: 'Aucun départ programmé pour le moment. Contactez-nous pour connaître le prochain vol.',
+      posterAlt: 'Affiche du départ vers {city} le {date}',
     },
     trustStats: {
       badge: 'En quelques chiffres',
@@ -609,6 +611,7 @@ export const translations: Record<Language, Translations> = {
       nextLabel: 'Next departure',
       goToLabel: 'Go to departure',
       emptyState: 'No departure scheduled right now. Contact us to find out about the next flight.',
+      posterAlt: 'Poster for the departure to {city} on {date}',
     },
     trustStats: {
       badge: 'At a glance',

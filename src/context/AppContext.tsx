@@ -15,7 +15,14 @@ import {
   Testimonial,
   TrackingItem,
 } from '../types';
-import { adminLogin, adminLogout, checkAdminSession } from '../lib/api';
+import {
+  adminLogin,
+  adminLogout,
+  checkAdminSession,
+  fetchAdminAnnouncements,
+  fetchPublicAnnouncements,
+  saveAnnouncements,
+} from '../lib/api';
 
 interface AppContextType {
   announcements: DepartureAnnouncement[];
@@ -42,11 +49,15 @@ interface AppContextType {
   searchPackage: (trackingNumber: string) => TrackingItem | null;
   clearTracking: () => void;
 
-  // CRUD Announcements
-  addAnnouncement: (announcement: Omit<DepartureAnnouncement, 'id' | 'createdAt'>) => void;
-  updateAnnouncement: (id: string, announcement: Partial<DepartureAnnouncement>) => void;
-  deleteAnnouncement: (id: string) => void;
-  toggleAnnouncementActive: (id: string) => void;
+  // CRUD Announcements — enregistrées sur le serveur (lèvent une erreur si
+  // l'enregistrement échoue, pour que l'admin puisse l'afficher).
+  addAnnouncement: (announcement: Omit<DepartureAnnouncement, 'id' | 'createdAt'>) => Promise<void>;
+  updateAnnouncement: (id: string, announcement: Partial<DepartureAnnouncement>) => Promise<void>;
+  deleteAnnouncement: (id: string) => Promise<void>;
+  toggleAnnouncementActive: (id: string) => Promise<void>;
+  // Message renseigné quand les annonces n'ont pas pu être chargées depuis
+  // le serveur (le site affiche alors les données initiales).
+  announcementsSyncError: string | null;
 
   // CRUD Agencies
   addAgency: (agency: Omit<Agency, 'id'>) => void;
@@ -72,11 +83,13 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // LocalStorage state initialization
-  const [announcements, setAnnouncements] = useState<DepartureAnnouncement[]>(() => {
-    const saved = localStorage.getItem('thg_announcements');
-    return saved ? JSON.parse(saved) : INITIAL_ANNOUNCEMENTS;
-  });
+  // Annonces de départ : source de vérité = serveur (GET /api/announcements).
+  // INITIAL_ANNOUNCEMENTS n'est qu'un affichage de repli tant que rien n'a été
+  // publié depuis l'admin, ou si l'API est injoignable.
+  const [announcements, setAnnouncements] = useState<DepartureAnnouncement[]>(INITIAL_ANNOUNCEMENTS);
+  const [announcementsSyncError, setAnnouncementsSyncError] = useState<string | null>(null);
+
+  // LocalStorage state initialization (données encore locales au navigateur)
 
   const [agencies, setAgencies] = useState<Agency[]>(() => {
     const saved = localStorage.getItem('thg_agencies');
@@ -130,10 +143,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('thg_language', lang);
   };
 
-  // Sync to localStorage
+  // Ancienne copie locale des annonces (avant l'enregistrement serveur) :
+  // supprimée pour ne jamais être confondue avec les données publiées.
   useEffect(() => {
-    localStorage.setItem('thg_announcements', JSON.stringify(announcements));
-  }, [announcements]);
+    localStorage.removeItem('thg_announcements');
+  }, []);
+
+  // Chargement des annonces : liste publique (départs actifs) pour les
+  // visiteurs, liste complète (actifs + masqués) pour l'admin connecté.
+  useEffect(() => {
+    let cancelled = false;
+    const load = isAdminAuthenticated ? fetchAdminAnnouncements : fetchPublicAnnouncements;
+    load()
+      .then((list) => {
+        if (cancelled) return;
+        if (list) setAnnouncements(list);
+        setAnnouncementsSyncError(null);
+      })
+      .catch((err: Error) => {
+        if (cancelled) return;
+        setAnnouncementsSyncError(err.message || 'Serveur injoignable.');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdminAuthenticated]);
+
+  // Sync to localStorage
 
   useEffect(() => {
     localStorage.setItem('thg_agencies', JSON.stringify(agencies));
@@ -252,29 +288,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTrackingError(null);
   };
 
-  // Announcements CRUD
+  // Announcements CRUD — chaque modification enregistre la liste complète sur
+  // le serveur ; l'état local n'est mis à jour qu'après confirmation du
+  // serveur, pour que l'admin voie exactement ce que voient les visiteurs.
+  const persistAnnouncements = async (next: DepartureAnnouncement[]) => {
+    const saved = await saveAnnouncements(next);
+    setAnnouncements(saved);
+    setAnnouncementsSyncError(null);
+  };
+
   const addAnnouncement = (item: Omit<DepartureAnnouncement, 'id' | 'createdAt'>) => {
     const newAnnouncement: DepartureAnnouncement = {
       ...item,
       id: `ann-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0],
     };
-    setAnnouncements((prev) => [newAnnouncement, ...prev]);
+    return persistAnnouncements([newAnnouncement, ...announcements]);
   };
 
   const updateAnnouncement = (id: string, changes: Partial<DepartureAnnouncement>) => {
-    setAnnouncements((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...changes } : item))
+    return persistAnnouncements(
+      announcements.map((item) => (item.id === id ? { ...item, ...changes } : item))
     );
   };
 
   const deleteAnnouncement = (id: string) => {
-    setAnnouncements((prev) => prev.filter((item) => item.id !== id));
+    return persistAnnouncements(announcements.filter((item) => item.id !== id));
   };
 
   const toggleAnnouncementActive = (id: string) => {
-    setAnnouncements((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, isActive: !item.isActive } : item))
+    return persistAnnouncements(
+      announcements.map((item) => (item.id === id ? { ...item, isActive: !item.isActive } : item))
     );
   };
 
@@ -337,14 +381,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTestimonials((prev) => prev.filter((item) => item.id !== id));
   };
 
+  // Réinitialise uniquement les données encore locales au navigateur. Les
+  // annonces de départ, publiées sur le serveur, ne sont pas touchées ici
+  // (sinon un clic effacerait les départs visibles par tous les visiteurs).
   const resetAllData = () => {
-    setAnnouncements(INITIAL_ANNOUNCEMENTS);
     setAgencies(INITIAL_AGENCIES);
     setDestinations(INITIAL_DESTINATIONS);
     setPricingRules(INITIAL_PRICING_RULES);
     setTestimonials(INITIAL_TESTIMONIALS);
     setTrackingItems(INITIAL_TRACKING_ITEMS);
-    localStorage.removeItem('thg_announcements');
     localStorage.removeItem('thg_agencies');
     localStorage.removeItem('thg_destinations');
     localStorage.removeItem('thg_pricing');
@@ -378,6 +423,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateAnnouncement,
         deleteAnnouncement,
         toggleAnnouncementActive,
+        announcementsSyncError,
         addAgency,
         updateAgency,
         deleteAgency,

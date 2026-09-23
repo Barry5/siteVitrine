@@ -3,6 +3,8 @@
  * En développement, VITE_API_URL peut pointer vers http://localhost:4000/api ;
  * en production, l'API est généralement servie sous le même domaine, via /api.
  */
+import type { DepartureAnnouncement } from '../types';
+
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function parseJsonSafe(res: Response): Promise<any> {
@@ -64,4 +66,79 @@ export async function checkAdminSession(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Transforme un chemin de fichier renvoyé par l'API (ex: "/uploads/posters/x.jpg")
+ * en URL utilisable dans <img src>. Les fichiers sont servis par l'API sous
+ * /api/uploads/..., donc la même règle de reverse proxy que /api suffit en production.
+ */
+export function resolveApiAsset(path: string): string {
+  return `${API_BASE}${path}`;
+}
+
+// --- Annonces de départ ------------------------------------------------------
+
+/**
+ * Départs actifs publiés depuis l'admin. Renvoie null si aucune annonce n'a
+ * encore été publiée côté serveur (le site garde alors ses données initiales).
+ * Lève une erreur si l'API est injoignable.
+ */
+export async function fetchPublicAnnouncements(): Promise<DepartureAnnouncement[] | null> {
+  const res = await fetch(`${API_BASE}/announcements`);
+  if (!res.ok) throw new Error('Annonces indisponibles.');
+  const data = await parseJsonSafe(res);
+  return Array.isArray(data?.announcements) ? data.announcements : null;
+}
+
+/** Toutes les annonces (actives et masquées) — admin connecté uniquement. */
+export async function fetchAdminAnnouncements(): Promise<DepartureAnnouncement[] | null> {
+  const res = await fetch(`${API_BASE}/admin/announcements`, { credentials: 'include' });
+  if (!res.ok) {
+    const data = await parseJsonSafe(res);
+    throw new Error(data?.error || 'Impossible de charger les annonces.');
+  }
+  const data = await parseJsonSafe(res);
+  return Array.isArray(data?.announcements) ? data.announcements : null;
+}
+
+/** Enregistre la liste complète des annonces sur le serveur et renvoie la version enregistrée. */
+export async function saveAnnouncements(
+  announcements: DepartureAnnouncement[]
+): Promise<DepartureAnnouncement[]> {
+  const res = await fetch(`${API_BASE}/admin/announcements`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ announcements }),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok || !Array.isArray(data?.announcements)) {
+    throw new Error(data?.error || "L'enregistrement a échoué.");
+  }
+  return data.announcements;
+}
+
+export const MAX_POSTER_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_POSTER_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+/** Téléverse une affiche (JPEG/PNG/WebP, 5 Mo max) et renvoie son chemin serveur. */
+export async function uploadPoster(file: File): Promise<string> {
+  if (!ACCEPTED_POSTER_TYPES.includes(file.type)) {
+    throw new Error('Format non pris en charge. Choisissez une image JPEG, PNG ou WebP.');
+  }
+  if (file.size > MAX_POSTER_BYTES) {
+    throw new Error('Image trop lourde (5 Mo maximum).');
+  }
+  const res = await fetch(`${API_BASE}/admin/uploads/poster`, {
+    method: 'POST',
+    headers: { 'Content-Type': file.type },
+    credentials: 'include',
+    body: file,
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok || typeof data?.posterUrl !== 'string') {
+    throw new Error(data?.error || "Le téléversement de l'affiche a échoué.");
+  }
+  return data.posterUrl;
 }
