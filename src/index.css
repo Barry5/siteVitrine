@@ -62,3 +62,45 @@
 .animate-fadeIn {
   animation: fadeIn 0.35s ease-out both;
 }
+
+/*
+ * Affiches des prochains départs en fond du hero (PosterBackdrop dans Hero.tsx).
+ * Mur : rangées qui défilent en sens opposés, boucle sur -50 % (la suite
+ * d'affiches est dupliquée). Fondu : 2 affiches, 7 s chacune.
+ */
+@keyframes poster-wall-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes poster-wall-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+@keyframes poster-fade-2 {
+  0% { opacity: 0; }
+  6% { opacity: 1; }
+  50% { opacity: 1; }
+  56% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.poster-wall-left { animation: poster-wall-left 90s linear infinite; }
+.poster-wall-right { animation: poster-wall-right 110s linear infinite; }
+.poster-fade-2 { opacity: 0; animation: poster-fade-2 14s ease-in-out infinite; }
+
+.poster-motion-paused .poster-wall-left,
+.poster-motion-paused .poster-wall-right,
+.poster-motion-paused .poster-fade-2 {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster-wall-left,
+  .poster-wall-right,
+  .poster-fade-2 {
+    animation: none;
+  }
+  .poster-fade-2:first-child {
+    opacity: 1;
+  }
+}

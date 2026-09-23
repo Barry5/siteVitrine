@@ -7,6 +7,8 @@ import {
   ImageOff,
   MapPin,
   MessageCircle,
+  Pause,
+  Play,
   PlaneTakeoff,
   Search,
 } from 'lucide-react';
@@ -22,6 +24,11 @@ const FACEBOOK_URL = 'https://www.facebook.com/p/Thiaguil-multi-services-6156698
 const whatsappLink = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
+/** Nombre maximum d'affiches utilisées en fond (poids de la page sur mobile). */
+const MAX_BACKDROP_POSTERS = 8;
+/** En dessous de ce nombre, le mur se répéterait trop : une affiche à la fois. */
+const MIN_POSTERS_FOR_WALL = 3;
+
 /**
  * Hero « Prochain départ » : le prochain départ publié depuis l'admin est
  * l'élément central de la page (trajet, date, compte à rebours, réservation
@@ -35,9 +42,18 @@ export const Hero: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failedPosters, setFailedPosters] = useState<Record<string, boolean>>({});
   const [trackingInput, setTrackingInput] = useState('');
+  const [motionPaused, setMotionPaused] = useState(false);
 
   const upcoming = getUpcomingDepartures(announcements);
   const current = upcoming.find((a) => a.id === selectedId) ?? upcoming[0];
+  const markPosterFailed = (id: string) => setFailedPosters((prev) => ({ ...prev, [id]: true }));
+
+  // Affiches des départs À VENIR uniquement (jamais un départ passé : sa date
+  // induirait en erreur), sans celles dont l'image ne se charge pas.
+  const backdropPosters = announcementsLoading
+    ? []
+    : upcoming.filter((a) => a.posterUrl && !failedPosters[a.id]).slice(0, MAX_BACKDROP_POSTERS);
+  const backdropAnimated = backdropPosters.length >= 2;
 
   const handleTrackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +68,16 @@ export const Hero: React.FC = () => {
           la même phrase est affichée plus bas, sous les cartes. */}
       <h1 className="sr-only">{t.slogan}</h1>
 
-      <div className="bg-ink text-white border-t-4 border-brand">
+      <div
+        className={`relative overflow-hidden bg-ink text-white border-t-4 border-brand ${
+          motionPaused ? 'poster-motion-paused' : ''
+        }`}
+      >
+        <PosterBackdrop posters={backdropPosters} onPosterError={markPosterFailed} />
+
         <div
           id="departs"
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-24 lg:pb-32 scroll-mt-20"
+          className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-24 lg:pb-32 scroll-mt-20"
         >
           {announcementsLoading ? (
             <HeroLoading label={t.loading} />
@@ -65,11 +87,28 @@ export const Hero: React.FC = () => {
               departure={current}
               upcoming={upcoming}
               onSelect={setSelectedId}
+              isNext={current.id === upcoming[0]?.id}
               posterFailed={Boolean(failedPosters[current.id])}
-              onPosterError={() => setFailedPosters((prev) => ({ ...prev, [current.id]: true }))}
+              onPosterError={() => markPosterFailed(current.id)}
             />
           ) : (
             <NoDepartureHero />
+          )}
+
+          {/* Pause du défilement des affiches (masqué si le visiteur a déjà
+              réduit les animations dans les réglages de son appareil). */}
+          {backdropAnimated && (
+            <div className="flex justify-end pt-8 motion-reduce:hidden">
+              <button
+                type="button"
+                aria-pressed={motionPaused}
+                onClick={() => setMotionPaused((p) => !p)}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-slate-500 bg-ink/75 text-slate-200 text-[13px] font-bold hover:border-slate-300 transition-colors cursor-pointer"
+              >
+                {motionPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                {motionPaused ? t.playMotion : t.pauseMotion}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -157,9 +196,10 @@ const DepartureHero: React.FC<{
   departure: DepartureAnnouncement;
   upcoming: DepartureAnnouncement[];
   onSelect: (id: string) => void;
+  isNext: boolean;
   posterFailed: boolean;
   onPosterError: () => void;
-}> = ({ departure, upcoming, onSelect, posterFailed, onPosterError }) => {
+}> = ({ departure, upcoming, onSelect, isNext, posterFailed, onPosterError }) => {
   const { language } = useApp();
   const t = translations[language].hero;
 
@@ -174,6 +214,11 @@ const DepartureHero: React.FC<{
   );
   const posterAlt = t.posterAlt.replace('{city}', departure.destinationCity).replace('{date}', longDate);
   const showPoster = Boolean(departure.posterUrl) && !posterFailed;
+  // « Prochain départ » seulement pour le départ le plus proche ; si le
+  // visiteur a choisi un autre départ dans les pastilles, on affiche sa date.
+  const featuredLabel = isNext
+    ? t.featuredNext
+    : t.featuredOther.replace('{date}', date?.short ?? departure.departureDayLabel);
 
   return (
     <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 xl:gap-24">
@@ -280,13 +325,19 @@ const DepartureHero: React.FC<{
       {/* Affiche Facebook, ou carte calendrier si le départ n'a pas d'affiche */}
       <div className="w-full lg:w-[400px] shrink-0 flex justify-center lg:block">
         {showPoster ? (
-          <img
-            src={resolveApiAsset(departure.posterUrl as string)}
-            alt={posterAlt}
-            decoding="async"
-            onError={onPosterError}
-            className="w-full max-w-sm lg:max-w-none max-h-[520px] object-contain rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl shadow-black/40"
-          />
+          <figure className="w-full max-w-sm lg:max-w-none">
+            <figcaption className="ml-4 inline-flex items-center gap-2 px-3.5 py-2 rounded-t-xl bg-brand text-white text-[11px] sm:text-xs font-extrabold tracking-[0.12em] uppercase">
+              <span className="w-2 h-2 rounded-full bg-white" aria-hidden="true" />
+              {featuredLabel}
+            </figcaption>
+            <img
+              src={resolveApiAsset(departure.posterUrl as string)}
+              alt={posterAlt}
+              decoding="async"
+              onError={onPosterError}
+              className="block w-full max-h-[520px] object-contain rounded-2xl border-4 border-brand bg-slate-950 shadow-2xl shadow-black/60"
+            />
+          </figure>
         ) : (
           <CalendarCard
             month={date?.month ?? ''}
@@ -377,3 +428,84 @@ const HeroLoading: React.FC<{ label: string }> = ({ label }) => (
     </div>
   </div>
 );
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Affiches des prochains départs en fond du bandeau, derrière un voile sombre
+ * qui garde le texte lisible. Purement décoratif (aria-hidden) : les mêmes
+ * informations sont données en texte au premier plan.
+ * - 3 affiches ou plus : mur d'affiches qui défile, rangées en sens opposés ;
+ * - 1 ou 2 affiches : une affiche à la fois, floutée, en fondu ;
+ * - aucune affiche : rien (fond uni).
+ * Les animations s'arrêtent avec le bouton pause (classe poster-motion-paused
+ * sur le bandeau) et pour les visiteurs qui ont réduit les animations.
+ */
+const PosterBackdrop: React.FC<{
+  posters: DepartureAnnouncement[];
+  onPosterError: (id: string) => void;
+}> = ({ posters, onPosterError }) => {
+  if (posters.length === 0) return null;
+
+  const scrim = (
+    <div className="absolute inset-0 bg-ink/90 lg:bg-transparent lg:bg-gradient-to-r lg:from-ink/95 lg:via-ink/90 lg:to-ink/55" />
+  );
+
+  if (posters.length < MIN_POSTERS_FOR_WALL) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        {posters.map((poster, i) => (
+          <img
+            key={poster.id}
+            src={resolveApiAsset(poster.posterUrl as string)}
+            alt=""
+            decoding="async"
+            onError={() => onPosterError(poster.id)}
+            style={posters.length > 1 ? { animationDelay: `${i * 7}s` } : undefined}
+            className={`absolute -inset-10 w-[calc(100%+5rem)] h-[calc(100%+5rem)] max-w-none object-cover blur-xl ${
+              posters.length > 1 ? 'poster-fade-2' : ''
+            }`}
+          />
+        ))}
+        {scrim}
+      </div>
+    );
+  }
+
+  // Chaque rangée : au moins 8 affiches, puis la même suite deux fois pour
+  // une boucle sans à-coup (l'animation décale de -50 %).
+  const rowCount = 6;
+  const rows = Array.from({ length: rowCount }, (_, r) => {
+    const base: DepartureAnnouncement[] = [];
+    for (let i = 0; base.length < Math.max(8, posters.length); i++) {
+      base.push(posters[(i + r) % posters.length]);
+    }
+    return base.concat(base);
+  });
+
+  return (
+    <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+      <div className="absolute -inset-x-10 -top-16 bottom-0 flex flex-col gap-4 sm:gap-5 -rotate-[4deg] origin-center">
+        {rows.map((row, r) => (
+          <div
+            key={r}
+            className={`flex gap-4 sm:gap-5 w-max ${r % 2 === 0 ? 'poster-wall-left' : 'poster-wall-right'}`}
+            style={{ marginLeft: `-${(r * 53) % 160}px` }}
+          >
+            {row.map((poster, i) => (
+              <img
+                key={`${poster.id}-${i}`}
+                src={resolveApiAsset(poster.posterUrl as string)}
+                alt=""
+                decoding="async"
+                onError={() => onPosterError(poster.id)}
+                className="w-32 h-40 sm:w-44 sm:h-56 lg:w-[200px] lg:h-[250px] shrink-0 rounded-xl object-cover bg-slate-800"
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      {scrim}
+    </div>
+  );
+};
