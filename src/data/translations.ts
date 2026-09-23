@@ -36,6 +36,10 @@ export interface Translations {
     facebookLink: string;
     upcomingLabel: string;
     posterAlt: string;
+    featuredNext: string;
+    featuredOther: string;
+    pauseMotion: string;
+    playMotion: string;
     loading: string;
     emptyEyebrow: string;
     emptyTitle: string;
@@ -304,6 +308,10 @@ export const translations: Record<Language, Translations> = {
       facebookLink: 'Voir nos annonces sur Facebook',
       upcomingLabel: 'Départs à venir :',
       posterAlt: 'Affiche du départ vers {city} le {date}',
+      featuredNext: 'À la une · Prochain départ',
+      featuredOther: 'Départ du {date}',
+      pauseMotion: 'Mettre en pause le défilement',
+      playMotion: 'Relancer le défilement',
       loading: 'Chargement des prochains départs…',
       emptyEyebrow: 'PROCHAINS DÉPARTS',
       emptyTitle: 'Prochain départ bientôt annoncé',
@@ -597,6 +605,10 @@ export const translations: Record<Language, Translations> = {
       facebookLink: 'See our announcements on Facebook',
       upcomingLabel: 'Upcoming departures:',
       posterAlt: 'Poster for the departure to {city} on {date}',
+      featuredNext: 'Featured · Next departure',
+      featuredOther: 'Departure on {date}',
+      pauseMotion: 'Pause the slideshow',
+      playMotion: 'Resume the slideshow',
       loading: 'Loading upcoming departures…',
       emptyEyebrow: 'UPCOMING DEPARTURES',
       emptyTitle: 'Next departure coming soon',
