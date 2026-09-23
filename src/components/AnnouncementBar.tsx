@@ -116,7 +116,7 @@ export const AnnouncementBar: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white hover:bg-slate-100 text-brand font-bold text-xs transition-colors shadow-2xs"
           >
-            <span>{t.reserveButton}</span>
+            <span>{t.bookColis}</span>
             <ArrowRight className="w-3 h-3" />
           </a>
 

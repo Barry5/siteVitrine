@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { NextDeparturesSection } from './components/NextDeparturesSection';
 import { TrackingSection } from './components/TrackingSection';
 import { ServicesSection } from './components/ServicesSection';
 import { ShippingCalculator } from './components/ShippingCalculator';
@@ -35,6 +36,9 @@ const MainLayout: React.FC = () => {
       <main className="flex-1">
         {/* Hero Section with Quick Tracker & Departure Showcase */}
         <Hero />
+
+        {/* Auto-playing carousel of upcoming departures (dates highlighted, mirrors the Facebook page's departure posters) */}
+        <NextDeparturesSection />
 
         {/* Live Parcel Tracking Module */}
         <TrackingSection />

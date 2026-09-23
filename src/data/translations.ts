@@ -3,6 +3,7 @@ export type Language = 'fr' | 'en';
 export interface Translations {
   nav: {
     home: string;
+    departures: string;
     services: string;
     destinations: string;
     tracking: string;
@@ -19,6 +20,20 @@ export interface Translations {
     bookColis: string;
     next: string;
     prev: string;
+  };
+  nextDepartures: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    dateLabel: string;
+    routeFrom: string;
+    reserveButton: string;
+    pauseLabel: string;
+    playLabel: string;
+    prevLabel: string;
+    nextLabel: string;
+    goToLabel: string;
+    emptyState: string;
   };
   hero: {
     tagline: string;
@@ -240,6 +255,7 @@ export const translations: Record<Language, Translations> = {
   fr: {
     nav: {
       home: 'Accueil',
+      departures: 'Départs',
       services: 'Services',
       destinations: 'Destinations',
       tracking: 'Suivi de colis',
@@ -256,6 +272,21 @@ export const translations: Record<Language, Translations> = {
       bookColis: 'Réserver mon colis',
       next: 'Suivant',
       prev: 'Précédent',
+    },
+    nextDepartures: {
+      badge: 'PROCHAINS DÉPARTS',
+      title: 'Nos prochains départs',
+      subtitle:
+        'Chaque semaine, vos colis embarquent vers l\'international. Réservez votre place avant la date limite de dépôt.',
+      dateLabel: 'Départ prévu',
+      routeFrom: 'Conakry',
+      reserveButton: 'Réserver ce départ',
+      pauseLabel: 'Mettre le défilement en pause',
+      playLabel: 'Relancer le défilement',
+      prevLabel: 'Départ précédent',
+      nextLabel: 'Départ suivant',
+      goToLabel: 'Aller au départ',
+      emptyState: 'Aucun départ programmé pour le moment. Contactez-nous pour connaître le prochain vol.',
     },
     hero: {
       tagline: 'TRANSITAIRE & FRET INTERNATIONAL • GUINÉE ➔ AMÉRIQUE & EUROPE',
@@ -501,6 +532,7 @@ export const translations: Record<Language, Translations> = {
   en: {
     nav: {
       home: 'Home',
+      departures: 'Departures',
       services: 'Services',
       destinations: 'Destinations',
       tracking: 'Track Parcel',
@@ -517,6 +549,21 @@ export const translations: Record<Language, Translations> = {
       bookColis: 'Book your shipment',
       next: 'Next',
       prev: 'Previous',
+    },
+    nextDepartures: {
+      badge: 'UPCOMING DEPARTURES',
+      title: 'Our upcoming departures',
+      subtitle:
+        'Every week, your parcels head abroad. Reserve your spot before the drop-off deadline.',
+      dateLabel: 'Scheduled departure',
+      routeFrom: 'Conakry',
+      reserveButton: 'Reserve this departure',
+      pauseLabel: 'Pause the slideshow',
+      playLabel: 'Resume the slideshow',
+      prevLabel: 'Previous departure',
+      nextLabel: 'Next departure',
+      goToLabel: 'Go to departure',
+      emptyState: 'No departure scheduled right now. Contact us to find out about the next flight.',
     },
     hero: {
       tagline: 'INTERNATIONAL FREIGHT FORWARDING • GUINEA ➔ NORTH AMERICA & EUROPE',
