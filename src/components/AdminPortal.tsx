@@ -21,9 +21,11 @@ import {
   Eye,
   EyeOff,
   Package,
+  ImagePlus,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
+import { resolveApiAsset, uploadPoster } from '../lib/api';
 import { Agency, DepartureAnnouncement, Destination, PricingRule, Testimonial } from '../types';
 
 export const AdminPortal: React.FC = () => {
@@ -43,6 +45,7 @@ export const AdminPortal: React.FC = () => {
     updateAnnouncement,
     deleteAnnouncement,
     toggleAnnouncementActive,
+    announcementsSyncError,
     addAgency,
     updateAgency,
     deleteAgency,
@@ -66,7 +69,13 @@ export const AdminPortal: React.FC = () => {
 
   // Modal forms states
   const [isAddingAnnouncement, setIsAddingAnnouncement] = useState(false);
+  // Erreur d'enregistrement serveur des annonces, et annonce en cours d'enregistrement.
+  const [annError, setAnnError] = useState<string | null>(null);
+  const [annBusyId, setAnnBusyId] = useState<string | null>(null);
+  const [isSavingNewAnn, setIsSavingNewAnn] = useState(false);
+  const [isUploadingNewPoster, setIsUploadingNewPoster] = useState(false);
   const [newAnn, setNewAnn] = useState({
+    posterUrl: undefined as string | undefined,
     title: '',
     destination: 'New York (USA)',
     destinationCity: 'New York',
@@ -132,13 +141,69 @@ export const AdminPortal: React.FC = () => {
     }
   };
 
+  // Exécute une action sur une annonce existante (masquer, supprimer, affiche)
+  // et affiche l'erreur du serveur si l'enregistrement échoue.
+  const runAnnAction = async (id: string, action: () => Promise<void>) => {
+    setAnnBusyId(id);
+    setAnnError(null);
+    try {
+      await action();
+    } catch (err) {
+      setAnnError((err as Error).message);
+    } finally {
+      setAnnBusyId(null);
+    }
+  };
+
+  const handleReplacePoster = (id: string, file: File | undefined) => {
+    if (!file) return;
+    runAnnAction(id, async () => {
+      const posterUrl = await uploadPoster(file);
+      await updateAnnouncement(id, { posterUrl });
+    });
+  };
+
+  const handleRemovePoster = (id: string) => {
+    if (!confirm("Retirer l'affiche de ce départ ? Le fichier sera supprimé du serveur.")) return;
+    runAnnAction(id, () => updateAnnouncement(id, { posterUrl: undefined }));
+  };
+
+  const handleDeleteAnnouncement = (id: string) => {
+    if (!confirm('Supprimer définitivement ce départ du site (et son affiche) ?')) return;
+    runAnnAction(id, () => deleteAnnouncement(id));
+  };
+
+  const handleNewAnnPoster = async (file: File | undefined) => {
+    if (!file) return;
+    setAnnError(null);
+    setIsUploadingNewPoster(true);
+    try {
+      const posterUrl = await uploadPoster(file);
+      setNewAnn((prev) => ({ ...prev, posterUrl }));
+    } catch (err) {
+      setAnnError((err as Error).message);
+    } finally {
+      setIsUploadingNewPoster(false);
+    }
+  };
+
   // Submit announcement
-  const handleCreateAnnouncement = (e: React.FormEvent) => {
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAnn.title || !newAnn.departureDayLabel) return;
-    addAnnouncement(newAnn);
+    setAnnError(null);
+    setIsSavingNewAnn(true);
+    try {
+      await addAnnouncement(newAnn);
+    } catch (err) {
+      setAnnError((err as Error).message);
+      return;
+    } finally {
+      setIsSavingNewAnn(false);
+    }
     setIsAddingAnnouncement(false);
     setNewAnn({
+      posterUrl: undefined,
       title: '',
       destination: 'New York (USA)',
       destinationCity: 'New York',
@@ -459,6 +524,12 @@ export const AdminPortal: React.FC = () => {
                   </button>
                 </div>
 
+                {annError && (
+                  <p role="alert" className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                    {annError}
+                  </p>
+                )}
+
                 <div className="space-y-2.5">
                   {announcements.slice(0, 3).map((ann) => (
                     <div
@@ -484,8 +555,9 @@ export const AdminPortal: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={() => toggleAnnouncementActive(ann.id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
+                        onClick={() => runAnnAction(ann.id, () => toggleAnnouncementActive(ann.id))}
+                        disabled={annBusyId === ann.id}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-wait ${
                           ann.isActive
                             ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -502,10 +574,13 @@ export const AdminPortal: React.FC = () => {
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col justify-between space-y-4">
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 mb-2">
-                    Synchronisation Locale
+                    Où sont enregistrées vos modifications ?
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Toutes les modifications saisies ici (tarifs, agences, départs) sont enregistrées immédiatement dans votre navigateur et s'affichent instantanément sur le site vitrine.
+                    <strong>Départs et affiches :</strong> enregistrés sur le serveur, visibles immédiatement par tous les visiteurs.
+                  </p>
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2">
+                    <strong>Tarifs, agences, destinations, témoignages :</strong> encore enregistrés uniquement dans ce navigateur — les visiteurs ne voient pas ces modifications.
                   </p>
                 </div>
 
@@ -519,11 +594,11 @@ export const AdminPortal: React.FC = () => {
                     className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
                   >
                     <RefreshCcw className="w-3.5 h-3.5 text-brand" />
-                    <span>Réinitialiser aux valeurs d'origine</span>
+                    <span>Réinitialiser les données locales</span>
                   </button>
 
                   <p className="text-[10px] text-slate-600 text-center">
-                    Utile pour réinitialiser la démo avec les affiches Facebook réelles.
+                    Restaure tarifs, agences, destinations et témoignages d'origine dans ce navigateur. Ne touche pas aux départs publiés.
                   </p>
                 </div>
               </div>
@@ -536,13 +611,37 @@ export const AdminPortal: React.FC = () => {
            ========================================================================= */}
         {activeTab === 'announcements' && (
           <div className="space-y-6 animate-fadeIn">
+            {announcementsSyncError && (
+              <div role="alert" className="flex items-start gap-2 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Serveur injoignable :</strong> les départs affichés ci-dessous ne sont peut-être pas ceux publiés sur le site, et vos modifications ne pourront pas être enregistrées. ({announcementsSyncError})
+                </span>
+              </div>
+            )}
+            {annError && (
+              <div role="alert" className="flex items-start justify-between gap-2 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs">
+                <span className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{annError}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setAnnError(null)}
+                  className="p-0.5 rounded hover:bg-red-100 cursor-pointer"
+                  aria-label="Fermer le message d'erreur"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-3xl border border-slate-200">
               <div>
                 <h3 className="text-lg font-extrabold text-slate-900">
                   Gestion des Annonces de Départs Spéciaux
                 </h3>
                 <p className="text-xs text-slate-600">
-                  Publiez directement les départs (New York, Montréal, etc.) comme sur vos affiches Facebook. Ces annonces s'affichent dans la barre supérieure et dans la Hero section.
+                  Publiez directement les départs (New York, Montréal, etc.) avec l'affiche publiée sur Facebook. Ces annonces s'affichent dans la barre supérieure, dans la Hero section et dans le carrousel « Prochains départs ».
                 </p>
               </div>
 
@@ -641,6 +740,61 @@ export const AdminPortal: React.FC = () => {
                   </div>
 
                   <div>
+                    <span className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Affiche Facebook du départ (optionnel)
+                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {newAnn.posterUrl && (
+                        <img
+                          src={resolveApiAsset(newAnn.posterUrl)}
+                          alt="Aperçu de l'affiche téléversée"
+                          className="h-24 w-auto rounded-lg border border-slate-200 object-contain bg-slate-50"
+                        />
+                      )}
+                      <label
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 font-bold transition-colors ${
+                          isUploadingNewPoster ? 'opacity-60 cursor-wait' : 'hover:bg-slate-50 cursor-pointer'
+                        }`}
+                      >
+                        {isUploadingNewPoster ? (
+                          <RefreshCcw className="w-4 h-4 text-brand animate-spin" />
+                        ) : (
+                          <ImagePlus className="w-4 h-4 text-brand" />
+                        )}
+                        <span>
+                          {isUploadingNewPoster
+                            ? 'Téléversement…'
+                            : newAnn.posterUrl
+                              ? "Remplacer l'affiche"
+                              : "Téléverser l'affiche"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="sr-only"
+                          disabled={isUploadingNewPoster}
+                          onChange={(e) => {
+                            handleNewAnnPoster(e.target.files?.[0]);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                      {newAnn.posterUrl && !isUploadingNewPoster && (
+                        <button
+                          type="button"
+                          onClick={() => setNewAnn((prev) => ({ ...prev, posterUrl: undefined }))}
+                          className="text-red-600 font-bold hover:underline cursor-pointer"
+                        >
+                          Retirer
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      JPEG, PNG ou WebP, 5 Mo maximum. Enregistrez l'image depuis votre publication Facebook, puis téléversez-la ici. Les informations saisies ci-dessus restent affichées en texte à côté de l'affiche.
+                    </p>
+                  </div>
+
+                  <div>
                     <label className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
                       Note informative / Agences concernées
                     </label>
@@ -663,9 +817,10 @@ export const AdminPortal: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer"
+                      disabled={isSavingNewAnn || isUploadingNewPoster}
+                      className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                     >
-                      Publier l'avis de départ
+                      {isSavingNewAnn ? 'Publication…' : "Publier l'avis de départ"}
                     </button>
                   </div>
                 </form>
@@ -682,6 +837,18 @@ export const AdminPortal: React.FC = () => {
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      {ann.posterUrl ? (
+                        <img
+                          src={resolveApiAsset(ann.posterUrl)}
+                          alt={`Affiche du départ vers ${ann.destinationCity} le ${ann.departureDayLabel}`}
+                          className="h-20 w-16 shrink-0 rounded-lg border border-slate-200 object-cover bg-slate-50"
+                        />
+                      ) : (
+                        <div className="h-20 w-16 shrink-0 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-slate-400" title="Aucune affiche">
+                          <ImagePlus className="w-5 h-5" />
+                        </div>
+                      )}
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-base text-slate-900">
@@ -701,12 +868,50 @@ export const AdminPortal: React.FC = () => {
 
                       <h4 className="text-sm font-bold text-slate-800">{ann.title}</h4>
                       <p className="text-xs text-slate-600">{ann.urgencyNote}</p>
+                      <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
+                        <label
+                          className={`inline-flex items-center gap-1 font-bold text-brand ${
+                            annBusyId === ann.id ? 'opacity-50 cursor-wait' : 'hover:underline cursor-pointer'
+                          }`}
+                        >
+                          <ImagePlus className="w-3.5 h-3.5" />
+                          <span>{ann.posterUrl ? "Remplacer l'affiche" : "Téléverser l'affiche"}</span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            className="sr-only"
+                            disabled={annBusyId === ann.id}
+                            onChange={(e) => {
+                              handleReplacePoster(ann.id, e.target.files?.[0]);
+                              e.target.value = '';
+                            }}
+                          />
+                        </label>
+                        {ann.posterUrl && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePoster(ann.id)}
+                            disabled={annBusyId === ann.id}
+                            className="font-bold text-slate-600 hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            Retirer l'affiche
+                          </button>
+                        )}
+                        {annBusyId === ann.id && (
+                          <span className="inline-flex items-center gap-1 text-slate-500">
+                            <RefreshCcw className="w-3 h-3 animate-spin" />
+                            Enregistrement…
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
                       <button
-                        onClick={() => toggleAnnouncementActive(ann.id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
+                        onClick={() => runAnnAction(ann.id, () => toggleAnnouncementActive(ann.id))}
+                        disabled={annBusyId === ann.id}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-wait ${
                           ann.isActive
                             ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -716,8 +921,9 @@ export const AdminPortal: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => deleteAnnouncement(ann.id)}
-                        className="p-2 rounded-xl text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                        onClick={() => handleDeleteAnnouncement(ann.id)}
+                        disabled={annBusyId === ann.id}
+                        className="p-2 rounded-xl text-red-600 hover:bg-red-50 cursor-pointer transition-colors disabled:opacity-50"
                         title="Supprimer cette annonce"
                         aria-label="Supprimer cette annonce"
                       >

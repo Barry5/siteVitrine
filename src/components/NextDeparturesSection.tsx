@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
+import { resolveApiAsset } from '../lib/api';
+import { DepartureAnnouncement } from '../types';
 
 const AUTOPLAY_MS = 6000;
 
@@ -95,71 +97,14 @@ export const NextDeparturesSection: React.FC = () => {
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${safeIndex * 100}%)` }}
             >
-              {upcoming.map((departure) => {
-                const flag = flagFor(departure.destinationCity);
-                return (
-                  <div key={departure.id} className="w-full shrink-0 px-1">
-                    <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 border border-slate-700/80 rounded-3xl p-6 sm:p-10 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-                      {/* Left: big date block */}
-                      <div className="lg:col-span-4 flex flex-col items-start gap-3">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand text-white font-extrabold text-[10px] uppercase tracking-wide">
-                          {departure.badge}
-                        </span>
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
-                            <CalendarClock className="w-6 h-6 text-brand" />
-                          </div>
-                          <div>
-                            <span className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
-                              {t.dateLabel}
-                            </span>
-                            <span className="block text-xl sm:text-2xl font-extrabold text-white font-display leading-tight">
-                              {departure.departureDayLabel}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Middle: route + title + urgency note */}
-                      <div className="lg:col-span-5 space-y-3">
-                        <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-white">
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-lg">🇬🇳</span>
-                            {t.routeFrom}
-                          </span>
-                          <ArrowRight className="w-4 h-4 text-brand shrink-0" />
-                          <span className="flex items-center gap-1.5">
-                            {flag && <span className="text-lg">{flag}</span>}
-                            {departure.destinationCity}
-                          </span>
-                        </div>
-                        <h3 className="text-white/90 font-semibold text-sm sm:text-base">
-                          {departure.title}
-                        </h3>
-                        <div className="inline-flex items-center gap-1.5 text-xs bg-black/30 text-amber-200 px-2.5 py-1 rounded-lg border border-white/10">
-                          <MapPin className="w-3.5 h-3.5 shrink-0" />
-                          <span>{departure.urgencyNote}</span>
-                        </div>
-                      </div>
-
-                      {/* Right: reserve CTA */}
-                      <div className="lg:col-span-3 flex lg:justify-end">
-                        <a
-                          href={`https://wa.me/224611835683?text=${encodeURIComponent(
-                            `Bonjour Thiaguil Multi-services, je souhaite réserver pour le départ du ${departure.departureDayLabel} vers ${departure.destinationCity}.`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-sm transition-colors shadow-lg"
-                        >
-                          <span>{t.reserveButton}</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {upcoming.map((departure) => (
+                <DepartureSlide
+                  key={departure.id}
+                  departure={departure}
+                  flag={flagFor(departure.destinationCity)}
+                  t={t}
+                />
+              ))}
             </div>
           </div>
 
@@ -211,5 +156,127 @@ export const NextDeparturesSection: React.FC = () => {
         </div>
       </div>
     </section>
+  );
+};
+
+type NextDeparturesT = (typeof translations)['fr']['nextDepartures'];
+
+/**
+ * Une carte du carrousel. Deux présentations :
+ * - avec affiche (posterUrl) : l'affiche Facebook en visuel principal, et à
+ *   côté les mêmes informations en texte (date, destination, note) — le texte
+ *   reste indispensable pour Google, la traduction FR/EN et les lecteurs d'écran ;
+ * - sans affiche, ou si l'image ne se charge pas : la carte texte d'origine.
+ */
+const DepartureSlide: React.FC<{
+  departure: DepartureAnnouncement;
+  flag: string | null;
+  t: NextDeparturesT;
+}> = ({ departure, flag, t }) => {
+  const [posterFailed, setPosterFailed] = useState(false);
+  const showPoster = Boolean(departure.posterUrl) && !posterFailed;
+
+  const posterAlt = t.posterAlt
+    .replace('{city}', departure.destinationCity)
+    .replace('{date}', departure.departureDayLabel);
+
+  const reserveHref = `https://wa.me/224611835683?text=${encodeURIComponent(
+    `Bonjour Thiaguil Multi-services, je souhaite réserver pour le départ du ${departure.departureDayLabel} vers ${departure.destinationCity}.`
+  )}`;
+
+  const dateBlock = (
+    <div className="flex flex-col items-start gap-3">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand text-white font-extrabold text-[10px] uppercase tracking-wide">
+        {departure.badge}
+      </span>
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
+          <CalendarClock className="w-6 h-6 text-brand" />
+        </div>
+        <div>
+          <span className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+            {t.dateLabel}
+          </span>
+          <span className="block text-xl sm:text-2xl font-extrabold text-white font-display leading-tight">
+            {departure.departureDayLabel}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const routeBlock = (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-white">
+        <span className="flex items-center gap-1.5">
+          <span className="text-lg">🇬🇳</span>
+          {t.routeFrom}
+        </span>
+        <ArrowRight className="w-4 h-4 text-brand shrink-0" />
+        <span className="flex items-center gap-1.5">
+          {flag && <span className="text-lg">{flag}</span>}
+          {departure.destinationCity}
+        </span>
+      </div>
+      <h3 className="text-white/90 font-semibold text-sm sm:text-base">{departure.title}</h3>
+      <div className="inline-flex items-center gap-1.5 text-xs bg-black/30 text-amber-200 px-2.5 py-1 rounded-lg border border-white/10">
+        <MapPin className="w-3.5 h-3.5 shrink-0" />
+        <span>{departure.urgencyNote}</span>
+      </div>
+    </div>
+  );
+
+  const reserveButton = (
+    <a
+      href={reserveHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-sm transition-colors shadow-lg"
+    >
+      <span>{t.reserveButton}</span>
+      <ArrowRight className="w-4 h-4" />
+    </a>
+  );
+
+  if (showPoster) {
+    return (
+      <div className="w-full shrink-0 px-1">
+        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 border border-slate-700/80 rounded-3xl p-4 sm:p-6 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+          {/* Affiche Facebook du départ */}
+          <div className="lg:col-span-5 flex justify-center">
+            <img
+              src={resolveApiAsset(departure.posterUrl as string)}
+              alt={posterAlt}
+              loading="lazy"
+              decoding="async"
+              onError={() => setPosterFailed(true)}
+              className="w-full max-w-sm max-h-[28rem] object-contain rounded-2xl border border-slate-700 bg-slate-950 shadow-xl"
+            />
+          </div>
+
+          {/* Mêmes informations en texte, à côté de l'affiche */}
+          <div className="lg:col-span-7 space-y-5">
+            {dateBlock}
+            {routeBlock}
+            <div className="pt-1">{reserveButton}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full shrink-0 px-1">
+      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 border border-slate-700/80 rounded-3xl p-6 sm:p-10 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+        {/* Left: big date block */}
+        <div className="lg:col-span-4">{dateBlock}</div>
+
+        {/* Middle: route + title + urgency note */}
+        <div className="lg:col-span-5">{routeBlock}</div>
+
+        {/* Right: reserve CTA */}
+        <div className="lg:col-span-3 flex lg:justify-end">{reserveButton}</div>
+      </div>
+    </div>
   );
 };

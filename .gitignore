@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Données publiées depuis l'admin (annonces, affiches) — jamais dans git
+server/data/

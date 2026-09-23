@@ -72,6 +72,9 @@ export interface DepartureAnnouncement {
   localOffices: string[];
   isActive: boolean;
   createdAt: string;
+  // Affiche Facebook du départ, téléversée depuis l'admin. Chemin renvoyé par
+  // l'API (ex: "/uploads/posters/<uuid>.jpg"), à résoudre avec resolveApiAsset().
+  posterUrl?: string;
 }
 
 export interface PricingRule {

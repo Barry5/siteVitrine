@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 /**
  * Charge Google Analytics 4 (gtag.js) UNIQUEMENT si un identifiant de
