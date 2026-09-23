@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Menu,
-  X,
-  Phone,
-  Search,
-  Package,
-  Globe,
-} from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
@@ -16,17 +9,17 @@ export const Header: React.FC = () => {
   const { currentView, setCurrentView, language, setLanguage } = useApp();
   const t = translations[language].nav;
 
+  // Menu volontairement court (5 liens). Services, destinations et FAQ
+  // restent accessibles dans la page et dans le pied de page.
   const navLinks = [
-    { label: t.home, href: '#accueil' },
     { label: t.departures, href: '#departs' },
-    { label: t.services, href: '#services' },
-    { label: t.destinations, href: '#destinations' },
     { label: t.tracking, href: '#suivi' },
-    { label: t.simulator, href: '#simulateur' },
+    { label: t.rates, href: '#simulateur' },
     { label: t.agencies, href: '#agences' },
-    { label: t.faq, href: '#faq' },
     { label: t.contact, href: '#contact' },
   ];
+
+  const whatsappHref = 'https://wa.me/224611835683';
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
@@ -55,13 +48,13 @@ export const Header: React.FC = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center gap-5 text-sm font-semibold text-slate-700">
+          <nav aria-label="Navigation principale" className="hidden lg:flex items-center gap-8 text-[15px] font-semibold text-slate-800">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="hover:text-brand transition-colors py-1 relative group text-[13px]"
+                className="hover:text-brand transition-colors py-1 relative group"
               >
                 {link.label}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand transition-all duration-200 group-hover:w-full"></span>
@@ -71,21 +64,6 @@ export const Header: React.FC = () => {
 
           {/* Desktop Right CTAs */}
           <div className="hidden lg:flex items-center gap-3">
-            {/* Quick Hotline direct link */}
-            <a
-              href="tel:+224611835683"
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-700 hover:text-brand hover:bg-slate-50 transition-colors text-xs font-semibold"
-              title="Assistance directe WhatsApp / Téléphone"
-            >
-              <div className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shrink-0">
-                <Phone className="w-3.5 h-3.5" />
-              </div>
-              <div className="text-left leading-tight hidden 2xl:block">
-                <span className="text-[10px] text-slate-600 uppercase block font-bold">{t.assistance}</span>
-                <span className="text-xs font-bold text-slate-900">+224 611 83 56 83</span>
-              </div>
-            </a>
-
             {/* Language Switcher (FR / EN) */}
             <div className="flex items-center rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
               <button
@@ -114,24 +92,17 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Secondary CTA: Suivre un colis (discret / contour neutre) */}
+            {/* Contact direct WhatsApp (la réservation principale est dans le hero) */}
             <a
-              href="#suivi"
-              onClick={() => handleNavClick('#suivi')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 text-slate-800 transition-colors font-semibold text-xs shadow-2xs cursor-pointer"
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border-[1.5px] border-ink text-ink hover:bg-ink hover:text-white transition-colors text-sm font-bold"
+              title={t.assistance}
             >
-              <Search className="w-3.5 h-3.5 text-slate-500" />
-              <span>{t.trackButton}</span>
-            </a>
-
-            {/* Primary Action (solid red - reserved single primary CTA for section) */}
-            <a
-              href="#simulateur"
-              onClick={() => handleNavClick('#simulateur')}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white transition-colors font-bold text-xs shadow-xs hover:shadow cursor-pointer"
-            >
-              <Package className="w-3.5 h-3.5" />
-              <span>{t.sendButton}</span>
+              <MessageCircle className="w-4 h-4" />
+              <span className="hidden xl:inline">+224 611 83 56 83</span>
+              <span className="xl:hidden">WhatsApp</span>
             </a>
           </div>
 
@@ -162,7 +133,8 @@ export const Header: React.FC = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-              aria-label="Ouvrir le menu"
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6 text-brand" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -186,33 +158,16 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            {/* Secondary mobile button */}
+          <div className="pt-3 border-t border-slate-100">
             <a
-              href="#suivi"
-              onClick={() => handleNavClick('#suivi')}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-800 font-semibold text-sm hover:bg-slate-50"
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-[1.5px] border-ink text-ink font-bold text-sm"
             >
-              <Search className="w-4 h-4 text-slate-500" />
-              <span>{t.trackButton}</span>
+              <MessageCircle className="w-4 h-4" />
+              <span>WhatsApp : +224 611 83 56 83</span>
             </a>
-
-            {/* Primary mobile button */}
-            <a
-              href="#simulateur"
-              onClick={() => handleNavClick('#simulateur')}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-brand text-white font-bold text-sm shadow-xs"
-            >
-              <Package className="w-4 h-4" />
-              <span>{t.sendButton}</span>
-            </a>
-
-            <div className="pt-2 flex items-center justify-between text-xs text-slate-600 px-2">
-              <span className="flex items-center gap-1 font-medium">
-                <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                WhatsApp : 611 83 56 83
-              </span>
-            </div>
           </div>
         </div>
       )}

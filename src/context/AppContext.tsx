@@ -36,6 +36,8 @@ interface AppContextType {
   isAdminAuthChecking: boolean;
   activeTrackedItem: TrackingItem | null;
   activeSearchCode: string;
+  // Numéro recherché introuvable (null si pas d'erreur) ; le message traduit
+  // est construit par TrackingSection.
   trackingError: string | null;
   language: 'fr' | 'en';
   setLanguage: (lang: 'fr' | 'en') => void;
@@ -58,6 +60,8 @@ interface AppContextType {
   // Message renseigné quand les annonces n'ont pas pu être chargées depuis
   // le serveur (le site affiche alors les données initiales).
   announcementsSyncError: string | null;
+  // Vrai tant que la première lecture des annonces depuis le serveur n'est pas terminée.
+  announcementsLoading: boolean;
 
   // CRUD Agencies
   addAgency: (agency: Omit<Agency, 'id'>) => void;
@@ -88,6 +92,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // publié depuis l'admin, ou si l'API est injoignable.
   const [announcements, setAnnouncements] = useState<DepartureAnnouncement[]>(INITIAL_ANNOUNCEMENTS);
   const [announcementsSyncError, setAnnouncementsSyncError] = useState<string | null>(null);
+  const [announcementsLoading, setAnnouncementsLoading] = useState<boolean>(true);
 
   // LocalStorage state initialization (données encore locales au navigateur)
 
@@ -111,10 +116,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_TESTIMONIALS;
   });
 
-  const [trackingItems, setTrackingItems] = useState<Record<string, TrackingItem>>(() => {
-    const saved = localStorage.getItem('thg_tracking_items');
-    return saved ? JSON.parse(saved) : INITIAL_TRACKING_ITEMS;
-  });
+  // Suivi de colis : aucune source de données réelle n'est encore branchée
+  // (INITIAL_TRACKING_ITEMS est vide). Plus de copie dans le navigateur :
+  // l'ancienne version y enregistrait des colis de démonstration et des
+  // suivis inventés.
+  const [trackingItems, setTrackingItems] = useState<Record<string, TrackingItem>>(INITIAL_TRACKING_ITEMS);
 
   const [currentView, setCurrentView] = useState<
     'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv'
@@ -163,6 +169,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .catch((err: Error) => {
         if (cancelled) return;
         setAnnouncementsSyncError(err.message || 'Serveur injoignable.');
+      })
+      .finally(() => {
+        if (!cancelled) setAnnouncementsLoading(false);
       });
     return () => {
       cancelled = true;
@@ -188,8 +197,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [testimonials]);
 
   useEffect(() => {
-    localStorage.setItem('thg_tracking_items', JSON.stringify(trackingItems));
-  }, [trackingItems]);
+    localStorage.removeItem('thg_tracking_items');
+  }, []);
 
   const loginAdmin = async (password: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -210,75 +219,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentView('public');
   };
 
-  // Search package
+  // Search package — ne renvoie QUE des colis réellement connus. Un numéro
+  // inconnu affiche « aucun colis trouvé » (plus de faux suivi généré).
   const searchPackage = (trackingNumber: string): TrackingItem | null => {
     const cleanCode = trackingNumber.trim().toUpperCase();
     setActiveSearchCode(cleanCode);
 
     if (!cleanCode) {
       setActiveTrackedItem(null);
-      setTrackingError('Veuillez renseigner un numéro de suivi valide (ex: THG-NY-8910).');
+      setTrackingError(null);
       return null;
     }
 
-    if (trackingItems[cleanCode]) {
-      const item = trackingItems[cleanCode];
+    const item = trackingItems[cleanCode];
+    if (item) {
       setActiveTrackedItem(item);
       setTrackingError(null);
       return item;
     }
 
-    // Dynamic fallback generation if code follows pattern THG-XXX-XXXX
-    if (cleanCode.startsWith('THG-') || cleanCode.length >= 6) {
-      const simulatedItem: TrackingItem = {
-        trackingNumber: cleanCode,
-        senderName: 'Client Enregistré',
-        receiverName: 'Destinataire Vérifié',
-        senderCity: 'Conakry (Hamdallaye)',
-        destinationCity: 'International Hub',
-        weightKg: 4.2,
-        shipmentType: 'small_box',
-        departureDate: '2026-09-02',
-        estimatedDeliveryDate: '2026-09-06',
-        status: 'in_transit',
-        pickupAgency: 'Bureau Central Destination',
-        steps: [
-          {
-            title: 'Colis enregistré au comptoir',
-            location: 'Agence Hamdallaye Conakry',
-            date: 'Hier à 15h30',
-            completed: true,
-            current: false,
-            description: 'Inspection réglementaire du colis, emballage et étiquetage sécurisé.',
-          },
-          {
-            title: 'Préparation et scellage fret',
-            location: 'Hub Cargo Conakry',
-            date: 'Aujourd\'hui à 08h00',
-            completed: true,
-            current: true,
-            description: 'Numéro de bordereau vérifié, prêt pour embarquement sur le prochain vol programmé.',
-          },
-          {
-            title: 'Arrivée et distribution',
-            location: 'Bureau International',
-            date: 'Délai estimé 3-5 jours',
-            completed: false,
-            current: false,
-            description: 'Notification automatique par WhatsApp et SMS lors de la mise à disposition.',
-          },
-        ],
-      };
-
-      // Store in memory for seamless interaction
-      setTrackingItems((prev) => ({ ...prev, [cleanCode]: simulatedItem }));
-      setActiveTrackedItem(simulatedItem);
-      setTrackingError(null);
-      return simulatedItem;
-    }
-
     setActiveTrackedItem(null);
-    setTrackingError(`Aucun colis trouvé pour la référence "${cleanCode}". Essayez un exemple : THG-NY-8910, THG-MTL-2708 ou THG-KND-0109.`);
+    setTrackingError(cleanCode);
     return null;
   };
 
@@ -424,6 +385,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteAnnouncement,
         toggleAnnouncementActive,
         announcementsSyncError,
+        announcementsLoading,
         addAgency,
         updateAgency,
         deleteAgency,

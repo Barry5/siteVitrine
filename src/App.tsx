@@ -1,10 +1,8 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
-import { AnnouncementBar } from './components/AnnouncementBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { TrustStatsStrip } from './components/TrustStatsStrip';
-import { NextDeparturesSection } from './components/NextDeparturesSection';
 import { TrackingSection } from './components/TrackingSection';
 import { ServicesSection } from './components/ServicesSection';
 import { ShippingCalculator } from './components/ShippingCalculator';
@@ -47,22 +45,16 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-canvas text-slate-900 selection:bg-brand selection:text-white">
-      {/* Top dynamic announcements bar (Vol confirmation / Facebook posters) */}
-      <AnnouncementBar />
-
       {/* Modern navigation bar with logo, links and admin access */}
       <Header />
 
       {/* Main Content Sections */}
       <main className="flex-1">
-        {/* Hero Section with Quick Tracker & Departure Showcase */}
+        {/* Hero « Prochain départ » : départ à venir, affiche, réservation + cartes Suivi / Tarifs / Agences */}
         <Hero />
 
         {/* Trust bar with real, computed figures (agencies/destinations) — never invented stats */}
         <TrustStatsStrip />
-
-        {/* Auto-playing carousel of upcoming departures (dates highlighted, mirrors the Facebook page's departure posters) */}
-        <NextDeparturesSection />
 
         {/* Live Parcel Tracking Module */}
         <TrackingSection />
