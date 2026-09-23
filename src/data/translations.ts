@@ -4,6 +4,7 @@ export interface Translations {
   nav: {
     home: string;
     departures: string;
+    rates: string;
     services: string;
     destinations: string;
     tracking: string;
@@ -15,27 +16,6 @@ export interface Translations {
     sendButton: string;
     assistance: string;
   };
-  announcement: {
-    badge: string;
-    bookColis: string;
-    next: string;
-    prev: string;
-  };
-  nextDepartures: {
-    badge: string;
-    title: string;
-    subtitle: string;
-    dateLabel: string;
-    routeFrom: string;
-    reserveButton: string;
-    pauseLabel: string;
-    playLabel: string;
-    prevLabel: string;
-    nextLabel: string;
-    goToLabel: string;
-    emptyState: string;
-    posterAlt: string;
-  };
   trustStats: {
     badge: string;
     localAgencies: string;
@@ -44,27 +24,35 @@ export interface Translations {
     qualityCharter: string;
   };
   hero: {
-    tagline: string;
-    titleStart: string;
-    destinations: string;
-    titleEnd: string;
-    description: string;
-    trackingTitle: string;
-    trackingRealtime: string;
-    trackingPlaceholder: string;
-    searchButton: string;
-    sampleCodesLabel: string;
-    trust1: string;
-    trust2: string;
-    trust3: string;
-    networkTitle: string;
-    directHub: string;
-    originLabel: string;
-    originCity: string;
-    nextFlightTitle: string;
+    eyebrow: string;
+    routeFrom: string;
+    routeTo: string;
+    countdownToday: string;
+    countdownTomorrow: string;
+    countdownDays: string;
+    agenciesLabel: string;
     reserveButton: string;
-    contactsTitle: string;
-    directWhatsApp: string;
+    reserveMessage: string;
+    facebookLink: string;
+    upcomingLabel: string;
+    posterAlt: string;
+    loading: string;
+    emptyEyebrow: string;
+    emptyTitle: string;
+    emptyBody: string;
+    emptyButton: string;
+    emptyMessage: string;
+    trackTitle: string;
+    trackLabel: string;
+    trackPlaceholder: string;
+    trackButton: string;
+    ratesTitle: string;
+    ratesBody: string;
+    ratesLink: string;
+    agenciesTitle: string;
+    agenciesBody: string;
+    agenciesLink: string;
+    slogan: string;
   };
   tracking: {
     badge: string;
@@ -92,7 +80,12 @@ export interface Translations {
     printReceipt: string;
     emptyTitle: string;
     emptySubtitle: string;
-    quickTestPrompt: string;
+    notFound: string;
+    notFoundHelp: string;
+    contactAgency: string;
+    contactMessage: string;
+    inputPlaceholder: string;
+    inputButton: string;
   };
   services: {
     badge: string;
@@ -279,6 +272,7 @@ export const translations: Record<Language, Translations> = {
     nav: {
       home: 'Accueil',
       departures: 'Départs',
+      rates: 'Tarifs',
       services: 'Services',
       destinations: 'Destinations',
       tracking: 'Suivi de colis',
@@ -290,28 +284,6 @@ export const translations: Record<Language, Translations> = {
       sendButton: 'Envoyer un colis',
       assistance: 'Assistance',
     },
-    announcement: {
-      badge: 'DÉPART SPÉCIAL',
-      bookColis: 'Réserver mon colis',
-      next: 'Suivant',
-      prev: 'Précédent',
-    },
-    nextDepartures: {
-      badge: 'PROCHAINS DÉPARTS',
-      title: 'Nos prochains départs',
-      subtitle:
-        'Chaque semaine, vos colis embarquent vers l\'international. Réservez votre place avant la date limite de dépôt.',
-      dateLabel: 'Départ prévu',
-      routeFrom: 'Conakry',
-      reserveButton: 'Réserver ce départ',
-      pauseLabel: 'Mettre le défilement en pause',
-      playLabel: 'Relancer le défilement',
-      prevLabel: 'Départ précédent',
-      nextLabel: 'Départ suivant',
-      goToLabel: 'Aller au départ',
-      emptyState: 'Aucun départ programmé pour le moment. Contactez-nous pour connaître le prochain vol.',
-      posterAlt: 'Affiche du départ vers {city} le {date}',
-    },
     trustStats: {
       badge: 'En quelques chiffres',
       localAgencies: 'Agences en Guinée',
@@ -320,28 +292,36 @@ export const translations: Record<Language, Translations> = {
       qualityCharter: 'Charte qualité à chaque dépôt',
     },
     hero: {
-      tagline: 'TRANSITAIRE & FRET INTERNATIONAL • GUINÉE ➔ AMÉRIQUE & EUROPE',
-      titleStart: 'Expédiez vos colis vers',
-      destinations: 'New York, Montréal',
-      titleEnd: "et l'international en toute confiance.",
-      description:
-        'Vols réguliers et fret maritime programmés depuis Conakry, Coyah et Kindia. Chaque colis est enregistré, vérifié et préparé avec méthode avant son départ pour garantir une livraison irréprochable.',
-      trackingTitle: 'Suivi instantané de colis',
-      trackingRealtime: 'Mise à jour en temps réel',
-      trackingPlaceholder: 'Entrez votre numéro (ex: THG-NY-8910)...',
-      searchButton: 'Rechercher',
-      sampleCodesLabel: 'Exemples à tester :',
-      trust1: 'Scellement & Pesée certifiée',
-      trust2: 'Départs Aériens Réguliers',
-      trust3: 'Retrait direct au Bronx & Montréal',
-      networkTitle: 'Liaisons Internationales',
-      directHub: 'Direct Hub',
-      originLabel: 'Hub Départ',
-      originCity: 'Conakry (CKY)',
-      nextFlightTitle: 'PROCHAIN DÉPART CONFIRMÉ',
-      reserveButton: 'Réserver',
-      contactsTitle: 'Siège Central & Contacts Express',
-      directWhatsApp: 'WhatsApp direct',
+      eyebrow: 'PROCHAIN DÉPART',
+      routeFrom: 'Conakry',
+      routeTo: 'vers',
+      countdownToday: "Départ aujourd'hui",
+      countdownTomorrow: 'Départ demain',
+      countdownDays: 'Départ dans {n} jours',
+      agenciesLabel: 'Agences de dépôt :',
+      reserveButton: 'Réserver ma place sur WhatsApp',
+      reserveMessage: 'Bonjour Thiaguil Multi-services, je souhaite réserver une place pour le départ du {date} vers {city}.',
+      facebookLink: 'Voir nos annonces sur Facebook',
+      upcomingLabel: 'Départs à venir :',
+      posterAlt: 'Affiche du départ vers {city} le {date}',
+      loading: 'Chargement des prochains départs…',
+      emptyEyebrow: 'PROCHAINS DÉPARTS',
+      emptyTitle: 'Prochain départ bientôt annoncé',
+      emptyBody:
+        "Contactez-nous pour connaître la date du prochain vol vers New York, Montréal ou l'Europe, et réserver votre place dès son ouverture.",
+      emptyButton: 'Demander la prochaine date',
+      emptyMessage: 'Bonjour Thiaguil Multi-services, quelle est la date du prochain départ ?',
+      trackTitle: 'Suivre un colis',
+      trackLabel: 'Numéro inscrit sur votre reçu',
+      trackPlaceholder: 'Votre numéro de suivi',
+      trackButton: 'Suivre',
+      ratesTitle: 'Estimer mon tarif',
+      ratesBody: 'Poids, destination, aérien ou maritime : une estimation immédiate avant de déposer votre colis.',
+      ratesLink: 'Ouvrir le simulateur',
+      agenciesTitle: 'Trouver une agence',
+      agenciesBody: "Adresses, horaires et contacts de nos agences en Guinée et de nos bureaux à l'international.",
+      agenciesLink: 'Voir les adresses',
+      slogan: "Expédiez vos colis vers New York, Montréal et l'international en toute confiance.",
     },
     tracking: {
       badge: 'Traçabilité & Statut en Direct',
@@ -368,10 +348,15 @@ export const translations: Record<Language, Translations> = {
       pickupIdRequired: "Veuillez vous munir d'une pièce d'identité valide lors du retrait.",
       whatsAppHelp: 'Aide WhatsApp',
       printReceipt: 'Imprimer la fiche',
-      emptyTitle: 'Aucun colis recherché pour le moment',
+      emptyTitle: 'Suivez votre colis',
       emptySubtitle:
-        'Utilisez le champ de recherche dans le haut de page ou cliquez sur un de nos colis tests ci-dessous pour voir le suivi en direct :',
-      quickTestPrompt: 'Colis pilotes à tester en un clic :',
+        'Entrez le numéro de suivi inscrit sur votre reçu de dépôt.',
+      notFound: 'Aucun colis trouvé pour le numéro « {code} ».',
+      notFoundHelp: "Vérifiez le numéro inscrit sur votre reçu. Si votre colis n'apparaît pas encore en ligne, notre équipe vous répond directement.",
+      contactAgency: "Demander le suivi sur WhatsApp",
+      contactMessage: 'Bonjour Thiaguil Multi-services, je souhaite suivre mon colis n° {code}.',
+      inputPlaceholder: 'Numéro de suivi',
+      inputButton: 'Suivre',
     },
     services: {
       badge: "Offres & Typologies d'Envois",
@@ -445,7 +430,7 @@ export const translations: Record<Language, Translations> = {
       step3Title: 'Acheminement & Suivi Direct',
       step3Subtitle: 'Vols réguliers & Fret maritime',
       step3Desc:
-        "Votre colis est embarqué sur le vol programmé. Suivez son avancement en direct sur le site grâce à votre numéro de suivi unique (ex: THG-NY-8910).",
+        "Votre colis est embarqué sur le vol programmé. Suivez son avancement en direct sur le site grâce à votre numéro de suivi unique.",
       step3Badge: 'Traçabilité 24/7',
       step4Title: 'Mise à disposition & Retrait',
       step4Subtitle: 'Au bureau de New York ou Montréal',
@@ -580,6 +565,7 @@ export const translations: Record<Language, Translations> = {
     nav: {
       home: 'Home',
       departures: 'Departures',
+      rates: 'Rates',
       services: 'Services',
       destinations: 'Destinations',
       tracking: 'Track Parcel',
@@ -591,28 +577,6 @@ export const translations: Record<Language, Translations> = {
       sendButton: 'Ship a Parcel',
       assistance: 'Support',
     },
-    announcement: {
-      badge: 'SPECIAL FLIGHT',
-      bookColis: 'Book your shipment',
-      next: 'Next',
-      prev: 'Previous',
-    },
-    nextDepartures: {
-      badge: 'UPCOMING DEPARTURES',
-      title: 'Our upcoming departures',
-      subtitle:
-        'Every week, your parcels head abroad. Reserve your spot before the drop-off deadline.',
-      dateLabel: 'Scheduled departure',
-      routeFrom: 'Conakry',
-      reserveButton: 'Reserve this departure',
-      pauseLabel: 'Pause the slideshow',
-      playLabel: 'Resume the slideshow',
-      prevLabel: 'Previous departure',
-      nextLabel: 'Next departure',
-      goToLabel: 'Go to departure',
-      emptyState: 'No departure scheduled right now. Contact us to find out about the next flight.',
-      posterAlt: 'Poster for the departure to {city} on {date}',
-    },
     trustStats: {
       badge: 'At a glance',
       localAgencies: 'Branches in Guinea',
@@ -621,28 +585,36 @@ export const translations: Record<Language, Translations> = {
       qualityCharter: 'Quality checks on every drop-off',
     },
     hero: {
-      tagline: 'INTERNATIONAL FREIGHT FORWARDING • GUINEA ➔ NORTH AMERICA & EUROPE',
-      titleStart: 'Ship your parcels to',
-      destinations: 'New York, Montreal',
-      titleEnd: 'and worldwide with total confidence.',
-      description:
-        'Scheduled regular flights and maritime cargo from Conakry, Coyah and Kindia. Every parcel is logged, inspected and securely packed before departure to ensure seamless delivery.',
-      trackingTitle: 'Instant Parcel Tracking',
-      trackingRealtime: 'Real-time live updates',
-      trackingPlaceholder: 'Enter your tracking number (e.g. THG-NY-8910)...',
-      searchButton: 'Track Now',
-      sampleCodesLabel: 'Demo tracking numbers:',
-      trust1: 'Certified Weighing & Tamper-Proof Seal',
-      trust2: 'Regular Air Cargo Departures',
-      trust3: 'Direct Pick-up in the Bronx & Montreal',
-      networkTitle: 'International Flight Routes',
-      directHub: 'Direct Hub',
-      originLabel: 'Origin Hub',
-      originCity: 'Conakry (CKY)',
-      nextFlightTitle: 'NEXT CONFIRMED FLIGHT',
-      reserveButton: 'Book Slot',
-      contactsTitle: 'Central HQ & Express Contacts',
-      directWhatsApp: 'Direct WhatsApp',
+      eyebrow: 'NEXT DEPARTURE',
+      routeFrom: 'Conakry',
+      routeTo: 'to',
+      countdownToday: 'Departs today',
+      countdownTomorrow: 'Departs tomorrow',
+      countdownDays: 'Departs in {n} days',
+      agenciesLabel: 'Drop-off branches:',
+      reserveButton: 'Book my spot on WhatsApp',
+      reserveMessage: 'Hello Thiaguil Multi-services, I would like to book a spot on the {date} departure to {city}.',
+      facebookLink: 'See our announcements on Facebook',
+      upcomingLabel: 'Upcoming departures:',
+      posterAlt: 'Poster for the departure to {city} on {date}',
+      loading: 'Loading upcoming departures…',
+      emptyEyebrow: 'UPCOMING DEPARTURES',
+      emptyTitle: 'Next departure coming soon',
+      emptyBody:
+        'Contact us to find out the date of the next flight to New York, Montreal or Europe, and book your spot as soon as it opens.',
+      emptyButton: 'Ask for the next date',
+      emptyMessage: 'Hello Thiaguil Multi-services, when is the next departure?',
+      trackTitle: 'Track a parcel',
+      trackLabel: 'Number printed on your receipt',
+      trackPlaceholder: 'Your tracking number',
+      trackButton: 'Track',
+      ratesTitle: 'Estimate my rate',
+      ratesBody: 'Weight, destination, air or sea: an instant estimate before you drop off your parcel.',
+      ratesLink: 'Open the calculator',
+      agenciesTitle: 'Find a branch',
+      agenciesBody: 'Addresses, opening hours and contacts for our branches in Guinea and our offices abroad.',
+      agenciesLink: 'See addresses',
+      slogan: 'Ship your parcels to New York, Montreal and worldwide with total confidence.',
     },
     tracking: {
       badge: 'Live Traceability & Status',
@@ -669,10 +641,15 @@ export const translations: Record<Language, Translations> = {
       pickupIdRequired: 'Please present a valid ID card or passport when collecting your parcel.',
       whatsAppHelp: 'WhatsApp Support',
       printReceipt: 'Print Receipt',
-      emptyTitle: 'No shipment selected yet',
+      emptyTitle: 'Track your parcel',
       emptySubtitle:
-        'Use the quick search bar in the hero section or click on one of our live pilot shipments below to see live tracking:',
-      quickTestPrompt: 'One-click pilot shipments to test:',
+        'Enter the tracking number printed on your drop-off receipt.',
+      notFound: 'No parcel found for number "{code}".',
+      notFoundHelp: 'Please check the number printed on your receipt. If your parcel is not online yet, our team will answer you directly.',
+      contactAgency: 'Ask for tracking on WhatsApp',
+      contactMessage: 'Hello Thiaguil Multi-services, I would like to track my parcel no. {code}.',
+      inputPlaceholder: 'Tracking number',
+      inputButton: 'Track',
     },
     services: {
       badge: 'Shipping Solutions & Formats',
@@ -746,7 +723,7 @@ export const translations: Record<Language, Translations> = {
       step3Title: 'Transit & Live Tracking',
       step3Subtitle: 'Regular flights & sea freight',
       step3Desc:
-        'Your parcel is loaded onto the scheduled flight. Track its progress live on the site with your unique tracking number (e.g. THG-NY-8910).',
+        'Your parcel is loaded onto the scheduled flight. Track its progress live on the site with your unique tracking number.',
       step3Badge: '24/7 tracking',
       step4Title: 'Availability & Pickup',
       step4Subtitle: 'At our New York or Montreal office',

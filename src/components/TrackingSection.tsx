@@ -287,87 +287,57 @@ export const TrackingSection: React.FC = () => {
 
             <div className="space-y-2">
               <h3 className="font-bold text-slate-900 text-lg sm:text-xl">
-                {t.noPackageTitle}
+                {t.emptyTitle}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
-                {t.noPackageDesc}
+                {t.emptySubtitle}
               </p>
             </div>
 
-            {/* Error Message if search failed */}
+            {/* Numéro introuvable : message honnête + contact direct de l'agence */}
             {trackingError && (
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto">
+              <div
+                role="alert"
+                className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
+              >
                 <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-semibold">{trackingError}</p>
-                  <p className="text-xs text-amber-800">
-                    {language === 'fr'
-                      ? 'Vérifiez les caractères ou cliquez directement sur un colis témoin ci-dessous.'
-                      : 'Please check your code or click one of the live demo parcels below.'}
-                  </p>
+                <div className="space-y-2">
+                  <p className="font-semibold">{t.notFound.replace('{code}', trackingError)}</p>
+                  <p className="text-xs text-amber-800">{t.notFoundHelp}</p>
+                  <a
+                    href={`https://wa.me/224611835683?text=${encodeURIComponent(
+                      t.contactMessage.replace('{code}', trackingError)
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    {t.contactAgency}
+                  </a>
                 </div>
               </div>
             )}
 
-            {/* Live demo parcels buttons */}
-            <div className="pt-2">
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-3">
-                {language === 'fr' ? 'Consulter un colis pilote en cours :' : 'Inspect a live pilot parcel:'}
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-xl mx-auto">
-                <button
-                  type="button"
-                  onClick={() => searchPackage('THG-NY-8910')}
-                  className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
-                >
-                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
-                    THG-NY-8910
-                  </div>
-                  <div className="text-xs font-bold text-slate-900 mt-0.5">New York JFK</div>
-                  <div className="text-[11px] text-slate-600">En vol international</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => searchPackage('THG-MTL-2708')}
-                  className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
-                >
-                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
-                    THG-MTL-2708
-                  </div>
-                  <div className="text-xs font-bold text-slate-900 mt-0.5">Montréal YUL</div>
-                  <div className="text-[11px] text-emerald-700 font-semibold">Prêt pour retrait</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => searchPackage('THG-KND-0109')}
-                  className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all text-left group cursor-pointer shadow-2xs"
-                >
-                  <div className="text-[11px] font-mono font-bold text-brand group-hover:underline">
-                    THG-KND-0109
-                  </div>
-                  <div className="text-xs font-bold text-slate-900 mt-0.5">Kindia</div>
-                  <div className="text-[11px] text-slate-600">Enregistré en agence</div>
-                </button>
-              </div>
-            </div>
-
-            {/* Quick direct number lookup without whole redundant banner */}
             <div className="pt-3 border-t border-slate-100 max-w-md mx-auto">
               <form onSubmit={handleMiniSubmit} className="flex gap-2">
+                <label htmlFor="tracking-code" className="sr-only">
+                  {t.inputPlaceholder}
+                </label>
                 <input
+                  id="tracking-code"
                   type="text"
                   value={quickInput}
                   onChange={(e) => setQuickInput(e.target.value)}
-                  placeholder={language === 'fr' ? 'Ou saisir un autre code de suivi...' : 'Or enter another tracking code...'}
-                  className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
+                  placeholder={t.inputPlaceholder}
+                  autoComplete="off"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors cursor-pointer"
                 >
-                  {language === 'fr' ? 'Afficher' : 'View'}
+                  {t.inputButton}
                 </button>
               </form>
             </div>

@@ -79,8 +79,10 @@ export const AdminPortal: React.FC = () => {
     title: '',
     destination: 'New York (USA)',
     destinationCity: 'New York',
-    departureDate: '2026-09-15',
-    departureDayLabel: 'MARDI 15 SEPTEMBRE',
+    // Vides par défaut : une date pré-remplie finit toujours par être passée,
+    // et un départ passé n'est jamais affiché sur le site.
+    departureDate: '',
+    departureDayLabel: '',
     badge: 'VOL CONFIRMÉ • DÉPÔTS OUVERTS',
     urgencyNote: 'Dépôts acceptés dans toutes nos agences de Conakry, Coyah & Kindia.',
     localOffices: ['Hamdallaye', 'Bentouraya', 'Kindia', 'Kipé'],
@@ -190,7 +192,7 @@ export const AdminPortal: React.FC = () => {
   // Submit announcement
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAnn.title || !newAnn.departureDayLabel) return;
+    if (!newAnn.title || !newAnn.departureDayLabel || !newAnn.departureDate) return;
     setAnnError(null);
     setIsSavingNewAnn(true);
     try {
@@ -207,8 +209,8 @@ export const AdminPortal: React.FC = () => {
       title: '',
       destination: 'New York (USA)',
       destinationCity: 'New York',
-      departureDate: '2026-09-15',
-      departureDayLabel: 'MARDI 15 SEPTEMBRE',
+      departureDate: '',
+      departureDayLabel: '',
       badge: 'VOL CONFIRMÉ • DÉPÔTS OUVERTS',
       urgencyNote: 'Dépôts acceptés dans nos agences de Conakry, Coyah & Kindia.',
       localOffices: ['Hamdallaye', 'Bentouraya', 'Kindia', 'Kipé'],
@@ -641,7 +643,7 @@ export const AdminPortal: React.FC = () => {
                   Gestion des Annonces de Départs Spéciaux
                 </h3>
                 <p className="text-xs text-slate-600">
-                  Publiez directement les départs (New York, Montréal, etc.) avec l'affiche publiée sur Facebook. Ces annonces s'affichent dans la barre supérieure, dans la Hero section et dans le carrousel « Prochains départs ».
+                  Publiez directement les départs (New York, Montréal, etc.) avec l'affiche publiée sur Facebook. Le départ à venir le plus proche s'affiche en tête du site (bandeau « Prochain départ »), les suivants en pastilles. Les départs dont la date est passée sont masqués automatiquement.
                 </p>
               </div>
 
@@ -687,7 +689,7 @@ export const AdminPortal: React.FC = () => {
 
                     <div>
                       <label className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
-                        Jour de départ affiché en grand (ex: MARDI 01 SEPTEMBRE) *
+                        Libellé du jour (ex: MARDI 01 SEPTEMBRE) *
                       </label>
                       <input
                         type="text"
@@ -716,10 +718,11 @@ export const AdminPortal: React.FC = () => {
 
                     <div>
                       <label className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
-                        Date ISO
+                        Date de départ *
                       </label>
                       <input
                         type="date"
+                        required
                         value={newAnn.departureDate}
                         onChange={(e) => setNewAnn({ ...newAnn, departureDate: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold"
