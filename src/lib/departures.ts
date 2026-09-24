@@ -37,6 +37,61 @@ export function getUpcomingDepartures(
     .sort((a, b) => a.departureDate.localeCompare(b.departureDate));
 }
 
+/**
+ * Nombre de départs montrés au visiteur : s'il y a moins de départs à venir,
+ * le site complète avec les derniers départs effectués (toujours marqués
+ * comme tels, sans bouton de réservation) pour montrer la régularité des envois.
+ */
+export const SHOWN_DEPARTURES_TARGET = 3;
+
+/**
+ * Départ actif dont la date est passée (départ effectué). Sert à l'admin
+ * (badge) et au hero (preuve de régularité).
+ */
+export function isPastDeparture(announcement: DepartureAnnouncement, today: string = todayIso()): boolean {
+  return ISO_DATE.test(announcement.departureDate) && announcement.departureDate < today;
+}
+
+/**
+ * Les `count` départs effectués les plus récents (actifs, date valide et
+ * passée), du plus récent au plus ancien. Affichés uniquement pour rassurer
+ * le visiteur sur la régularité des envois, toujours marqués « effectués ».
+ */
+export function getRecentPastDepartures(
+  announcements: DepartureAnnouncement[],
+  count: number,
+  today: string = todayIso()
+): DepartureAnnouncement[] {
+  if (count <= 0) return [];
+  return announcements
+    .filter((a) => a.isActive && isPastDeparture(a, today))
+    .slice()
+    .sort((a, b) => b.departureDate.localeCompare(a.departureDate))
+    .slice(0, count);
+}
+
+/**
+ * Départs effectués montrés au visiteur quand il y a moins de
+ * SHOWN_DEPARTURES_TARGET départs à venir :
+ * - `listed` : les plus récents, avec ou sans affiche (liste « Nos derniers
+ *   départs effectués ») ;
+ * - `wall` : les plus récents qui ont une affiche (mur d'affiches en fond,
+ *   avec le tampon « Départ effectué »).
+ * Utilisé par le bandeau d'accueil et par l'admin (statut de chaque départ).
+ */
+export function getPastShowcase(
+  announcements: DepartureAnnouncement[],
+  upcomingCount: number,
+  hasPoster: (a: DepartureAnnouncement) => boolean = (a) => Boolean(a.posterUrl),
+  today: string = todayIso()
+): { listed: DepartureAnnouncement[]; wall: DepartureAnnouncement[] } {
+  const count = SHOWN_DEPARTURES_TARGET - upcomingCount;
+  return {
+    listed: getRecentPastDepartures(announcements, count, today),
+    wall: getRecentPastDepartures(announcements.filter(hasPoster), count, today),
+  };
+}
+
 /** Nombre de jours entre aujourd'hui et la date de départ (0 = aujourd'hui). */
 export function daysUntil(iso: string, today: string = todayIso()): number {
   const target = parseIsoLocal(iso);
@@ -55,6 +110,8 @@ export interface FormattedDepartureDate {
   dayMonth: string;
   /** Ex : "mar. 06 oct." / "Tue 06 Oct" */
   short: string;
+  /** Ex : "27 août" / "27 Aug" — pour les listes compactes */
+  dayMonthShort: string;
   /** Ex : "octobre" / "October" */
   month: string;
   /** Ex : "mardi 06 octobre" — pour les phrases (message WhatsApp, texte alternatif) */
@@ -73,6 +130,7 @@ export function formatDepartureDate(iso: string, language: Language): FormattedD
   const weekday = new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(date);
   const dayMonth = new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long' }).format(date);
   const short = new Intl.DateTimeFormat(locale, { weekday: 'short', day: '2-digit', month: 'short' }).format(date);
+  const dayMonthShort = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(date);
   const month = new Intl.DateTimeFormat(locale, { month: 'long' }).format(date);
-  return { weekday, dayMonth, short, month, long: `${weekday} ${dayMonth}` };
+  return { weekday, dayMonth, short, dayMonthShort, month, long: `${weekday} ${dayMonth}` };
 }
