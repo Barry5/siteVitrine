@@ -16,6 +16,15 @@ import { fileURLToPath } from 'url';
  */
 const SERVER_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+/**
+ * Dossier du site construit par Vite (npm run build), servi par ce même
+ * serveur en production (un seul domaine pour le site et l'API).
+ * Par défaut : <racine du projet>/dist ; modifiable avec SITE_DIR.
+ */
+export function getSiteDir(): string {
+  return path.resolve(process.env.SITE_DIR || path.join(SERVER_ROOT, '..', 'dist'));
+}
+
 export function getDataDir(): string {
   return path.resolve(process.env.DATA_DIR || path.join(SERVER_ROOT, 'data'));
 }
