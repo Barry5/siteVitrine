@@ -32,12 +32,61 @@
     <meta name="twitter:description" content="Transport, fret aérien/maritime et envoi de colis de la Guinée vers l'Amérique du Nord, l'Europe et l'Afrique." />
     <meta name="twitter:image" content="https://colisthiaguil.com/og-image.jpg" />
 
+    <!-- Données structurées (schema.org) : uniquement des informations déjà
+         publiées sur le site (nom, téléphone WhatsApp, villes des agences,
+         page Facebook). Adresses précises et horaires à ajouter une fois
+         confirmés. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://colisthiaguil.com/#entreprise",
+        "name": "Thiaguil Multi-services",
+        "description": "Transitaire et fret international : envoi de colis, documents et bagages de la Guinée vers New York, Montréal, l'Europe et l'Afrique, par avion ou par bateau.",
+        "url": "https://colisthiaguil.com/",
+        "logo": "https://colisthiaguil.com/icon-512.png",
+        "image": "https://colisthiaguil.com/og-image.jpg",
+        "telephone": "+224611835683",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Conakry",
+          "addressCountry": "GN"
+        },
+        "areaServed": [
+          { "@type": "City", "name": "Conakry" },
+          { "@type": "City", "name": "Coyah" },
+          { "@type": "City", "name": "Kindia" }
+        ],
+        "sameAs": ["https://www.facebook.com/p/Thiaguil-multi-services-61566989230221/"]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body class="bg-canvas text-slate-900 antialiased">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Présentation lisible sans JavaScript (moteurs de recherche, connexions
+           lentes). React remplace tout ce bloc dès que le site est chargé :
+           garder ce texte identique à l'accroche du bandeau d'accueil
+           (src/data/translations.ts, hero.introTitle / introBody / introServices). -->
+      <main style="background:#0B0F19;color:#fff;border-top:4px solid #C8102E;padding:40px 16px 56px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+        <div style="max-width:896px;margin:0 auto">
+          <p style="margin:0 0 12px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#FCA5A5">Thiaguil Multi-services · Transitaire &amp; fret international</p>
+          <h1 style="margin:0 0 16px;font-family:Outfit,system-ui,sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;line-height:1.1">Envoi de colis de la Guinée vers New York, Montréal, l'Europe et l'Afrique</h1>
+          <p style="margin:0 0 16px;font-size:17px;line-height:1.6;color:#CBD5E1">Déposez vos colis dans nos agences de Conakry, Coyah et Kindia : nous les pesons, les sécurisons et les expédions par avion ou par bateau, jusqu'à nos bureaux de New York et de Montréal.</p>
+          <ul style="margin:0 0 20px;padding-left:20px;line-height:1.8;color:#E2E8F0">
+            <li>Documents &amp; enveloppes</li>
+            <li>Petits colis (1 à 10 kg)</li>
+            <li>Grands colis &amp; bagages</li>
+            <li>Fret aérien</li>
+            <li>Fret maritime &amp; conteneurs</li>
+          </ul>
+          <p style="margin:0;font-size:16px;color:#E2E8F0">Service client WhatsApp : <a href="https://wa.me/224611835683" style="color:#fff;font-weight:700">+224 611 83 56 83</a></p>
+        </div>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

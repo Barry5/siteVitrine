@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+# Espace d'administration : inutile pour les moteurs de recherche.
+# Ne pas bloquer tout /api/ : la page charge les départs (/api/announcements)
+# et les affiches (/api/uploads/) depuis cette adresse, Google doit pouvoir les lire.
+Disallow: /api/admin/
 
 Sitemap: https://colisthiaguil.com/sitemap.xml
