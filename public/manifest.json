@@ -1,7 +1,7 @@
 {
   "name": "Thiaguil Multi-services",
   "short_name": "Thiaguil",
-  "description": "Transport, fret aérien/maritime et gestion de colis internationale entre la Guinée, l'Amérique du Nord et l'Europe.",
+  "description": "Transport, fret aérien/maritime et envoi de colis de la Guinée vers l'Amérique du Nord, l'Europe et l'Afrique.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
