@@ -24,7 +24,12 @@ export interface Translations {
     qualityCharter: string;
   };
   hero: {
+    introLabel: string;
+    introTitle: string;
+    introBody: string;
+    introServices: string[];
     eyebrow: string;
+    routeLead: string;
     routeFrom: string;
     routeTo: string;
     countdownToday: string;
@@ -56,7 +61,6 @@ export interface Translations {
     agenciesTitle: string;
     agenciesBody: string;
     agenciesLink: string;
-    slogan: string;
   };
   tracking: {
     badge: string;
@@ -296,14 +300,26 @@ export const translations: Record<Language, Translations> = {
       qualityCharter: 'Charte qualité à chaque dépôt',
     },
     hero: {
-      eyebrow: 'PROCHAIN DÉPART',
+      introLabel: 'Thiaguil Multi-services · Transitaire & fret international',
+      introTitle: "Envoi de colis de la Guinée vers New York, Montréal, l'Europe et l'Afrique",
+      introBody:
+        "Déposez vos colis dans nos agences de Conakry, Coyah et Kindia : nous les pesons, les sécurisons et les expédions par avion ou par bateau, jusqu'à nos bureaux de New York et de Montréal.",
+      introServices: [
+        'Documents & enveloppes',
+        'Petits colis (1 à 10 kg)',
+        'Grands colis & bagages',
+        'Fret aérien',
+        'Fret maritime & conteneurs',
+      ],
+      eyebrow: 'PROCHAIN DÉPART DE COLIS',
+      routeLead: 'Vos colis partent de',
       routeFrom: 'Conakry',
       routeTo: 'vers',
       countdownToday: "Départ aujourd'hui",
       countdownTomorrow: 'Départ demain',
       countdownDays: 'Départ dans {n} jours',
       agenciesLabel: 'Agences de dépôt :',
-      reserveButton: 'Réserver ma place sur WhatsApp',
+      reserveButton: "Réserver l'envoi de mon colis",
       reserveMessage: 'Bonjour Thiaguil Multi-services, je souhaite réserver une place pour le départ du {date} vers {city}.',
       facebookLink: 'Voir nos annonces sur Facebook',
       upcomingLabel: 'Départs à venir :',
@@ -329,7 +345,6 @@ export const translations: Record<Language, Translations> = {
       agenciesTitle: 'Trouver une agence',
       agenciesBody: "Adresses, horaires et contacts de nos agences en Guinée et de nos bureaux à l'international.",
       agenciesLink: 'Voir les adresses',
-      slogan: "Expédiez vos colis vers New York, Montréal et l'international en toute confiance.",
     },
     tracking: {
       badge: 'Traçabilité & Statut en Direct',
@@ -593,14 +608,26 @@ export const translations: Record<Language, Translations> = {
       qualityCharter: 'Quality checks on every drop-off',
     },
     hero: {
-      eyebrow: 'NEXT DEPARTURE',
+      introLabel: 'Thiaguil Multi-services · Freight forwarding & international cargo',
+      introTitle: 'Parcel shipping from Guinea to New York, Montreal, Europe and Africa',
+      introBody:
+        'Drop off your parcels at our branches in Conakry, Coyah and Kindia: we weigh them, secure them and ship them by air or by sea, all the way to our offices in New York and Montreal.',
+      introServices: [
+        'Documents & envelopes',
+        'Small parcels (1 to 10 kg)',
+        'Large parcels & luggage',
+        'Air freight',
+        'Sea freight & containers',
+      ],
+      eyebrow: 'NEXT PARCEL DEPARTURE',
+      routeLead: 'Your parcels leave',
       routeFrom: 'Conakry',
       routeTo: 'to',
       countdownToday: 'Departs today',
       countdownTomorrow: 'Departs tomorrow',
       countdownDays: 'Departs in {n} days',
       agenciesLabel: 'Drop-off branches:',
-      reserveButton: 'Book my spot on WhatsApp',
+      reserveButton: 'Book my parcel shipment',
       reserveMessage: 'Hello Thiaguil Multi-services, I would like to book a spot on the {date} departure to {city}.',
       facebookLink: 'See our announcements on Facebook',
       upcomingLabel: 'Upcoming departures:',
@@ -626,7 +653,6 @@ export const translations: Record<Language, Translations> = {
       agenciesTitle: 'Find a branch',
       agenciesBody: 'Addresses, opening hours and contacts for our branches in Guinea and our offices abroad.',
       agenciesLink: 'See addresses',
-      slogan: 'Ship your parcels to New York, Montreal and worldwide with total confidence.',
     },
     tracking: {
       badge: 'Live Traceability & Status',

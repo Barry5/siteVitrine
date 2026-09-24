@@ -64,10 +64,6 @@ export const Hero: React.FC = () => {
 
   return (
     <section id="accueil" className="relative bg-canvas">
-      {/* Titre de page pour les moteurs de recherche et lecteurs d'écran ;
-          la même phrase est affichée plus bas, sous les cartes. */}
-      <h1 className="sr-only">{t.slogan}</h1>
-
       <div
         className={`relative overflow-hidden bg-ink text-white border-t-4 border-brand ${
           motionPaused ? 'poster-motion-paused' : ''
@@ -75,10 +71,33 @@ export const Hero: React.FC = () => {
       >
         <PosterBackdrop posters={backdropPosters} onPosterError={markPosterFailed} />
 
-        <div
-          id="departs"
-          className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-24 lg:pb-32 scroll-mt-20"
-        >
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 lg:pt-14 pb-24 lg:pb-32">
+          {/* Ce que fait l'entreprise, visible avant le prochain départ :
+              c'est le titre principal (h1) de la page. */}
+          <div className="max-w-4xl space-y-3 sm:space-y-4">
+            <p className="text-[11px] sm:text-xs font-extrabold tracking-[0.14em] uppercase text-red-300">
+              {t.introLabel}
+            </p>
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.9rem] font-extrabold leading-[1.1] tracking-tight text-white">
+              {t.introTitle}
+            </h1>
+            <p className="text-[15px] sm:text-[17px] leading-relaxed text-slate-300 max-w-3xl">{t.introBody}</p>
+            <ul className="flex flex-wrap gap-2 sm:gap-2.5 pt-1">
+              {t.introServices.map((service) => (
+                <li
+                  key={service}
+                  className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-slate-800/85 border border-slate-700 text-[13px] sm:text-sm font-semibold text-slate-200"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden="true" />
+                  {service}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="h-px bg-slate-700/80 my-8 lg:my-10" aria-hidden="true" />
+
+          <div id="departs" className="scroll-mt-24">
           {announcementsLoading ? (
             <HeroLoading label={t.loading} />
           ) : current ? (
@@ -94,6 +113,7 @@ export const Hero: React.FC = () => {
           ) : (
             <NoDepartureHero />
           )}
+          </div>
 
           {/* Pause du défilement des affiches (masqué si le visiteur a déjà
               réduit les animations dans les réglages de son appareil). */}
@@ -183,9 +203,7 @@ export const Hero: React.FC = () => {
         </div>
       </div>
 
-      <p aria-hidden="true" className="max-w-4xl mx-auto px-4 pt-10 pb-12 text-center font-display text-xl sm:text-2xl font-semibold text-stone-700">
-        {t.slogan}
-      </p>
+      <div className="h-10 sm:h-12" aria-hidden="true" />
     </section>
   );
 };
@@ -236,8 +254,8 @@ const DepartureHero: React.FC<{
         </div>
 
         <h2 className="flex flex-col gap-2 sm:gap-2.5">
-          <span className="flex items-center gap-2.5 font-display text-xl sm:text-2xl font-semibold text-slate-200">
-            {t.routeFrom}
+          <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-display text-xl sm:text-2xl font-semibold text-slate-200">
+            {t.routeLead} {t.routeFrom}
             <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 shrink-0" aria-label={t.routeTo} />
             {departure.destinationCity}
           </span>
@@ -246,7 +264,7 @@ const DepartureHero: React.FC<{
               <span className="font-display text-2xl sm:text-3xl font-bold text-red-300 uppercase tracking-wide">
                 {date.weekday}
               </span>
-              <span className="font-display text-5xl sm:text-7xl xl:text-[6.75rem] font-black uppercase leading-[0.92] tracking-tight text-white">
+              <span className="font-display text-5xl sm:text-7xl xl:text-[6rem] font-black uppercase leading-[0.92] tracking-tight text-white">
                 {date.dayMonth}
               </span>
             </>
