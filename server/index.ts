@@ -2,11 +2,13 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import fs from 'fs';
+import path from 'path';
 import { contactRouter } from './routes/contact.js';
 import { adminRouter } from './routes/admin.js';
 import { publicAnnouncementsRouter, adminAnnouncementsRouter } from './routes/announcements.js';
 import { uploadsRouter } from './routes/uploads.js';
-import { getDataDir, getUploadsDir } from './lib/storage.js';
+import { getDataDir, getSiteDir, getUploadsDir } from './lib/storage.js';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
@@ -47,6 +49,39 @@ app.use(
   })
 );
 
+// Site vitrine (build Vite) servi par ce même serveur, à la même adresse que
+// l'API : utilisé en production (o2switch). En développement, le dossier
+// dist/ n'existe généralement pas et Vite sert le site lui-même.
+const SITE_DIR = getSiteDir();
+const SITE_INDEX = path.join(SITE_DIR, 'index.html');
+const siteAvailable = fs.existsSync(SITE_INDEX);
+
+if (siteAvailable) {
+  app.use(
+    express.static(SITE_DIR, {
+      index: 'index.html',
+      dotfiles: 'ignore',
+      maxAge: '1h',
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('index.html')) {
+          // Toujours revalider la page : elle référence les fichiers du dernier build.
+          res.setHeader('Cache-Control', 'no-cache');
+        } else if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+          // Fichiers de build Vite : noms uniques à chaque build.
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+      },
+    })
+  );
+
+  // Toute adresse de page (hors /api et hors fichier, ex. /contact) renvoie
+  // la page du site ; un fichier absent (ex. /photo.jpg) reste une vraie 404.
+  app.get(/^\/(?!api(?:\/|$))[^.]*$/, (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
+    res.sendFile(SITE_INDEX);
+  });
+}
+
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route non trouvée.' });
 });
@@ -70,6 +105,11 @@ app.listen(PORT, () => {
   console.log(`[thiaguil-backend] API en écoute sur http://localhost:${PORT}`);
   console.log(`[thiaguil-backend] Données (annonces, affiches) stockées dans : ${getDataDir()}`);
   console.log(`[thiaguil-backend] Site(s) autorisé(s) : ${FRONTEND_ORIGINS.join(', ')}`);
+  console.log(
+    siteAvailable
+      ? `[thiaguil-backend] Site vitrine servi depuis : ${SITE_DIR}`
+      : `[thiaguil-backend] Aucun site construit dans ${SITE_DIR} (lancer « npm run build ») : seule l'API répond.`
+  );
   if (!process.env.ADMIN_PASSWORD) {
     console.warn('[thiaguil-backend] ATTENTION : ADMIN_PASSWORD non défini — la connexion admin échouera.');
   }
