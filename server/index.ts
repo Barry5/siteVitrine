@@ -10,9 +10,15 @@ import { getDataDir, getUploadsDir } from './lib/storage.js';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// Adresse(s) du site autorisées à appeler l'API avec le cookie admin (CORS).
+// Plusieurs adresses possibles, séparées par des virgules, par exemple :
+// FRONTEND_URL="https://colisthiaguil.com,https://www.colisthiaguil.com"
+const FRONTEND_ORIGINS = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
 
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors({ origin: FRONTEND_ORIGINS, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -63,6 +69,7 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`[thiaguil-backend] API en écoute sur http://localhost:${PORT}`);
   console.log(`[thiaguil-backend] Données (annonces, affiches) stockées dans : ${getDataDir()}`);
+  console.log(`[thiaguil-backend] Site(s) autorisé(s) : ${FRONTEND_ORIGINS.join(', ')}`);
   if (!process.env.ADMIN_PASSWORD) {
     console.warn('[thiaguil-backend] ATTENTION : ADMIN_PASSWORD non défini — la connexion admin échouera.');
   }
