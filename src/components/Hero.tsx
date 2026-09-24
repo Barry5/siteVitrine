@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Calculator,
   Building2,
+  Check,
   Clock,
   ImageOff,
   MapPin,
@@ -15,7 +16,12 @@ import {
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
 import { resolveApiAsset } from '../lib/api';
-import { daysUntil, formatDepartureDate, getUpcomingDepartures } from '../lib/departures';
+import {
+  daysUntil,
+  formatDepartureDate,
+  getPastShowcase,
+  getUpcomingDepartures,
+} from '../lib/departures';
 import type { DepartureAnnouncement } from '../types';
 
 const WHATSAPP_NUMBER = '224611835683';
@@ -36,7 +42,7 @@ const MIN_POSTERS_FOR_WALL = 3;
  * agences) sont regroupées dans trois cartes à cheval sur le bas du bandeau.
  */
 export const Hero: React.FC = () => {
-  const { announcements, announcementsLoading, searchPackage, language } = useApp();
+  const { announcements, announcementsLoading, announcementsFromServer, searchPackage, language } = useApp();
   const t = translations[language].hero;
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -48,11 +54,27 @@ export const Hero: React.FC = () => {
   const current = upcoming.find((a) => a.id === selectedId) ?? upcoming[0];
   const markPosterFailed = (id: string) => setFailedPosters((prev) => ({ ...prev, [id]: true }));
 
-  // Affiches des départs À VENIR uniquement (jamais un départ passé : sa date
-  // induirait en erreur), sans celles dont l'image ne se charge pas.
+  const hasPoster = (a: DepartureAnnouncement) => Boolean(a.posterUrl) && !failedPosters[a.id];
+
+  // Moins de 3 départs à venir : on complète avec les derniers départs
+  // effectués. Uniquement des départs réellement publiés depuis l'admin
+  // (jamais les données de repli de initialData.ts, qui sont des exemples).
+  // Liste « Nos derniers départs effectués » : les plus récents, avec ou sans
+  // affiche. Mur : les plus récents qui ont une affiche (tampon « Départ
+  // effectué »), pour atteindre 3 affiches quand c'est possible.
+  const canShowPast = !announcementsLoading && announcementsFromServer;
+  const pastShowcase = canShowPast
+    ? getPastShowcase(announcements, upcoming.length, hasPoster)
+    : { listed: [], wall: [] };
+  const recentPast = pastShowcase.listed;
+  const recentPastWithPoster = pastShowcase.wall;
+  const pastIds = new Set(recentPastWithPoster.map((a) => a.id));
+
+  // Affiches en fond : d'abord les départs à venir, puis les départs
+  // effectués, sans celles dont l'image ne se charge pas.
   const backdropPosters = announcementsLoading
     ? []
-    : upcoming.filter((a) => a.posterUrl && !failedPosters[a.id]).slice(0, MAX_BACKDROP_POSTERS);
+    : [...upcoming.filter(hasPoster), ...recentPastWithPoster].slice(0, MAX_BACKDROP_POSTERS);
   const backdropAnimated = backdropPosters.length >= 2;
 
   const handleTrackSubmit = (e: React.FormEvent) => {
@@ -69,7 +91,12 @@ export const Hero: React.FC = () => {
           motionPaused ? 'poster-motion-paused' : ''
         }`}
       >
-        <PosterBackdrop posters={backdropPosters} onPosterError={markPosterFailed} />
+        <PosterBackdrop
+          posters={backdropPosters}
+          pastIds={pastIds}
+          pastStamp={t.recentStamp}
+          onPosterError={markPosterFailed}
+        />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 lg:pt-14 pb-24 lg:pb-32">
           {/* Ce que fait l'entreprise, visible avant le prochain départ :
@@ -105,13 +132,14 @@ export const Hero: React.FC = () => {
               key={current.id}
               departure={current}
               upcoming={upcoming}
+              recent={recentPast}
               onSelect={setSelectedId}
               isNext={current.id === upcoming[0]?.id}
               posterFailed={Boolean(failedPosters[current.id])}
               onPosterError={() => markPosterFailed(current.id)}
             />
           ) : (
-            <NoDepartureHero />
+            <NoDepartureHero recent={recentPast} />
           )}
           </div>
 
@@ -213,11 +241,12 @@ export const Hero: React.FC = () => {
 const DepartureHero: React.FC<{
   departure: DepartureAnnouncement;
   upcoming: DepartureAnnouncement[];
+  recent: DepartureAnnouncement[];
   onSelect: (id: string) => void;
   isNext: boolean;
   posterFailed: boolean;
   onPosterError: () => void;
-}> = ({ departure, upcoming, onSelect, isNext, posterFailed, onPosterError }) => {
+}> = ({ departure, upcoming, recent, onSelect, isNext, posterFailed, onPosterError }) => {
   const { language } = useApp();
   const t = translations[language].hero;
 
@@ -338,6 +367,8 @@ const DepartureHero: React.FC<{
             })}
           </div>
         )}
+
+        <RecentDepartures departures={recent} />
       </div>
 
       {/* Affiche Facebook, ou carte calendrier si le départ n'a pas d'affiche */}
@@ -394,8 +425,37 @@ const CalendarCard: React.FC<{ month: string; day: string; weekday: string; rout
   </div>
 );
 
+/**
+ * Derniers départs effectués : simple liste (pas de bouton, pas de
+ * réservation) qui montre au visiteur que les envois partent régulièrement.
+ */
+const RecentDepartures: React.FC<{ departures: DepartureAnnouncement[] }> = ({ departures }) => {
+  const { language } = useApp();
+  const t = translations[language].hero;
+  if (departures.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2 pt-1">
+      <span className="w-full sm:w-auto text-xs sm:text-[13px] font-bold text-slate-400">{t.recentLabel}</span>
+      <ul className="flex flex-wrap gap-2">
+        {departures.map((item) => {
+          const itemDate = formatDepartureDate(item.departureDate, language);
+          return (
+            <li
+              key={item.id}
+              className="inline-flex items-center gap-1.5 min-h-9 px-3 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-50 text-[13px] font-semibold"
+            >
+              {item.destinationCity} · {itemDate?.dayMonthShort ?? item.departureDayLabel}
+              <Check className="w-3.5 h-3.5 text-emerald-300" strokeWidth={3} aria-hidden="true" />
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
 /** Aucun départ à venir : message honnête, jamais de fausse date. */
-const NoDepartureHero: React.FC = () => {
+const NoDepartureHero: React.FC<{ recent: DepartureAnnouncement[] }> = ({ recent }) => {
   const { language } = useApp();
   const t = translations[language].hero;
   return (
@@ -426,6 +486,7 @@ const NoDepartureHero: React.FC = () => {
           {t.facebookLink}
         </a>
       </div>
+      <RecentDepartures departures={recent} />
     </div>
   );
 };
@@ -450,9 +511,10 @@ const HeroLoading: React.FC<{ label: string }> = ({ label }) => (
 /* -------------------------------------------------------------------------- */
 
 /**
- * Affiches des prochains départs en fond du bandeau, derrière un voile sombre
- * qui garde le texte lisible. Purement décoratif (aria-hidden) : les mêmes
- * informations sont données en texte au premier plan.
+ * Affiches des départs en fond du bandeau, derrière un voile sombre qui garde
+ * le texte lisible. Purement décoratif (aria-hidden) : les mêmes informations
+ * sont données en texte au premier plan. Les affiches de départs effectués
+ * (pastIds) portent un tampon « Départ effectué » sur le mur.
  * - 3 affiches ou plus : mur d'affiches qui défile, rangées en sens opposés ;
  * - 1 ou 2 affiches : une affiche à la fois, floutée, en fondu ;
  * - aucune affiche : rien (fond uni).
@@ -461,8 +523,10 @@ const HeroLoading: React.FC<{ label: string }> = ({ label }) => (
  */
 const PosterBackdrop: React.FC<{
   posters: DepartureAnnouncement[];
+  pastIds: ReadonlySet<string>;
+  pastStamp: string;
   onPosterError: (id: string) => void;
-}> = ({ posters, onPosterError }) => {
+}> = ({ posters, pastIds, pastStamp, onPosterError }) => {
   if (posters.length === 0) return null;
 
   const scrim = (
@@ -510,16 +574,29 @@ const PosterBackdrop: React.FC<{
             className={`flex gap-4 sm:gap-5 w-max ${r % 2 === 0 ? 'poster-wall-left' : 'poster-wall-right'}`}
             style={{ marginLeft: `-${(r * 53) % 160}px` }}
           >
-            {row.map((poster, i) => (
-              <img
-                key={`${poster.id}-${i}`}
-                src={resolveApiAsset(poster.posterUrl as string)}
-                alt=""
-                decoding="async"
-                onError={() => onPosterError(poster.id)}
-                className="w-32 h-40 sm:w-44 sm:h-56 lg:w-[200px] lg:h-[250px] shrink-0 rounded-xl object-cover bg-slate-800"
-              />
-            ))}
+            {row.map((poster, i) => {
+              const isPast = pastIds.has(poster.id);
+              return (
+                <div
+                  key={`${poster.id}-${i}`}
+                  className="relative w-32 h-40 sm:w-44 sm:h-56 lg:w-[200px] lg:h-[250px] shrink-0 rounded-xl overflow-hidden bg-slate-800"
+                >
+                  <img
+                    src={resolveApiAsset(poster.posterUrl as string)}
+                    alt=""
+                    decoding="async"
+                    onError={() => onPosterError(poster.id)}
+                    className={`w-full h-full object-cover ${isPast ? 'grayscale-[40%]' : ''}`}
+                  />
+                  {isPast && (
+                    <span className="absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-1 rounded-md bg-emerald-600 text-white text-[10px] sm:text-xs font-extrabold uppercase tracking-wider py-1 sm:py-1.5">
+                      <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" strokeWidth={3} />
+                      {pastStamp}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

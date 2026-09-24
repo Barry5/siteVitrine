@@ -62,6 +62,9 @@ interface AppContextType {
   announcementsSyncError: string | null;
   // Vrai tant que la première lecture des annonces depuis le serveur n'est pas terminée.
   announcementsLoading: boolean;
+  // Vrai seulement si la liste affichée vient du serveur (départs réellement
+  // publiés depuis l'admin), faux pour les données de repli INITIAL_ANNOUNCEMENTS.
+  announcementsFromServer: boolean;
 
   // CRUD Agencies
   addAgency: (agency: Omit<Agency, 'id'>) => void;
@@ -93,6 +96,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [announcements, setAnnouncements] = useState<DepartureAnnouncement[]>(INITIAL_ANNOUNCEMENTS);
   const [announcementsSyncError, setAnnouncementsSyncError] = useState<string | null>(null);
   const [announcementsLoading, setAnnouncementsLoading] = useState<boolean>(true);
+  const [announcementsFromServer, setAnnouncementsFromServer] = useState<boolean>(false);
 
   // LocalStorage state initialization (données encore locales au navigateur)
 
@@ -163,7 +167,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     load()
       .then((list) => {
         if (cancelled) return;
-        if (list) setAnnouncements(list);
+        if (list) {
+          setAnnouncements(list);
+          setAnnouncementsFromServer(true);
+        }
         setAnnouncementsSyncError(null);
       })
       .catch((err: Error) => {
@@ -255,6 +262,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const persistAnnouncements = async (next: DepartureAnnouncement[]) => {
     const saved = await saveAnnouncements(next);
     setAnnouncements(saved);
+    setAnnouncementsFromServer(true);
     setAnnouncementsSyncError(null);
   };
 
@@ -386,6 +394,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleAnnouncementActive,
         announcementsSyncError,
         announcementsLoading,
+        announcementsFromServer,
         addAgency,
         updateAgency,
         deleteAgency,

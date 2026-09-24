@@ -40,6 +40,8 @@ export interface Translations {
     reserveMessage: string;
     facebookLink: string;
     upcomingLabel: string;
+    recentLabel: string;
+    recentStamp: string;
     posterAlt: string;
     featuredNext: string;
     featuredOther: string;
@@ -323,6 +325,8 @@ export const translations: Record<Language, Translations> = {
       reserveMessage: 'Bonjour Thiaguil Multi-services, je souhaite réserver une place pour le départ du {date} vers {city}.',
       facebookLink: 'Voir nos annonces sur Facebook',
       upcomingLabel: 'Départs à venir :',
+      recentLabel: 'Nos derniers départs effectués :',
+      recentStamp: 'Départ effectué',
       posterAlt: 'Affiche du départ vers {city} le {date}',
       featuredNext: 'À la une · Prochain départ',
       featuredOther: 'Départ du {date}',
@@ -631,6 +635,8 @@ export const translations: Record<Language, Translations> = {
       reserveMessage: 'Hello Thiaguil Multi-services, I would like to book a spot on the {date} departure to {city}.',
       facebookLink: 'See our announcements on Facebook',
       upcomingLabel: 'Upcoming departures:',
+      recentLabel: 'Our latest completed departures:',
+      recentStamp: 'Departed',
       posterAlt: 'Poster for the departure to {city} on {date}',
       featuredNext: 'Featured · Next departure',
       featuredOther: 'Departure on {date}',

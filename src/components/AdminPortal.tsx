@@ -26,6 +26,12 @@ import {
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
 import { resolveApiAsset, uploadPoster } from '../lib/api';
+import {
+  getPastShowcase,
+  getUpcomingDepartures,
+  SHOWN_DEPARTURES_TARGET,
+  todayIso,
+} from '../lib/departures';
 import { Agency, DepartureAnnouncement, Destination, PricingRule, Testimonial } from '../types';
 
 export const AdminPortal: React.FC = () => {
@@ -74,6 +80,16 @@ export const AdminPortal: React.FC = () => {
   const [annBusyId, setAnnBusyId] = useState<string | null>(null);
   const [isSavingNewAnn, setIsSavingNewAnn] = useState(false);
   const [isUploadingNewPoster, setIsUploadingNewPoster] = useState(false);
+  // Modification d'un départ existant (formulaire affiché dans sa fiche).
+  const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
+  const [editAnn, setEditAnn] = useState({
+    title: '',
+    departureDayLabel: '',
+    destinationCity: '',
+    departureDate: '',
+    badge: '',
+    urgencyNote: '',
+  });
   const [newAnn, setNewAnn] = useState({
     posterUrl: undefined as string | undefined,
     title: '',
@@ -170,6 +186,72 @@ export const AdminPortal: React.FC = () => {
     runAnnAction(id, () => updateAnnouncement(id, { posterUrl: undefined }));
   };
 
+  const startEditAnnouncement = (ann: DepartureAnnouncement) => {
+    setAnnError(null);
+    setEditingAnnId(ann.id);
+    setEditAnn({
+      title: ann.title,
+      departureDayLabel: ann.departureDayLabel,
+      destinationCity: ann.destinationCity,
+      departureDate: ann.departureDate,
+      badge: ann.badge,
+      urgencyNote: ann.urgencyNote,
+    });
+  };
+
+  const handleSaveEditAnn = (e: React.FormEvent) => {
+    e.preventDefault();
+    const id = editingAnnId;
+    if (!id) return;
+    runAnnAction(id, async () => {
+      // `destination` suit la ville saisie (le formulaire de création
+      // l'initialisait toujours à « New York (USA) »).
+      await updateAnnouncement(id, { ...editAnn, destination: editAnn.destinationCity });
+      setEditingAnnId(null);
+    });
+  };
+
+  // Statut réel de chaque départ sur le site, calculé avec les mêmes règles
+  // que le bandeau d'accueil (src/lib/departures.ts).
+  const today = todayIso();
+  const upcomingIds = new Set(getUpcomingDepartures(announcements, today).map((a) => a.id));
+  const pastShowcase = getPastShowcase(announcements, upcomingIds.size, undefined, today);
+  const listedPastIds = new Set(pastShowcase.listed.map((a) => a.id));
+  const wallPastIds = new Set(pastShowcase.wall.map((a) => a.id));
+  const annStatus = (ann: DepartureAnnouncement) => {
+    if (!ann.isActive) {
+      return { label: 'Masqué', className: 'bg-slate-200 text-slate-600', hint: "N'apparaît pas sur le site." };
+    }
+    if (upcomingIds.has(ann.id)) {
+      return {
+        label: 'En ligne',
+        className: 'bg-emerald-100 text-emerald-800',
+        hint: 'Affiché sur le site comme départ à venir, avec le bouton de réservation.',
+      };
+    }
+    if (listedPastIds.has(ann.id)) {
+      return {
+        label: 'Effectué · affiché',
+        className: 'bg-sky-100 text-sky-800',
+        hint: wallPastIds.has(ann.id)
+          ? 'Date passée : affiché sur le site comme « Départ effectué » (liste et affiche en fond, sans réservation), pour montrer la régularité des envois.'
+          : 'Date passée : affiché sur le site dans « Nos derniers départs effectués » (sans réservation), pour montrer la régularité des envois.',
+      };
+    }
+    if (wallPastIds.has(ann.id)) {
+      return {
+        label: 'Effectué · affiche en fond',
+        className: 'bg-sky-100 text-sky-800',
+        hint: "Date passée : seule son affiche apparaît en fond du bandeau, avec le tampon « Départ effectué ».",
+      };
+    }
+    return {
+      label: 'Date passée · non affiché',
+      className: 'bg-amber-100 text-amber-800',
+      hint: "Date passée : n'apparaît plus sur le site.",
+    };
+  };
+
   const handleDeleteAnnouncement = (id: string) => {
     if (!confirm('Supprimer définitivement ce départ du site (et son affiche) ?')) return;
     runAnnAction(id, () => deleteAnnouncement(id));
@@ -196,7 +278,7 @@ export const AdminPortal: React.FC = () => {
     setAnnError(null);
     setIsSavingNewAnn(true);
     try {
-      await addAnnouncement(newAnn);
+      await addAnnouncement({ ...newAnn, destination: newAnn.destinationCity });
     } catch (err) {
       setAnnError((err as Error).message);
       return;
@@ -544,15 +626,14 @@ export const AdminPortal: React.FC = () => {
                             {ann.departureDayLabel}
                           </span>
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                              ann.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
-                            }`}
+                            title={annStatus(ann).hint}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${annStatus(ann).className}`}
                           >
-                            {ann.isActive ? 'Affiché sur le site' : 'Masqué'}
+                            {annStatus(ann).label}
                           </span>
                         </div>
                         <p className="text-slate-600 font-medium truncate max-w-md">
-                          {ann.title} • {ann.destination}
+                          {ann.title} • {ann.destinationCity}
                         </p>
                       </div>
 
@@ -643,7 +724,7 @@ export const AdminPortal: React.FC = () => {
                   Gestion des Annonces de Départs Spéciaux
                 </h3>
                 <p className="text-xs text-slate-600">
-                  Publiez directement les départs (New York, Montréal, etc.) avec l'affiche publiée sur Facebook. Le départ à venir le plus proche s'affiche en tête du site (bandeau « Prochain départ »), les suivants en pastilles. Les départs dont la date est passée sont masqués automatiquement.
+                  Publiez directement les départs (New York, Montréal, etc.) avec l'affiche publiée sur Facebook. Le départ à venir le plus proche s'affiche en tête du site (bandeau « Prochain départ »), les suivants en pastilles. Une fois la date passée, un départ n'est plus proposé à la réservation ; s'il y a moins de {SHOWN_DEPARTURES_TARGET} départs à venir, les plus récents restent visibles avec la mention « Départ effectué », pour montrer la régularité des envois. Masquez un départ pour qu'il n'apparaisse plus du tout.
                 </p>
               </div>
 
@@ -839,6 +920,118 @@ export const AdminPortal: React.FC = () => {
                     ann.isActive ? 'border-slate-300 shadow-sm' : 'border-slate-200 opacity-60'
                   }`}
                 >
+                  {editingAnnId === ann.id ? (
+                    <form onSubmit={handleSaveEditAnn} className="space-y-4 text-xs">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h4 className="font-extrabold text-sm text-slate-900">Modifier le départ</h4>
+                        <button
+                          type="button"
+                          onClick={() => setEditingAnnId(null)}
+                          className="p-1 rounded-lg text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          aria-label="Fermer sans enregistrer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor={`edit-title-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Titre de l'annonce *
+                          </label>
+                          <input
+                            id={`edit-title-${ann.id}`}
+                            type="text"
+                            required
+                            value={editAnn.title}
+                            onChange={(e) => setEditAnn({ ...editAnn, title: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor={`edit-departureDayLabel-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Libellé du jour (ex: MARDI 01 SEPTEMBRE) *
+                          </label>
+                          <input
+                            id={`edit-departureDayLabel-${ann.id}`}
+                            type="text"
+                            required
+                            value={editAnn.departureDayLabel}
+                            onChange={(e) => setEditAnn({ ...editAnn, departureDayLabel: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor={`edit-destinationCity-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Ville de destination *
+                          </label>
+                          <input
+                            id={`edit-destinationCity-${ann.id}`}
+                            type="text"
+                            required
+                            value={editAnn.destinationCity}
+                            onChange={(e) => setEditAnn({ ...editAnn, destinationCity: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor={`edit-departureDate-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Date de départ *
+                          </label>
+                          <input
+                            id={`edit-departureDate-${ann.id}`}
+                            type="date"
+                            required
+                            value={editAnn.departureDate}
+                            onChange={(e) => setEditAnn({ ...editAnn, departureDate: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor={`edit-badge-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Badge d'urgence
+                          </label>
+                          <input
+                            id={`edit-badge-${ann.id}`}
+                            type="text"
+                            value={editAnn.badge}
+                            onChange={(e) => setEditAnn({ ...editAnn, badge: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label htmlFor={`edit-urgencyNote-${ann.id}`} className="block font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Note informative / Agences concernées
+                          </label>
+                          <input
+                            id={`edit-urgencyNote-${ann.id}`}
+                            type="text"
+                            value={editAnn.urgencyNote}
+                            onChange={(e) => setEditAnn({ ...editAnn, urgencyNote: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:border-brand"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Le site place le départ grâce au champ « Date de départ » : si vous changez la date, mettez aussi à jour le libellé du jour. L'affiche se change avec « Remplacer l'affiche », sous la fiche.
+                      </p>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingAnnId(null)}
+                          className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer"
+                        >
+                          Annuler
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={annBusyId === ann.id}
+                          className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                        >
+                          {annBusyId === ann.id ? 'Enregistrement…' : 'Enregistrer les modifications'}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
                       {ann.posterUrl ? (
@@ -858,11 +1051,10 @@ export const AdminPortal: React.FC = () => {
                           {ann.departureDayLabel}
                         </span>
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                            ann.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
-                          }`}
+                          title={annStatus(ann).hint}
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${annStatus(ann).className}`}
                         >
-                          {ann.isActive ? 'En ligne' : 'Masqué'}
+                          {annStatus(ann).label}
                         </span>
                         <span className="px-2 py-0.5 rounded bg-red-50 text-brand text-[10px] font-bold">
                           {ann.destinationCity}
@@ -871,6 +1063,9 @@ export const AdminPortal: React.FC = () => {
 
                       <h4 className="text-sm font-bold text-slate-800">{ann.title}</h4>
                       <p className="text-xs text-slate-600">{ann.urgencyNote}</p>
+                      {ann.isActive && !upcomingIds.has(ann.id) && (
+                        <p className="text-[11px] font-semibold text-slate-500">{annStatus(ann).hint}</p>
+                      )}
                       <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
                         <label
                           className={`inline-flex items-center gap-1 font-bold text-brand ${
@@ -912,6 +1107,15 @@ export const AdminPortal: React.FC = () => {
 
                     <div className="flex items-center gap-2 shrink-0">
                       <button
+                        type="button"
+                        onClick={() => startEditAnnouncement(ann)}
+                        disabled={annBusyId === ann.id}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-wait"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                        Modifier
+                      </button>
+                      <button
                         onClick={() => runAnnAction(ann.id, () => toggleAnnouncementActive(ann.id))}
                         disabled={annBusyId === ann.id}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-wait ${
@@ -934,6 +1138,7 @@ export const AdminPortal: React.FC = () => {
                       </button>
                     </div>
                   </div>
+                  )}
                 </div>
               ))}
             </div>
