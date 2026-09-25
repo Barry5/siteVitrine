@@ -102,7 +102,7 @@ export const Hero: React.FC = () => {
           {/* Ce que fait l'entreprise, visible avant le prochain départ :
               c'est le titre principal (h1) de la page. */}
           <div className="max-w-4xl space-y-3 sm:space-y-4">
-            <p className="text-[11px] sm:text-xs font-extrabold tracking-[0.14em] uppercase text-red-300">
+            <p className="text-xs sm:text-xs font-extrabold tracking-[0.14em] uppercase text-sand">
               {t.introLabel}
             </p>
             <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.9rem] font-extrabold leading-[1.1] tracking-tight text-white">
@@ -113,7 +113,7 @@ export const Hero: React.FC = () => {
               {t.introServices.map((service) => (
                 <li
                   key={service}
-                  className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-slate-800/85 border border-slate-700 text-[13px] sm:text-sm font-semibold text-slate-200"
+                  className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-ink-2/85 border border-ink-line text-[13px] sm:text-sm font-semibold text-slate-200"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden="true" />
                   {service}
@@ -122,7 +122,7 @@ export const Hero: React.FC = () => {
             </ul>
           </div>
 
-          <div className="h-px bg-slate-700/80 my-8 lg:my-10" aria-hidden="true" />
+          <div className="h-px bg-ink-line/80 my-8 lg:my-10" aria-hidden="true" />
 
           <div id="departs" className="scroll-mt-24">
           {announcementsLoading ? (
@@ -151,7 +151,7 @@ export const Hero: React.FC = () => {
                 type="button"
                 aria-pressed={motionPaused}
                 onClick={() => setMotionPaused((p) => !p)}
-                className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-slate-500 bg-ink/75 text-slate-200 text-[13px] font-bold hover:border-slate-300 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-slate-500 bg-ink/75 text-slate-200 text-[13px] font-bold hover:border-stone-300 transition-colors cursor-pointer"
               >
                 {motionPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                 {motionPaused ? t.playMotion : t.pauseMotion}
@@ -164,12 +164,12 @@ export const Hero: React.FC = () => {
       {/* Trois cartes d'action, à cheval sur le bas du bandeau */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-14 lg:-mt-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-xl shadow-slate-900/10 p-5 sm:p-6 space-y-3">
+          <div className="bg-white rounded-xl border border-stone-200 shadow-xl shadow-ink/10 p-5 sm:p-6 space-y-3">
             <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-red-50 text-brand flex items-center justify-center shrink-0">
+              <span className="w-10 h-10 rounded-lg bg-red-50 text-brand flex items-center justify-center shrink-0">
                 <Search className="w-5 h-5" />
               </span>
-              <h2 className="font-display text-xl font-bold text-slate-900">{t.trackTitle}</h2>
+              <h2 className="font-display text-xl font-bold text-stone-900">{t.trackTitle}</h2>
             </div>
             <form onSubmit={handleTrackSubmit} className="space-y-2">
               <label htmlFor="hero-tracking" className="block text-xs font-semibold text-stone-600">
@@ -183,11 +183,11 @@ export const Hero: React.FC = () => {
                   onChange={(e) => setTrackingInput(e.target.value)}
                   placeholder={t.trackPlaceholder}
                   autoComplete="off"
-                  className="flex-1 min-w-0 h-11 px-3.5 rounded-xl border border-stone-300 bg-canvas text-sm font-semibold text-slate-900 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                  className="flex-1 min-w-0 h-11 px-3.5 rounded-lg border border-stone-300 bg-canvas text-sm font-semibold text-stone-900 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
                 />
                 <button
                   type="submit"
-                  className="h-11 px-4 rounded-xl bg-ink hover:bg-slate-800 text-white text-sm font-bold transition-colors cursor-pointer shrink-0"
+                  className="h-11 px-4 rounded-lg bg-ink hover:bg-ink-2 text-white text-sm font-bold transition-colors cursor-pointer shrink-0"
                 >
                   {t.trackButton}
                 </button>
@@ -197,13 +197,13 @@ export const Hero: React.FC = () => {
 
           <a
             href="#simulateur"
-            className="group bg-white rounded-2xl border border-stone-200 shadow-xl shadow-slate-900/10 p-5 sm:p-6 flex flex-col gap-3 hover:border-brand/40 transition-colors"
+            className="group bg-white rounded-xl border border-stone-200 shadow-xl shadow-ink/10 p-5 sm:p-6 flex flex-col gap-3 hover:border-brand/40 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-red-50 text-brand flex items-center justify-center shrink-0">
+              <span className="w-10 h-10 rounded-lg bg-red-50 text-brand flex items-center justify-center shrink-0">
                 <Calculator className="w-5 h-5" />
               </span>
-              <span className="font-display text-xl font-bold text-slate-900">{t.ratesTitle}</span>
+              <span className="font-display text-xl font-bold text-stone-900">{t.ratesTitle}</span>
             </div>
             <span className="text-sm text-stone-600 leading-relaxed">{t.ratesBody}</span>
             <span className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-brand">
@@ -214,13 +214,13 @@ export const Hero: React.FC = () => {
 
           <a
             href="#agences"
-            className="group bg-white rounded-2xl border border-stone-200 shadow-xl shadow-slate-900/10 p-5 sm:p-6 flex flex-col gap-3 hover:border-brand/40 transition-colors"
+            className="group bg-white rounded-xl border border-stone-200 shadow-xl shadow-ink/10 p-5 sm:p-6 flex flex-col gap-3 hover:border-brand/40 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-red-50 text-brand flex items-center justify-center shrink-0">
+              <span className="w-10 h-10 rounded-lg bg-red-50 text-brand flex items-center justify-center shrink-0">
                 <Building2 className="w-5 h-5" />
               </span>
-              <span className="font-display text-xl font-bold text-slate-900">{t.agenciesTitle}</span>
+              <span className="font-display text-xl font-bold text-stone-900">{t.agenciesTitle}</span>
             </div>
             <span className="text-sm text-stone-600 leading-relaxed">{t.agenciesBody}</span>
             <span className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-brand">
@@ -272,11 +272,11 @@ const DepartureHero: React.FC<{
       {/* Informations du départ */}
       <div className="flex-1 min-w-0 space-y-5 sm:space-y-6">
         <div className="flex flex-wrap items-center gap-2.5">
-          <span className="px-3 py-1.5 rounded-full bg-brand text-white text-[11px] sm:text-xs font-extrabold tracking-[0.12em]">
+          <span className="px-3 py-1.5 rounded-full bg-brand text-white text-xs sm:text-xs font-extrabold tracking-[0.12em]">
             {t.eyebrow}
           </span>
           {departure.badge && (
-            <span className="px-3 py-1.5 rounded-full border border-slate-600 text-slate-200 text-[11px] sm:text-xs font-bold tracking-wider uppercase">
+            <span className="px-3 py-1.5 rounded-full border border-ink-line text-slate-200 text-xs sm:text-xs font-bold tracking-wider uppercase">
               {departure.badge}
             </span>
           )}
@@ -290,7 +290,7 @@ const DepartureHero: React.FC<{
           </span>
           {date ? (
             <>
-              <span className="font-display text-2xl sm:text-3xl font-bold text-red-300 uppercase tracking-wide">
+              <span className="font-display text-2xl sm:text-3xl font-bold text-sand uppercase tracking-wide">
                 {date.weekday}
               </span>
               <span className="font-display text-5xl sm:text-7xl xl:text-[6rem] font-black uppercase leading-[0.92] tracking-tight text-white">
@@ -305,8 +305,8 @@ const DepartureHero: React.FC<{
         </h2>
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
-          <span className="self-start inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm sm:text-base font-bold">
-            <Clock className="w-4 h-4 text-red-400" />
+          <span className="self-start inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-ink-2 border border-ink-line text-sm sm:text-base font-bold">
+            <Clock className="w-4 h-4 text-sand" />
             {countdown}
           </span>
           {departure.urgencyNote && (
@@ -328,7 +328,7 @@ const DepartureHero: React.FC<{
             href={reserveHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2.5 h-14 px-6 rounded-xl bg-brand hover:bg-brand-dark text-white text-base sm:text-[17px] font-extrabold shadow-lg shadow-black/30 transition-colors"
+            className="inline-flex items-center justify-center gap-2.5 h-14 px-6 rounded-lg bg-brand hover:bg-brand-dark text-white text-base sm:text-[17px] font-extrabold shadow-lg shadow-black/30 transition-colors"
           >
             <MessageCircle className="w-5 h-5" />
             {t.reserveButton}
@@ -358,7 +358,7 @@ const DepartureHero: React.FC<{
                   className={`min-h-11 px-3.5 rounded-full text-[13px] border transition-colors cursor-pointer ${
                     isSelected
                       ? 'bg-white text-ink border-white font-bold'
-                      : 'bg-transparent text-slate-200 border-slate-600 font-semibold hover:border-slate-300'
+                      : 'bg-transparent text-slate-200 border-ink-line font-semibold hover:border-stone-300'
                   }`}
                 >
                   {item.destinationCity} · {itemDate?.short ?? item.departureDayLabel}
@@ -375,7 +375,7 @@ const DepartureHero: React.FC<{
       <div className="w-full lg:w-[400px] shrink-0 flex justify-center lg:block">
         {showPoster ? (
           <figure className="w-full max-w-sm lg:max-w-none">
-            <figcaption className="ml-4 inline-flex items-center gap-2 px-3.5 py-2 rounded-t-xl bg-brand text-white text-[11px] sm:text-xs font-extrabold tracking-[0.12em] uppercase">
+            <figcaption className="ml-4 inline-flex items-center gap-2 px-3.5 py-2 rounded-t-lg bg-brand text-white text-xs sm:text-xs font-extrabold tracking-[0.12em] uppercase">
               <span className="w-2 h-2 rounded-full bg-white" aria-hidden="true" />
               {featuredLabel}
             </figcaption>
@@ -384,7 +384,7 @@ const DepartureHero: React.FC<{
               alt={posterAlt}
               decoding="async"
               onError={onPosterError}
-              className="block w-full max-h-[520px] object-contain rounded-2xl border-4 border-brand bg-slate-950 shadow-2xl shadow-black/60"
+              className="block w-full max-h-[520px] object-contain rounded-2xl border-4 border-brand bg-ink shadow-2xl shadow-black/60"
             />
           </figure>
         ) : (
@@ -409,7 +409,7 @@ const CalendarCard: React.FC<{ month: string; day: string; weekday: string; rout
 }) => (
   <div
     aria-hidden="true"
-    className="w-full max-w-sm lg:max-w-none rounded-3xl bg-white text-ink overflow-hidden shadow-2xl shadow-black/40 lg:mt-4"
+    className="w-full max-w-sm lg:max-w-none rounded-2xl bg-white text-ink overflow-hidden shadow-2xl shadow-black/40 lg:mt-4"
   >
     <div className="h-20 sm:h-24 bg-brand text-white flex items-center justify-between px-6 sm:px-8">
       <span className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-[0.12em]">{month}</span>
@@ -460,7 +460,7 @@ const NoDepartureHero: React.FC<{ recent: DepartureAnnouncement[] }> = ({ recent
   const t = translations[language].hero;
   return (
     <div className="max-w-4xl space-y-5 sm:space-y-6">
-      <span className="inline-block px-3 py-1.5 rounded-full border border-slate-600 text-slate-200 text-[11px] sm:text-xs font-extrabold tracking-[0.12em]">
+      <span className="inline-block px-3 py-1.5 rounded-full border border-ink-line text-slate-200 text-xs sm:text-xs font-extrabold tracking-[0.12em]">
         {t.emptyEyebrow}
       </span>
       <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl font-black leading-none tracking-tight">
@@ -472,7 +472,7 @@ const NoDepartureHero: React.FC<{ recent: DepartureAnnouncement[] }> = ({ recent
           href={whatsappLink(t.emptyMessage)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2.5 h-14 px-6 rounded-xl bg-brand hover:bg-brand-dark text-white text-base sm:text-[17px] font-extrabold shadow-lg shadow-black/30 transition-colors"
+          className="inline-flex items-center justify-center gap-2.5 h-14 px-6 rounded-lg bg-brand hover:bg-brand-dark text-white text-base sm:text-[17px] font-extrabold shadow-lg shadow-black/30 transition-colors"
         >
           <MessageCircle className="w-5 h-5" />
           {t.emptyButton}
@@ -496,14 +496,14 @@ const HeroLoading: React.FC<{ label: string }> = ({ label }) => (
   <div role="status" aria-live="polite" className="flex flex-col lg:flex-row gap-10 lg:gap-24 animate-pulse">
     <span className="sr-only">{label}</span>
     <div className="flex-1 space-y-5" aria-hidden="true">
-      <div className="h-7 w-44 rounded-full bg-slate-800" />
-      <div className="h-7 w-64 rounded-lg bg-slate-800" />
-      <div className="h-24 sm:h-28 w-full max-w-2xl rounded-2xl bg-slate-800" />
-      <div className="h-10 w-56 rounded-xl bg-slate-800" />
-      <div className="h-14 w-72 rounded-xl bg-slate-800" />
+      <div className="h-7 w-44 rounded-full bg-ink-2" />
+      <div className="h-7 w-64 rounded-lg bg-ink-2" />
+      <div className="h-24 sm:h-28 w-full max-w-2xl rounded-xl bg-ink-2" />
+      <div className="h-10 w-56 rounded-lg bg-ink-2" />
+      <div className="h-14 w-72 rounded-lg bg-ink-2" />
     </div>
-    <div className="hidden lg:flex w-[400px] h-[480px] rounded-2xl bg-slate-800 items-center justify-center" aria-hidden="true">
-      <ImageOff className="w-10 h-10 text-slate-600" />
+    <div className="hidden lg:flex w-[400px] h-[480px] rounded-xl bg-ink-2 items-center justify-center" aria-hidden="true">
+      <ImageOff className="w-10 h-10 text-stone-600" />
     </div>
   </div>
 );
@@ -579,7 +579,7 @@ const PosterBackdrop: React.FC<{
               return (
                 <div
                   key={`${poster.id}-${i}`}
-                  className="relative w-32 h-40 sm:w-44 sm:h-56 lg:w-[200px] lg:h-[250px] shrink-0 rounded-xl overflow-hidden bg-slate-800"
+                  className="relative w-32 h-40 sm:w-44 sm:h-56 lg:w-[200px] lg:h-[250px] shrink-0 rounded-lg overflow-hidden bg-ink-2"
                 >
                   <img
                     src={resolveApiAsset(poster.posterUrl as string)}
@@ -589,7 +589,7 @@ const PosterBackdrop: React.FC<{
                     className={`w-full h-full object-cover ${isPast ? 'grayscale-[40%]' : ''}`}
                   />
                   {isPast && (
-                    <span className="absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-1 rounded-md bg-emerald-600 text-white text-[10px] sm:text-xs font-extrabold uppercase tracking-wider py-1 sm:py-1.5">
+                    <span className="absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-1 rounded-md bg-emerald-700 text-white text-xs sm:text-xs font-extrabold uppercase tracking-wider py-1 sm:py-1.5">
                       <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" strokeWidth={3} />
                       {pastStamp}
                     </span>

@@ -230,35 +230,35 @@ export const LegalPage: React.FC<LegalPageProps> = ({ page }) => {
         <button
           type="button"
           onClick={() => setCurrentView('public')}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-brand transition-colors mb-8 cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-600 hover:text-brand transition-colors mb-8 cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>{language === 'fr' ? "Retour à l'accueil" : 'Back to homepage'}</span>
         </button>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mb-2">
           {content.title}
         </h1>
-        <p className="text-slate-600 text-sm mb-10">{content.intro}</p>
+        <p className="text-stone-600 text-sm mb-10">{content.intro}</p>
 
         <div className="space-y-8">
           {content.sections.map((section) => (
             <div key={section.heading}>
-              <h2 className="font-extrabold text-sm text-slate-900 mb-2">{section.heading}</h2>
+              <h2 className="font-extrabold text-sm text-stone-900 mb-2">{section.heading}</h2>
               {section.pending && (
-                <div className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wide">
+                <div className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold uppercase tracking-wide">
                   <AlertTriangle className="w-3 h-3" />
                   <span>{language === 'fr' ? 'Information à compléter' : 'Pending information'}</span>
                 </div>
               )}
-              <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
+              <p className="text-stone-600 text-sm leading-relaxed whitespace-pre-line">
                 {section.body}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="mt-14 pt-6 border-t border-slate-200 flex flex-wrap gap-4">
+        <div className="mt-14 pt-6 border-t border-stone-200 flex flex-wrap gap-4">
           {NAV_ITEMS.filter((item) => item.key !== page).map((item) => (
             <button
               key={item.key}

@@ -33,7 +33,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-xs">
+    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200/80 transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo Brand */}
@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <nav aria-label="Navigation principale" className="hidden lg:flex items-center gap-8 text-[15px] font-semibold text-slate-800">
+          <nav aria-label="Navigation principale" className="hidden lg:flex items-center gap-8 text-[15px] font-semibold text-stone-800">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -65,14 +65,14 @@ export const Header: React.FC = () => {
           {/* Desktop Right CTAs */}
           <div className="hidden lg:flex items-center gap-3">
             {/* Language Switcher (FR / EN) */}
-            <div className="flex items-center rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
+            <div className="flex items-center rounded-lg bg-stone-100 p-0.5 border border-stone-200 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => setLanguage('fr')}
                 className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
                   language === 'fr'
-                    ? 'bg-white text-slate-950 shadow-2xs font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-stone-950 shadow-2xs font-extrabold'
+                    : 'text-stone-600 hover:text-stone-900'
                 }`}
                 title="Passer en français"
               >
@@ -83,8 +83,8 @@ export const Header: React.FC = () => {
                 onClick={() => setLanguage('en')}
                 className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
                   language === 'en'
-                    ? 'bg-white text-slate-950 shadow-2xs font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-stone-950 shadow-2xs font-extrabold'
+                    : 'text-stone-600 hover:text-stone-900'
                 }`}
                 title="Switch to English"
               >
@@ -109,12 +109,12 @@ export const Header: React.FC = () => {
           {/* Mobile menu trigger & Lang */}
           <div className="flex items-center gap-2 lg:hidden">
             {/* Mobile Lang switch */}
-            <div className="flex items-center rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
+            <div className="flex items-center rounded-lg bg-stone-100 p-0.5 border border-stone-200 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => setLanguage('fr')}
                 className={`px-2 py-1 rounded transition-all ${
-                  language === 'fr' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600'
+                  language === 'fr' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'text-stone-600'
                 }`}
               >
                 FR
@@ -123,7 +123,7 @@ export const Header: React.FC = () => {
                 type="button"
                 onClick={() => setLanguage('en')}
                 className={`px-2 py-1 rounded transition-all ${
-                  language === 'en' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600'
+                  language === 'en' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'text-stone-600'
                 }`}
               >
                 EN
@@ -132,7 +132,7 @@ export const Header: React.FC = () => {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-2 rounded-lg text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
@@ -144,21 +144,21 @@ export const Header: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
+        <div className="lg:hidden border-t border-stone-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
           <div className="flex flex-col space-y-1">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="px-3 py-2 rounded-md text-sm font-semibold text-slate-800 hover:bg-slate-50 hover:text-brand transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-semibold text-stone-800 hover:bg-stone-50 hover:text-brand transition-colors"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="pt-3 border-t border-slate-100">
+          <div className="pt-3 border-t border-stone-100">
             <a
               href={whatsappHref}
               target="_blank"

@@ -23,7 +23,7 @@ export const FloatingWhatsApp: React.FC = () => {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* Popover drawer */}
       {isOpen && (
-        <div className="mb-3 w-80 sm:w-88 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+        <div className="mb-3 w-80 sm:w-88 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden animate-fadeIn">
           {/* Header */}
           <div className="bg-whatsapp text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export const FloatingWhatsApp: React.FC = () => {
                 <h4 className="font-extrabold text-sm leading-tight">
                   Thiaguil Multi-services
                 </h4>
-                <span className="text-[11px] text-emerald-100 flex items-center gap-1">
+                <span className="text-xs text-emerald-100 flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                   En ligne • Réponse rapide
                 </span>
@@ -51,25 +51,25 @@ export const FloatingWhatsApp: React.FC = () => {
           </div>
 
           {/* Body */}
-          <div className="p-4 bg-slate-50 space-y-3">
-            <div className="bg-white p-3 rounded-2xl border border-slate-200 text-xs text-slate-700 shadow-2xs">
+          <div className="p-4 bg-stone-50 space-y-3">
+            <div className="bg-white p-3 rounded-xl border border-stone-200 text-xs text-stone-700 shadow-2xs">
               <p className="font-medium">
                 Bonjour ! 👋 Comment pouvons-nous vous assister aujourd'hui pour votre envoi de colis ?
               </p>
-              <span className="text-[10px] text-slate-600 block text-right mt-1">
+              <span className="text-xs text-stone-600 block text-right mt-1">
                 Numéro direct : +224 611 83 56 83
               </span>
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 px-1 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-stone-600 px-1 block">
                 Sélectionnez un sujet rapide :
               </span>
               {quickQuestions.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(q)}
-                  className="w-full text-left p-2.5 rounded-xl bg-white hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 text-xs font-semibold text-slate-800 transition-all flex items-center justify-between cursor-pointer group shadow-2xs"
+                  className="w-full text-left p-2.5 rounded-lg bg-white hover:bg-emerald-50 hover:border-emerald-300 border border-stone-200 text-xs font-semibold text-stone-800 transition-all flex items-center justify-between cursor-pointer group shadow-2xs"
                 >
                   <span className="truncate pr-2">{q}</span>
                   <Send className="w-3.5 h-3.5 text-emerald-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
@@ -77,17 +77,17 @@ export const FloatingWhatsApp: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
+            <div className="pt-2 border-t border-stone-200 flex justify-between items-center text-xs">
               <a
                 href={`tel:+${phoneNumber}`}
-                className="text-slate-600 hover:text-slate-900 flex items-center gap-1 font-bold text-[11px]"
+                className="text-stone-600 hover:text-stone-900 flex items-center gap-1 font-bold text-xs"
               >
-                <Phone className="w-3.5 h-3.5 text-slate-700" />
+                <Phone className="w-3.5 h-3.5 text-stone-700" />
                 <span>Appel téléphonique direct</span>
               </a>
               <button
                 onClick={() => handleSend('Bonjour Thiaguil Multi-services')}
-                className="text-whatsapp font-bold hover:underline text-[11px] cursor-pointer"
+                className="text-whatsapp font-bold hover:underline text-xs cursor-pointer"
               >
                 Écrire librement ➔
               </button>

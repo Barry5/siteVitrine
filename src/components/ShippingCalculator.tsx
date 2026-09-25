@@ -13,9 +13,11 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
+import { SectionEyebrow } from './SectionEyebrow';
+import { nextDepartureLabel } from '../lib/departures';
 
-export const ShippingCalculator: React.FC = () => {
-  const { destinations, agencies, pricingRules, exchangeRates, language } = useApp();
+export const ShippingCalculator: React.FC<{ number?: string }> = ({ number }) => {
+  const { destinations, agencies, pricingRules, exchangeRates, announcements, language } = useApp();
   const t = translations[language].calculator;
 
   const [originAgencyId, setOriginAgencyId] = useState(agencies[0]?.id || '');
@@ -74,30 +76,27 @@ Could you confirm the branch deposit details?`;
   };
 
   return (
-    <section id="simulateur" className="py-20 bg-white border-b border-slate-200 scroll-mt-20">
+    <section id="simulateur" className="py-20 bg-white border-b border-stone-200 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
-            <Calculator className="w-3.5 h-3.5" />
-            <span>{t.badge}</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <SectionEyebrow number={number} label={translations[language].sections.calculator} />
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight">
             {t.title}
           </h2>
-          <p className="text-slate-600 text-base">
+          <p className="text-stone-600 text-base">
             {t.subtitle}
           </p>
         </div>
 
         {/* Calculator Interactive Box */}
-        <div className="max-w-5xl mx-auto bg-canvas border-2 border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl">
+        <div className="max-w-5xl mx-auto bg-canvas border border-stone-200 rounded-2xl p-6 sm:p-10 shadow-sm">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column: Form Controls */}
             <div className="lg:col-span-7 space-y-6">
               {/* Type selection: Enveloppe vs Colis (Segmented controls with clean active state) */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
                   {t.stepFormat}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -107,10 +106,10 @@ Could you confirm the branch deposit details?`;
                       setPackageType('envelope');
                       setTransitMode('air');
                     }}
-                    className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
+                    className={`py-3 px-4 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
                       packageType === 'envelope'
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                        ? 'bg-ink text-white border-ink-line shadow-xs'
+                        : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
                     }`}
                   >
                     <span>{t.envelopeOption}</span>
@@ -119,10 +118,10 @@ Could you confirm the branch deposit details?`;
                   <button
                     type="button"
                     onClick={() => setPackageType('parcel')}
-                    className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
+                    className={`py-3 px-4 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
                       packageType === 'parcel'
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                        ? 'bg-ink text-white border-ink-line shadow-xs'
+                        : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
                     }`}
                   >
                     <span>{t.parcelOption}</span>
@@ -133,24 +132,24 @@ Could you confirm the branch deposit details?`;
               {/* Transit Mode: Air vs Sea (only for parcels) */}
               {packageType === 'parcel' && (
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
                     {t.stepMode}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setTransitMode('air')}
-                      className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
+                      className={`p-3.5 rounded-lg text-left border transition-all cursor-pointer ${
                         transitMode === 'air'
                           ? 'bg-white border-brand ring-2 ring-red-100 shadow-sm'
-                          : 'bg-white border-slate-300 hover:bg-slate-50'
+                          : 'bg-white border-stone-300 hover:bg-stone-50'
                       }`}
                     >
-                      <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
+                      <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-stone-900">
                         <Plane className="w-4 h-4 text-brand" />
                         <span>{t.airModeTitle}</span>
                       </div>
-                      <span className="text-[11px] text-slate-600 mt-1 block">
+                      <span className="text-xs text-stone-600 mt-1 block">
                         {t.airModeDesc}
                       </span>
                     </button>
@@ -158,17 +157,17 @@ Could you confirm the branch deposit details?`;
                     <button
                       type="button"
                       onClick={() => setTransitMode('sea')}
-                      className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
+                      className={`p-3.5 rounded-lg text-left border transition-all cursor-pointer ${
                         transitMode === 'sea'
                           ? 'bg-white border-brand ring-2 ring-red-100 shadow-sm'
-                          : 'bg-white border-slate-300 hover:bg-slate-50'
+                          : 'bg-white border-stone-300 hover:bg-stone-50'
                       }`}
                     >
-                      <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
-                        <Ship className="w-4 h-4 text-cyan-600" />
+                      <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-stone-900">
+                        <Ship className="w-4 h-4 text-stone-700" />
                         <span>{t.seaModeTitle}</span>
                       </div>
-                      <span className="text-[11px] text-slate-600 mt-1 block">
+                      <span className="text-xs text-stone-600 mt-1 block">
                         {t.seaModeDesc}
                       </span>
                     </button>
@@ -179,13 +178,13 @@ Could you confirm the branch deposit details?`;
               {/* Origin & Destination Selectors */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
                     {t.originLabel}
                   </label>
                   <select
                     value={originAgencyId}
                     onChange={(e) => setOriginAgencyId(e.target.value)}
-                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
+                    className="w-full py-2.5 px-3 rounded-lg border border-stone-300 bg-white font-semibold text-stone-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
                   >
                     {agencies
                       .filter((a) => !a.isInternational)
@@ -198,13 +197,13 @@ Could you confirm the branch deposit details?`;
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
                     {t.destLabel}
                   </label>
                   <select
                     value={destinationId}
                     onChange={(e) => setDestinationId(e.target.value)}
-                    className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
+                    className="w-full py-2.5 px-3 rounded-lg border border-stone-300 bg-white font-semibold text-stone-900 text-xs focus:ring-2 focus:ring-brand focus:outline-none"
                   >
                     {destinations.map((dest) => (
                       <option key={dest.id} value={dest.id}>
@@ -217,9 +216,9 @@ Could you confirm the branch deposit details?`;
 
               {/* Weight Slider & Input (for parcels) */}
               {packageType === 'parcel' && (
-                <div className="space-y-3 p-4 rounded-2xl bg-white border border-slate-200">
+                <div className="space-y-3 p-4 rounded-xl bg-white border border-stone-200">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
                       <Weight className="w-3.5 h-3.5 text-brand" />
                       {t.weightLabel}
                     </label>
@@ -243,10 +242,10 @@ Could you confirm the branch deposit details?`;
                     step="1"
                     value={weightKg}
                     onChange={(e) => setWeightKg(Number(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand"
+                    className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-brand"
                   />
 
-                  <div className="flex justify-between text-[11px] text-slate-600 font-semibold">
+                  <div className="flex justify-between text-xs text-stone-600 font-semibold">
                     <span>1 kg (Petit)</span>
                     <span>10 kg (Standard)</span>
                     <span>25 kg (Valise)</span>
@@ -257,14 +256,14 @@ Could you confirm the branch deposit details?`;
             </div>
 
             {/* Right Column: Instant Calculation Quote Summary */}
-            <div className="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xl border border-slate-800">
+            <div className="lg:col-span-5 bg-ink text-white rounded-xl p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xl border border-ink-line">
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+                <div className="flex items-center justify-between pb-4 border-b border-ink-line">
+                  <span className="text-xs font-bold uppercase tracking-wider text-sand flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
                     {t.instantEstimate}
                   </span>
-                  <span className="text-[11px] bg-slate-800 px-2.5 py-0.5 rounded text-slate-300 font-mono">
+                  <span className="text-xs bg-ink-2 px-2.5 py-0.5 rounded text-slate-300 font-mono">
                     {t.indicativeQuote}
                   </span>
                 </div>
@@ -279,13 +278,13 @@ Could you confirm the branch deposit details?`;
                       <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
                         {formatGnf(totalGnf)}
                       </div>
-                      <div className="text-xs text-amber-300/90 font-medium pt-1 flex justify-center gap-3">
+                      <div className="text-xs text-sand/90 font-medium pt-1 flex justify-center gap-3">
                         <span>~ {totalUsd} $ USD</span>
                         <span>•</span>
                         <span>~ {totalCad} $ CAD</span>
                       </div>
                       {packageType === 'parcel' && billableWeight > weightKg && (
-                        <p className="text-[11px] text-slate-300 pt-2">
+                        <p className="text-xs text-slate-300 pt-2">
                           {t.minWeightNote.replace('{kg}', String(minWeightKg))}
                         </p>
                       )}
@@ -301,7 +300,7 @@ Could you confirm the branch deposit details?`;
                 </div>
 
                 {/* Breakdown specs */}
-                <div className="space-y-2.5 text-xs text-slate-300 bg-slate-950/80 p-4 rounded-xl border border-slate-800/80">
+                <div className="space-y-2.5 text-xs text-slate-300 bg-ink/80 p-4 rounded-lg border border-ink-line/80">
                   <div className="flex justify-between">
                     <span className="text-slate-300">{t.destLabel} :</span>
                     <span className="text-white font-bold">
@@ -318,8 +317,8 @@ Could you confirm the branch deposit details?`;
 
                   <div className="flex justify-between">
                     <span className="text-slate-300">{t.nextFlight}</span>
-                    <span className="text-amber-300 font-bold">
-                      {selectedDestination?.nextScheduledFlight || (language === 'fr' ? 'Hebdomadaire' : 'Weekly')}
+                    <span className="text-sand font-bold">
+                      {(selectedDestination && nextDepartureLabel(announcements, selectedDestination.name, language)) || t.nextFlightTba}
                     </span>
                   </div>
 
@@ -338,12 +337,12 @@ Could you confirm the branch deposit details?`;
                   href={`https://wa.me/224611835683?text=${generateWhatsAppMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="w-full py-3.5 px-4 rounded-lg bg-brand hover:bg-brand-dark text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>{pricing ? t.bookWhatsApp : t.askQuote}</span>
                 </a>
-                <p className="text-[10px] text-slate-300 text-center">
+                <p className="text-xs text-slate-300 text-center">
                   {t.guaranteeNote}
                 </p>
               </div>

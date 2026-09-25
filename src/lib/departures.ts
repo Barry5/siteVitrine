@@ -134,3 +134,43 @@ export function formatDepartureDate(iso: string, language: Language): FormattedD
   const month = new Intl.DateTimeFormat(locale, { month: 'long' }).format(date);
   return { weekday, dayMonth, short, dayMonthShort, month, long: `${weekday} ${dayMonth}` };
 }
+
+function normalizeCity(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+/**
+ * Prochain départ publié (actif, à venir) vers une destination du site, par
+ * exemple « New York » ou « Berlin & Allemagne » (comparaison sans accents,
+ * dans les deux sens). Remplace les dates écrites en dur dans les
+ * destinations, qui devenaient fausses une fois passées.
+ */
+export function nextDepartureForDestination(
+  announcements: DepartureAnnouncement[],
+  destinationName: string,
+  today: string = todayIso()
+): DepartureAnnouncement | null {
+  const dest = normalizeCity(destinationName);
+  if (!dest) return null;
+  return (
+    getUpcomingDepartures(announcements, today).find((a) => {
+      const city = normalizeCity(a.destinationCity);
+      return Boolean(city) && (dest.includes(city) || city.includes(dest));
+    }) ?? null
+  );
+}
+
+/** Libellé court du prochain départ vers une destination (« jeu. 01 oct. »), ou null. */
+export function nextDepartureLabel(
+  announcements: DepartureAnnouncement[],
+  destinationName: string,
+  language: Language
+): string | null {
+  const next = nextDepartureForDestination(announcements, destinationName);
+  if (!next) return null;
+  return formatDepartureDate(next.departureDate, language)?.short ?? null;
+}

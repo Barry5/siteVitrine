@@ -16,16 +16,16 @@ export const Footer: React.FC = () => {
   const copyrightText = t.copyright.replace('{year}', String(new Date().getFullYear()));
 
   return (
-    <footer className="bg-ink text-white border-t border-slate-800 pt-16 pb-12 text-xs">
+    <footer className="bg-ink text-white border-t border-ink-line pt-16 pb-12 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-14 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-14 border-b border-ink-line">
           {/* Brand Info */}
           <div className="lg:col-span-4 space-y-4">
             <Logo variant="dark" size="lg" />
             <p className="text-slate-300 text-xs leading-relaxed max-w-sm">
               {t.tagline}
             </p>
-            <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1 text-[11px] text-slate-300">
+            <div className="p-3.5 rounded-xl bg-ink border border-ink-line space-y-1 text-xs text-slate-300">
               <span className="text-white font-bold block uppercase tracking-wider">
                 {t.mottoLabel}
               </span>
@@ -89,7 +89,7 @@ export const Footer: React.FC = () => {
             <h4 className="font-extrabold uppercase tracking-wider text-white text-xs">
               {t.localAgenciesTitle}
             </h4>
-            <ul className="space-y-2 text-slate-300 text-[11px]">
+            <ul className="space-y-2 text-slate-300 text-xs">
               {agencies
                 .filter((a) => !a.isInternational)
                 .map((agency) => (
@@ -106,12 +106,12 @@ export const Footer: React.FC = () => {
             <h4 className="font-extrabold uppercase tracking-wider text-white text-xs">
               {t.intlOfficesTitle}
             </h4>
-            <div className="space-y-2 text-slate-300 text-[11px]">
+            <div className="space-y-2 text-slate-300 text-xs">
               {agencies
                 .filter((a) => a.isInternational)
                 .map((agency) => (
-                  <div key={agency.id} className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                    <strong className="text-amber-300 block font-bold">{agency.name} :</strong>
+                  <div key={agency.id} className="p-2.5 rounded-lg bg-ink border border-ink-line">
+                    <strong className="text-sand block font-bold">{agency.name} :</strong>
                     <span>{agency.address}</span>
                     <span className="block font-mono text-white font-semibold mt-0.5">
                       {agency.phones.join(' / ')}
@@ -120,7 +120,7 @@ export const Footer: React.FC = () => {
                 ))}
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-300">
+            <div className="p-3 rounded-lg bg-ink/60 border border-ink-line/80 text-xs text-slate-300">
               <span className="text-slate-300 font-semibold block mb-0.5">{t.centralAssistance}</span>
               <a href="tel:+224611835683" className="text-white font-mono font-bold hover:text-red-400 transition-colors">
                 +224 611 83 56 83
@@ -133,7 +133,7 @@ export const Footer: React.FC = () => {
         <PaymentMethodsStrip />
 
         {/* Bottom copyright and discreet legal/admin line */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-300 text-[11px]">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-300 text-xs">
           <p>{copyrightText}</p>
 
           <div className="flex flex-wrap items-center gap-4">

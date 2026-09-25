@@ -11,6 +11,8 @@ interface AgencyPhotoProps {
   caption?: string;
   className?: string;
   dark?: boolean;
+  /** Afficher le cadre « Photo à venir » quand il n'y a pas de photo (par défaut : rien). */
+  showPlaceholder?: boolean;
 }
 
 /**
@@ -26,11 +28,16 @@ export const AgencyPhoto: React.FC<AgencyPhotoProps> = ({
   caption,
   className = '',
   dark = false,
+  showPlaceholder = false,
 }) => {
   const [failed, setFailed] = useState(false);
 
   if (!photoUrl || failed) {
-    return <PlaceholderImage label={label} caption={caption} className={className} dark={dark} />;
+    // Sans vraie photo : rien plutôt qu'un cadre « Photo à venir », qui donne
+    // au site un air inachevé. `showPlaceholder` garde l'ancien comportement.
+    return showPlaceholder ? (
+      <PlaceholderImage label={label} caption={caption} className={className} dark={dark} />
+    ) : null;
   }
 
   return (
@@ -39,7 +46,7 @@ export const AgencyPhoto: React.FC<AgencyPhotoProps> = ({
       alt={alt}
       loading="lazy"
       onError={() => setFailed(true)}
-      className={`object-cover rounded-2xl ${className}`}
+      className={`object-cover rounded-xl ${className}`}
     />
   );
 };
