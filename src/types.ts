@@ -108,6 +108,8 @@ export interface Testimonial {
   verified: boolean;
 }
 
+export type ShipmentType = 'envelope' | 'small_box' | 'large_box' | 'air_freight' | 'sea_freight';
+
 export interface ShipmentService {
   id: ShipmentType;
   name: string;
