@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   AlertCircle,
   Calendar,
@@ -33,104 +33,70 @@ const WHATSAPP_NUMBER = '224611835683';
 const whatsappLink = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
+/** Place le curseur dans le champ de suivi de l'accueil (le seul champ de saisie du site). */
+export function focusHeroTrackingField() {
+  const field = document.getElementById('hero-tracking') as HTMLInputElement | null;
+  if (!field) return;
+  field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  field.focus({ preventScroll: true });
+}
+
 /**
- * Suivi de colis : données réelles de ColisBox, via le serveur du site
- * (GET /api/tracking/:numero). Un lien du type colisthiaguil.com/?suivi=NUMÉRO
- * lance directement la recherche.
+ * Résultat du suivi de colis : données réelles de ColisBox, via le serveur du
+ * site (GET /api/tracking/:numero). Le numéro se saisit dans la carte « Suivre
+ * un colis » de l'accueil (id="suivi") : cette zone n'apparaît que pendant une
+ * recherche, avec son résultat ou son erreur — plus de second champ identique.
+ * Un lien du type colisthiaguil.com/?suivi=NUMÉRO lance directement la recherche.
  */
 export const TrackingSection: React.FC<{ number?: string }> = ({ number }) => {
-  const { activeTrackedItem, activeSearchCode, trackingError, trackingLoading, searchPackage, clearTracking, language } =
-    useApp();
+  const { activeTrackedItem, trackingError, trackingLoading, searchPackage, clearTracking, language } = useApp();
   const t = translations[language].tracking;
-  const [quickInput, setQuickInput] = useState('');
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (activeSearchCode) setQuickInput(activeSearchCode);
-  }, [activeSearchCode]);
+  const zoneRef = useRef<HTMLDivElement>(null);
+  const visible = Boolean(activeTrackedItem || trackingLoading || trackingError);
 
   // Lien direct ?suivi=NUMÉRO (par ex. envoyé au client par WhatsApp).
   useEffect(() => {
     const code = trackingNumberFromUrl();
-    if (!code) return;
-    searchPackage(code);
-    sectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (code) searchPackage(code);
     // Une seule fois, à l'ouverture de la page.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickInput.trim()) return;
-    searchPackage(quickInput);
+  // À chaque recherche, on descend jusqu'au résultat.
+  useEffect(() => {
+    if (!trackingLoading) return;
+    requestAnimationFrame(() => zoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [trackingLoading]);
+
+  const searchAgain = () => {
+    clearTracking();
+    focusHeroTrackingField();
   };
 
   return (
-    <section
-      id="suivi"
-      ref={sectionRef}
-      className="py-14 sm:py-18 bg-stone-50/70 border-b border-stone-200 scroll-mt-20"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center space-y-2.5 mb-8 sm:mb-10">
-          <SectionEyebrow number={number} label={translations[language].sections.tracking} />
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">{t.title}</h2>
-          <p className="text-stone-600 text-sm sm:text-base max-w-xl mx-auto">{t.subtitle}</p>
-        </div>
-
-        {activeTrackedItem ? (
-          <TrackingResult parcel={activeTrackedItem} onReset={clearTracking} />
-        ) : (
-          <div className="max-w-3xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 text-center">
-            <div className="w-14 h-14 rounded-xl bg-red-50 text-brand flex items-center justify-center mx-auto border border-red-100">
-              <Package className="w-7 h-7" />
+    <div id="suivi-resultat" ref={zoneRef} className="scroll-mt-24">
+      {visible && (
+        <section aria-live="polite" className="py-14 sm:py-16 bg-stone-50/70 border-b border-stone-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center space-y-2.5 mb-8">
+              <SectionEyebrow number={number} label={translations[language].sections.tracking} />
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">{t.title}</h2>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="font-bold text-stone-900 text-lg sm:text-xl">{t.emptyTitle}</h3>
-              <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto">{t.emptySubtitle}</p>
-            </div>
-
-            <div className="pt-3 border-t border-stone-100 max-w-md mx-auto">
-              <form onSubmit={handleSubmit} className="flex gap-2">
-                <label htmlFor="tracking-code" className="sr-only">
-                  {t.inputPlaceholder}
-                </label>
-                <input
-                  id="tracking-code"
-                  type="text"
-                  value={quickInput}
-                  onChange={(e) => setQuickInput(e.target.value)}
-                  placeholder={t.inputPlaceholder}
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  spellCheck={false}
-                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm font-mono rounded-lg border border-stone-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={trackingLoading}
-                  className="px-4 py-2.5 rounded-lg bg-ink hover:bg-ink-2 text-white text-sm font-bold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait"
-                >
-                  {t.inputButton}
-                </button>
-              </form>
-            </div>
-
-            {trackingLoading && (
-              <p role="status" aria-live="polite" className="inline-flex items-center gap-2 text-sm font-semibold text-stone-600">
+            {trackingLoading ? (
+              <p role="status" className="flex items-center justify-center gap-2 text-sm font-semibold text-stone-600">
                 <RefreshCcw className="w-4 h-4 animate-spin text-brand" />
                 {t.loading}
               </p>
-            )}
-
-            {trackingError && !trackingLoading && (
+            ) : activeTrackedItem ? (
+              <TrackingResult parcel={activeTrackedItem} onReset={searchAgain} />
+            ) : trackingError ? (
               <div
                 role="alert"
-                className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
+                className="max-w-2xl mx-auto p-5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm"
               >
                 <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <p className="font-semibold">
                     {trackingError.kind === 'not_found'
                       ? t.notFound.replace('{code}', trackingError.code)
@@ -140,23 +106,33 @@ export const TrackingSection: React.FC<{ number?: string }> = ({ number }) => {
                           ? t.tooManyRequests
                           : t.unavailable}
                   </p>
-                  {trackingError.kind === 'not_found' && <p className="text-xs text-amber-800">{t.notFoundHelp}</p>}
-                  <a
-                    href={whatsappLink(t.contactMessage.replace('{code}', trackingError.code))}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    {t.contactAgency}
-                  </a>
+                  {trackingError.kind === 'not_found' && <p className="text-amber-800">{t.notFoundHelp}</p>}
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={searchAgain}
+                      className="inline-flex items-center gap-1.5 min-h-11 px-4 rounded-lg border border-amber-300 bg-white hover:bg-amber-100 text-amber-900 text-sm font-bold transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      {t.fixNumber}
+                    </button>
+                    <a
+                      href={whatsappLink(t.contactMessage.replace('{code}', trackingError.code))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 min-h-11 px-4 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      {t.contactAgency}
+                    </a>
+                  </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
-        )}
-      </div>
-    </section>
+        </section>
+      )}
+    </div>
   );
 };
 

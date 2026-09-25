@@ -3,13 +3,9 @@ import {
   Calculator,
   Plane,
   Ship,
-  MapPin,
   Weight,
-  HelpCircle,
-  ArrowRight,
   Sparkles,
-  Check,
-  Send,
+  MessageCircle,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
@@ -337,10 +333,10 @@ Could you confirm the branch deposit details?`;
                   href={`https://wa.me/224611835683?text=${generateWhatsAppMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3.5 px-4 rounded-lg bg-brand hover:bg-brand-dark text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="w-full min-h-12 px-4 rounded-lg bg-brand hover:bg-brand-dark text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{pricing ? t.bookWhatsApp : t.askQuote}</span>
+                  <MessageCircle className="w-5 h-5" />
+                  <span>{t.bookWhatsApp}</span>
                 </a>
                 <p className="text-xs text-slate-300 text-center">
                   {t.guaranteeNote}
