@@ -32,7 +32,7 @@ adminPricingRouter.put('/', async (req, res) => {
   try {
     const outcome = await withPricingLock(async () => {
       const validation = validatePricing(req.body?.pricing);
-      if (!validation.ok) return { status: 400 as const, body: { error: validation.error } };
+      if ('error' in validation) return { status: 400 as const, body: { error: validation.error } };
       await writePricing(validation.value);
       return { status: 200 as const, body: { pricing: validation.value } };
     });
