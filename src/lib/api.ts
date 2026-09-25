@@ -3,7 +3,7 @@
  * En développement, VITE_API_URL peut pointer vers http://localhost:4000/api ;
  * en production, l'API est généralement servie sous le même domaine, via /api.
  */
-import type { DepartureAnnouncement, TrackedParcel, TrackingErrorKind } from '../types';
+import type { DepartureAnnouncement, PricingSettings, TrackedParcel, TrackingErrorKind } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -170,4 +170,27 @@ export async function fetchTracking(trackingNumber: string): Promise<TrackedParc
   if (res.status === 400) throw new TrackingLookupError('invalid_number');
   if (res.status === 429) throw new TrackingLookupError('too_many_requests');
   throw new TrackingLookupError('unavailable');
+}
+
+/** Tarifs du simulateur publiés depuis l'admin, ou null si aucun n'a encore été enregistré. */
+export async function fetchPublicPricing(): Promise<PricingSettings | null> {
+  const res = await fetch(`${API_BASE}/pricing`);
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.error || 'Impossible de charger les tarifs.');
+  return data?.pricing && Array.isArray(data.pricing.rules) ? (data.pricing as PricingSettings) : null;
+}
+
+/** Enregistre la grille complète (admin connecté) et renvoie la version enregistrée. */
+export async function savePricing(pricing: PricingSettings): Promise<PricingSettings> {
+  const res = await fetch(`${API_BASE}/admin/pricing`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ pricing }),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok || !Array.isArray(data?.pricing?.rules)) {
+    throw new Error(data?.error || "L'enregistrement des tarifs a échoué.");
+  }
+  return data.pricing as PricingSettings;
 }

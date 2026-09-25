@@ -84,6 +84,18 @@ export interface DepartureAnnouncement {
   posterUrl?: string;
 }
 
+/** Nombre de GNF pour 1 USD / 1 CAD (conversion indicative du simulateur). */
+export interface ExchangeRates {
+  usdGnf: number;
+  cadGnf: number;
+}
+
+/** Tarifs du simulateur, enregistrés sur le serveur (GET /api/pricing). */
+export interface PricingSettings {
+  rules: PricingRule[];
+  exchangeRates: ExchangeRates;
+}
+
 export interface PricingRule {
   id: string;
   destinationId: string;

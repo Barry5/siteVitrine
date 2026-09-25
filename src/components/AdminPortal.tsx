@@ -32,7 +32,7 @@ import {
   SHOWN_DEPARTURES_TARGET,
   todayIso,
 } from '../lib/departures';
-import { Agency, DepartureAnnouncement, Destination, PricingRule, Testimonial } from '../types';
+import { Agency, DepartureAnnouncement, Destination, PricingRule, PricingSettings, Testimonial } from '../types';
 
 export const AdminPortal: React.FC = () => {
   const {
@@ -45,6 +45,7 @@ export const AdminPortal: React.FC = () => {
     agencies,
     destinations,
     pricingRules,
+    exchangeRates,
     testimonials,
     addAnnouncement,
     updateAnnouncement,
@@ -57,7 +58,7 @@ export const AdminPortal: React.FC = () => {
     addDestination,
     updateDestination,
     deleteDestination,
-    updatePricingRule,
+    savePricing,
     addTestimonial,
     deleteTestimonial,
     resetAllData,
@@ -103,6 +104,61 @@ export const AdminPortal: React.FC = () => {
     localOffices: ['Hamdallaye', 'Bentouraya', 'Kindia', 'Kipé'],
     isActive: true,
   });
+
+  // Tarifs du simulateur : brouillon modifié dans l'onglet, enregistré sur le
+  // serveur par le bouton « Enregistrer les tarifs » (null = aucune modification).
+  const [pricingDraft, setPricingDraft] = useState<PricingSettings | null>(null);
+  const [isSavingPricing, setIsSavingPricing] = useState(false);
+  const [pricingMessage, setPricingMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  const pricingView: PricingSettings = pricingDraft ?? { rules: pricingRules, exchangeRates };
+
+  const editPricing = (next: PricingSettings) => {
+    setPricingMessage(null);
+    setPricingDraft(next);
+  };
+  const updateDraftRule = (id: string, changes: Partial<PricingRule>) => {
+    editPricing({
+      ...pricingView,
+      rules: pricingView.rules.map((rule) => (rule.id === id ? { ...rule, ...changes } : rule)),
+    });
+  };
+  const addPricingRuleFor = (dest: Destination) => {
+    editPricing({
+      ...pricingView,
+      rules: [
+        ...pricingView.rules,
+        {
+          id: `pr-${dest.id}`.slice(0, 64),
+          destinationId: dest.id,
+          destinationName: `${dest.name} (${dest.country})`,
+          // Montants à saisir : le serveur refuse l'enregistrement tant qu'ils valent 0.
+          envelopePriceGnf: 0,
+          pricePerKgAirGnf: 0,
+          pricePerKgSeaGnf: 0,
+          minWeightKgAir: 2,
+          minWeightKgSea: 20,
+          delaiAir: dest.estimatedAirDays,
+          delaiSea: dest.estimatedSeaDays,
+        },
+      ],
+    });
+  };
+  const handleSavePricing = async () => {
+    if (!pricingDraft) return;
+    setIsSavingPricing(true);
+    setPricingMessage(null);
+    try {
+      await savePricing(pricingDraft);
+      setPricingDraft(null);
+      setPricingMessage({ kind: 'ok', text: 'Tarifs enregistrés : le simulateur du site les utilise dès maintenant.' });
+    } catch (err) {
+      setPricingMessage({ kind: 'error', text: (err as Error).message });
+    } finally {
+      setIsSavingPricing(false);
+    }
+  };
+  // Champ numérique : vide = 0 (le serveur refuse les prix à 0 avec un message clair).
+  const toNumber = (value: string) => (value === '' ? 0 : Number(value));
 
   const [isAddingAgency, setIsAddingAgency] = useState(false);
   const [newAgency, setNewAgency] = useState({
@@ -659,10 +715,10 @@ export const AdminPortal: React.FC = () => {
                     Où sont enregistrées vos modifications ?
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    <strong>Départs et affiches :</strong> enregistrés sur le serveur, visibles immédiatement par tous les visiteurs.
+                    <strong>Départs, affiches et tarifs du simulateur :</strong> enregistrés sur le serveur, visibles immédiatement par tous les visiteurs.
                   </p>
                   <p className="text-xs text-slate-600 leading-relaxed mt-2">
-                    <strong>Tarifs, agences, destinations, témoignages :</strong> encore enregistrés uniquement dans ce navigateur — les visiteurs ne voient pas ces modifications.
+                    <strong>Agences, destinations, témoignages :</strong> encore enregistrés uniquement dans ce navigateur — les visiteurs ne voient pas ces modifications.
                   </p>
                 </div>
 
@@ -680,7 +736,7 @@ export const AdminPortal: React.FC = () => {
                   </button>
 
                   <p className="text-[10px] text-slate-600 text-center">
-                    Restaure tarifs, agences, destinations et témoignages d'origine dans ce navigateur. Ne touche pas aux départs publiés.
+                    Restaure agences, destinations et témoignages d'origine dans ce navigateur. Ne touche ni aux départs publiés ni aux tarifs.
                   </p>
                 </div>
               </div>
@@ -1490,17 +1546,63 @@ export const AdminPortal: React.FC = () => {
            ========================================================================= */}
         {activeTab === 'pricing' && (
           <div className="space-y-6 animate-fadeIn">
-            <div className="bg-white p-5 rounded-3xl border border-slate-200">
-              <h3 className="text-lg font-extrabold text-slate-900">
-                Grille Tarifaire du Simulateur
-              </h3>
-              <p className="text-xs text-slate-600">
-                Ajustez le prix par kilogramme (Fret Aérien et Fret Maritime) ainsi que le forfait enveloppe. Ces montants sont immédiatement pris en compte par le simulateur public.
-              </p>
+            <div className="bg-white p-5 rounded-3xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900">
+                  Grille Tarifaire du Simulateur
+                </h3>
+                <p className="text-xs text-slate-600">
+                  Ajustez le forfait enveloppe, les prix au kilogramme, les poids minimum facturés et les taux de change, puis cliquez sur « Enregistrer les tarifs » : les montants sont enregistrés sur le serveur et utilisés par le simulateur pour tous les visiteurs.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {pricingDraft && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPricingDraft(null);
+                      setPricingMessage(null);
+                    }}
+                    disabled={isSavingPricing}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer disabled:opacity-50"
+                  >
+                    Annuler
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleSavePricing}
+                  disabled={!pricingDraft || isSavingPricing}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSavingPricing ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {isSavingPricing ? 'Enregistrement…' : 'Enregistrer les tarifs'}
+                </button>
+              </div>
             </div>
 
+            {pricingDraft && !pricingMessage && (
+              <div role="status" className="flex items-start gap-2 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>Modifications non enregistrées : les visiteurs voient encore les anciens tarifs.</span>
+              </div>
+            )}
+            {pricingMessage && (
+              <div
+                role={pricingMessage.kind === 'error' ? 'alert' : 'status'}
+                className={`flex items-start gap-2 p-4 rounded-2xl text-xs border ${
+                  pricingMessage.kind === 'error'
+                    ? 'bg-red-50 border-red-200 text-red-800'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                }`}
+              >
+                {pricingMessage.kind === 'error' ? <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> : <Check className="w-4 h-4 shrink-0 mt-0.5" />}
+                <span>{pricingMessage.text}</span>
+              </div>
+            )}
+
             <div className="space-y-4">
-              {pricingRules.map((rule) => (
+              {pricingView.rules.map((rule) => (
                 <div
                   key={rule.id}
                   className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4"
@@ -1510,68 +1612,168 @@ export const AdminPortal: React.FC = () => {
                       <span className="w-2.5 h-2.5 rounded-full bg-brand"></span>
                       Ligne : {rule.destinationName}
                     </h4>
-                    <span className="text-[11px] font-bold text-slate-600">
-                      Modifiable en direct
-                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                     <div>
-                      <label className="block font-bold uppercase text-slate-600 mb-1">
+                      <label htmlFor={`${rule.id}-envelopePriceGnf`} className="block font-bold uppercase text-slate-600 mb-1">
                         Forfait Enveloppe / Documents
                       </label>
                       <div className="flex items-center gap-2">
                         <input
+                          id={`${rule.id}-envelopePriceGnf`}
                           type="number"
+                          min="0"
                           step="10000"
                           value={rule.envelopePriceGnf}
-                          onChange={(e) =>
-                            updatePricingRule(rule.id, { envelopePriceGnf: Number(e.target.value) })
-                          }
+                          onChange={(e) => updateDraftRule(rule.id, { envelopePriceGnf: toNumber(e.target.value) })}
                           className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold"
                         />
-                        <span className="font-bold text-slate-600 text-[11px]">GNF</span>
+                        <span className="font-bold text-slate-600 text-[11px] shrink-0">GNF</span>
                       </div>
                     </div>
-
                     <div>
-                      <label className="block font-bold uppercase text-slate-600 mb-1">
+                      <label htmlFor={`${rule.id}-pricePerKgAirGnf`} className="block font-bold uppercase text-slate-600 mb-1">
                         Prix au Kg (Fret Aérien)
                       </label>
                       <div className="flex items-center gap-2">
                         <input
+                          id={`${rule.id}-pricePerKgAirGnf`}
                           type="number"
+                          min="0"
                           step="5000"
                           value={rule.pricePerKgAirGnf}
-                          onChange={(e) =>
-                            updatePricingRule(rule.id, { pricePerKgAirGnf: Number(e.target.value) })
-                          }
+                          onChange={(e) => updateDraftRule(rule.id, { pricePerKgAirGnf: toNumber(e.target.value) })}
                           className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-brand"
                         />
-                        <span className="font-bold text-slate-600 text-[11px]">GNF/kg</span>
+                        <span className="font-bold text-slate-600 text-[11px] shrink-0">GNF/kg</span>
                       </div>
                     </div>
-
                     <div>
-                      <label className="block font-bold uppercase text-slate-600 mb-1">
+                      <label htmlFor={`${rule.id}-pricePerKgSeaGnf`} className="block font-bold uppercase text-slate-600 mb-1">
                         Prix au Kg (Fret Maritime)
                       </label>
                       <div className="flex items-center gap-2">
                         <input
+                          id={`${rule.id}-pricePerKgSeaGnf`}
                           type="number"
+                          min="0"
                           step="5000"
                           value={rule.pricePerKgSeaGnf}
-                          onChange={(e) =>
-                            updatePricingRule(rule.id, { pricePerKgSeaGnf: Number(e.target.value) })
-                          }
+                          onChange={(e) => updateDraftRule(rule.id, { pricePerKgSeaGnf: toNumber(e.target.value) })}
                           className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-cyan-700"
                         />
-                        <span className="font-bold text-slate-600 text-[11px]">GNF/kg</span>
+                        <span className="font-bold text-slate-600 text-[11px] shrink-0">GNF/kg</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor={`${rule.id}-minWeightKgAir`} className="block font-bold uppercase text-slate-600 mb-1">
+                        Poids minimum facturé (aérien)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          id={`${rule.id}-minWeightKgAir`}
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={rule.minWeightKgAir}
+                          onChange={(e) => updateDraftRule(rule.id, { minWeightKgAir: toNumber(e.target.value) })}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold"
+                        />
+                        <span className="font-bold text-slate-600 text-[11px] shrink-0">kg</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor={`${rule.id}-minWeightKgSea`} className="block font-bold uppercase text-slate-600 mb-1">
+                        Poids minimum facturé (maritime)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          id={`${rule.id}-minWeightKgSea`}
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={rule.minWeightKgSea}
+                          onChange={(e) => updateDraftRule(rule.id, { minWeightKgSea: toNumber(e.target.value) })}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold"
+                        />
+                        <span className="font-bold text-slate-600 text-[11px] shrink-0">kg</span>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Destinations sans grille : « Tarif sur demande » dans le simulateur */}
+            {destinations.some((d) => !pricingView.rules.some((r) => r.destinationId === d.id)) && (
+              <div className="bg-white p-6 rounded-3xl border border-dashed border-slate-300 space-y-3">
+                <h4 className="font-extrabold text-sm text-slate-900">Destinations sans tarif</h4>
+                <p className="text-xs text-slate-600">
+                  Le simulateur affiche « Tarif sur demande » pour ces destinations. Ajoutez une grille, saisissez les montants, puis enregistrez.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {destinations
+                    .filter((d) => !pricingView.rules.some((r) => r.destinationId === d.id))
+                    .map((dest) => (
+                      <button
+                        key={dest.id}
+                        type="button"
+                        onClick={() => addPricingRuleFor(dest)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Ajouter la grille : {dest.name}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Taux de change (conversion indicative en USD et CAD) */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+              <div className="pb-3 border-b border-slate-100">
+                <h4 className="font-extrabold text-sm text-slate-900">Taux de change (conversion indicative)</h4>
+                <p className="text-xs text-slate-600 mt-1">
+                  Le simulateur affiche le montant en GNF, puis une conversion approximative en dollars américains et canadiens.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label htmlFor="rate-usd" className="block font-bold uppercase text-slate-600 mb-1">1 dollar américain (USD) =</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="rate-usd"
+                      type="number"
+                      min="1"
+                      step="50"
+                      value={pricingView.exchangeRates.usdGnf}
+                      onChange={(e) =>
+                        editPricing({ ...pricingView, exchangeRates: { ...pricingView.exchangeRates, usdGnf: toNumber(e.target.value) } })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold"
+                    />
+                    <span className="font-bold text-slate-600 text-[11px] shrink-0">GNF</span>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="rate-cad" className="block font-bold uppercase text-slate-600 mb-1">1 dollar canadien (CAD) =</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="rate-cad"
+                      type="number"
+                      min="1"
+                      step="50"
+                      value={pricingView.exchangeRates.cadGnf}
+                      onChange={(e) =>
+                        editPricing({ ...pricingView, exchangeRates: { ...pricingView.exchangeRates, cadGnf: toNumber(e.target.value) } })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold"
+                    />
+                    <span className="font-bold text-slate-600 text-[11px] shrink-0">GNF</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

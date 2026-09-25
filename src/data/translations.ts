@@ -144,6 +144,12 @@ export interface Translations {
     localPickup: string;
     bookWhatsApp: string;
     guaranteeNote: string;
+    /** Destination sans grille tarifaire enregistrée dans l'admin. */
+    onRequest: string;
+    onRequestHelp: string;
+    askQuote: string;
+    /** {kg} = poids minimum facturé de la ligne. */
+    minWeightNote: string;
   };
   faq: {
     badge: string;
@@ -471,6 +477,10 @@ export const translations: Record<Language, Translations> = {
       localPickup: 'Retrait sur place :',
       bookWhatsApp: 'Réserver ce tarif sur WhatsApp',
       guaranteeNote: 'Tarif final pesé et certifié en agence avant scellement. Pas de frais cachés.',
+      onRequest: 'Tarif sur demande',
+      onRequestHelp: 'Contactez-nous sur WhatsApp pour obtenir le tarif vers cette destination.',
+      askQuote: 'Demander le tarif sur WhatsApp',
+      minWeightNote: 'Poids minimum facturé : {kg} kg.',
     },
     faq: {
       badge: 'Foire Aux Questions',
@@ -813,6 +823,10 @@ export const translations: Record<Language, Translations> = {
       localPickup: 'On-site pickup:',
       bookWhatsApp: 'Lock this rate on WhatsApp',
       guaranteeNote: 'Final weight is certified at branch before tamper-proof sealing. No hidden fees.',
+      onRequest: 'Price on request',
+      onRequestHelp: 'Contact us on WhatsApp to get the price for this destination.',
+      askQuote: 'Ask for the price on WhatsApp',
+      minWeightNote: 'Minimum billed weight: {kg} kg.',
     },
     faq: {
       badge: 'Frequently Asked Questions',

@@ -1,4 +1,4 @@
-import { Agency, DepartureAnnouncement, Destination, PricingRule, ShipmentService, Testimonial } from '../types';
+import { Agency, DepartureAnnouncement, Destination, ExchangeRates, PricingRule, ShipmentService, Testimonial } from '../types';
 
 export const INITIAL_ANNOUNCEMENTS: DepartureAnnouncement[] = [
   {
@@ -286,12 +286,15 @@ export const INITIAL_SERVICES: ShipmentService[] = [
   },
 ];
 
+// Tarifs de départ du simulateur (montants validés par l'entreprise dans
+// l'admin). Utilisés tant qu'aucune grille n'a été enregistrée sur le serveur
+// (DATA_DIR/pricing.json) depuis l'onglet « Tarifs Simulateur ».
 export const INITIAL_PRICING_RULES: PricingRule[] = [
   {
     id: 'pr-ny',
     destinationId: 'dest-ny',
     destinationName: 'New York (USA)',
-    envelopePriceGnf: 450000,
+    envelopePriceGnf: 250000,
     pricePerKgAirGnf: 140000,
     pricePerKgSeaGnf: 45000,
     minWeightKgAir: 2,
@@ -303,7 +306,7 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
     id: 'pr-mtl',
     destinationId: 'dest-mtl',
     destinationName: 'Montréal (Canada)',
-    envelopePriceGnf: 450000,
+    envelopePriceGnf: 250000,
     pricePerKgAirGnf: 145000,
     pricePerKgSeaGnf: 50000,
     minWeightKgAir: 2,
@@ -315,7 +318,7 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
     id: 'pr-par',
     destinationId: 'dest-par',
     destinationName: 'Paris (France)',
-    envelopePriceGnf: 400000,
+    envelopePriceGnf: 200000,
     pricePerKgAirGnf: 120000,
     pricePerKgSeaGnf: 40000,
     minWeightKgAir: 2,
@@ -327,7 +330,7 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
     id: 'pr-ber',
     destinationId: 'dest-ber',
     destinationName: 'Berlin & Allemagne',
-    envelopePriceGnf: 480000,
+    envelopePriceGnf: 200000,
     pricePerKgAirGnf: 135000,
     pricePerKgSeaGnf: 45000,
     minWeightKgAir: 2,
@@ -336,6 +339,10 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
     delaiSea: '25-30 jours',
   },
 ];
+
+// Taux indicatifs repris de l'ancienne version du simulateur (valeurs fixes
+// dans le code) ; modifiables dans l'admin.
+export const INITIAL_EXCHANGE_RATES: ExchangeRates = { usdGnf: 8600, cadGnf: 6300 };
 
 // Aucun témoignage fictif par défaut : afficher un faux avis "vérifié"
 // serait trompeur. Les vrais avis clients sont ajoutés depuis l'espace

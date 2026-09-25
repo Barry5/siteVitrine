@@ -3,6 +3,7 @@ import {
   INITIAL_AGENCIES,
   INITIAL_ANNOUNCEMENTS,
   INITIAL_DESTINATIONS,
+  INITIAL_EXCHANGE_RATES,
   INITIAL_PRICING_RULES,
   INITIAL_TESTIMONIALS,
 } from '../data/initialData';
@@ -10,7 +11,9 @@ import {
   Agency,
   DepartureAnnouncement,
   Destination,
+  ExchangeRates,
   PricingRule,
+  PricingSettings,
   Testimonial,
   TrackedParcel,
   TrackingErrorKind,
@@ -21,6 +24,8 @@ import {
   checkAdminSession,
   fetchAdminAnnouncements,
   fetchPublicAnnouncements,
+  fetchPublicPricing,
+  savePricing as savePricingApi,
   saveAnnouncements,
   fetchTracking,
   TrackingLookupError,
@@ -31,6 +36,7 @@ interface AppContextType {
   agencies: Agency[];
   destinations: Destination[];
   pricingRules: PricingRule[];
+  exchangeRates: ExchangeRates;
   testimonials: Testimonial[];
   currentView: 'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv';
   isAdminAuthenticated: boolean;
@@ -79,8 +85,9 @@ interface AppContextType {
   updateDestination: (id: string, destination: Partial<Destination>) => void;
   deleteDestination: (id: string) => void;
 
-  // CRUD Pricing
-  updatePricingRule: (id: string, rule: Partial<PricingRule>) => void;
+  // Tarifs du simulateur — enregistrés sur le serveur (lève une erreur si
+  // l'enregistrement échoue, pour que l'admin puisse l'afficher).
+  savePricing: (pricing: PricingSettings) => Promise<void>;
 
   // CRUD Testimonials
   addTestimonial: (testimonial: Omit<Testimonial, 'id' | 'date'>) => void;
@@ -113,10 +120,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_DESTINATIONS;
   });
 
-  const [pricingRules, setPricingRules] = useState<PricingRule[]>(() => {
-    const saved = localStorage.getItem('thg_pricing');
-    return saved ? JSON.parse(saved) : INITIAL_PRICING_RULES;
-  });
+  // Tarifs du simulateur : source de vérité = serveur (GET /api/pricing).
+  // INITIAL_PRICING_RULES n'est qu'un affichage de repli tant qu'aucune grille
+  // n'a été enregistrée depuis l'admin, ou si l'API est injoignable.
+  const [pricingRules, setPricingRules] = useState<PricingRule[]>(INITIAL_PRICING_RULES);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>(INITIAL_EXCHANGE_RATES);
 
   const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
     const saved = localStorage.getItem('thg_testimonials');
@@ -198,9 +206,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('thg_destinations', JSON.stringify(destinations));
   }, [destinations]);
 
+  // Ancienne copie locale des tarifs (visible seulement dans le navigateur de
+  // l'admin) : supprimée, les tarifs viennent du serveur.
   useEffect(() => {
-    localStorage.setItem('thg_pricing', JSON.stringify(pricingRules));
-  }, [pricingRules]);
+    localStorage.removeItem('thg_pricing');
+    let cancelled = false;
+    fetchPublicPricing()
+      .then((pricing) => {
+        if (cancelled || !pricing) return;
+        setPricingRules(pricing.rules);
+        setExchangeRates(pricing.exchangeRates);
+      })
+      .catch((err: Error) => console.warn('[pricing]', err.message));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('thg_testimonials', JSON.stringify(testimonials));
@@ -340,10 +361,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Pricing
-  const updatePricingRule = (id: string, changes: Partial<PricingRule>) => {
-    setPricingRules((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...changes } : item))
-    );
+  const savePricing = async (pricing: PricingSettings) => {
+    const saved = await savePricingApi(pricing);
+    setPricingRules(saved.rules);
+    setExchangeRates(saved.exchangeRates);
   };
 
   // Testimonials
@@ -361,12 +382,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Réinitialise uniquement les données encore locales au navigateur. Les
-  // annonces de départ, publiées sur le serveur, ne sont pas touchées ici
-  // (sinon un clic effacerait les départs visibles par tous les visiteurs).
+  // annonces de départ et les tarifs, enregistrés sur le serveur, ne sont pas
+  // touchés ici (sinon un clic effacerait ce que voient tous les visiteurs).
   const resetAllData = () => {
     setAgencies(INITIAL_AGENCIES);
     setDestinations(INITIAL_DESTINATIONS);
-    setPricingRules(INITIAL_PRICING_RULES);
     setTestimonials(INITIAL_TESTIMONIALS);
     localStorage.removeItem('thg_agencies');
     localStorage.removeItem('thg_destinations');
@@ -382,6 +402,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         agencies,
         destinations,
         pricingRules,
+        exchangeRates,
         testimonials,
         currentView,
         isAdminAuthenticated,
@@ -410,7 +431,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addDestination,
         updateDestination,
         deleteDestination,
-        updatePricingRule,
+        savePricing,
         addTestimonial,
         deleteTestimonial,
         resetAllData,
