@@ -27,18 +27,18 @@ export const PlaceholderImage: React.FC<PlaceholderImageProps> = ({
     <div
       role="img"
       aria-label={label}
-      className={`flex flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed ${
+      className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed ${
         dark
-          ? 'border-slate-700 bg-slate-950/60 text-slate-400'
-          : 'border-slate-300 bg-slate-50 text-slate-500'
+          ? 'border-ink-line bg-ink/60 text-slate-400'
+          : 'border-stone-300 bg-stone-50 text-stone-500'
       } ${className}`}
     >
       <ImagePlus className="w-6 h-6" />
-      <span className="text-[11px] font-bold uppercase tracking-wider text-center px-2">
+      <span className="text-xs font-bold uppercase tracking-wider text-center px-2">
         {label}
       </span>
       {caption && (
-        <span className="text-[10px] text-center px-2 opacity-80">{caption}</span>
+        <span className="text-xs text-center px-2 opacity-80">{caption}</span>
       )}
     </div>
   );

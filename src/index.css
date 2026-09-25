@@ -13,9 +13,25 @@
   --color-brand-darker: #991B1B;
   --color-canvas: #FAF9F6;
   --color-canvas-soft: #FDFCFB;
-  --color-ink: #0B0F19;
+  /* Bleu nuit : bandeau d'accueil, sections sombres, pied de page. */
+  --color-ink: #0B1220;
+  /* Surface et bordure sur fond bleu nuit (cartes, pastilles, séparateurs). */
+  --color-ink-2: #131D33;
+  --color-ink-line: #26334D;
+  /* Or sable : dates et chiffres clés sur fond sombre uniquement. */
+  --color-sand: #E9B44C;
   --color-whatsapp: #25D366;
   --color-whatsapp-dark: #20BD5A;
+
+  /*
+   * Angles — 4 niveaux seulement (Version 4 de la maquette) :
+   *   rounded-full : badges de statut et filtres ;
+   *   rounded-lg (8 px) : boutons, champs, listes déroulantes, icônes ;
+   *   rounded-xl (12 px) : cartes ;
+   *   rounded-2xl (16 px) : grands blocs (affiche, carte de suivi, simulateur), jamais plus.
+   * Un élément dans une carte est toujours moins arrondi que la carte.
+   * Gris : famille « stone » (chaude, accordée au fond canvas) sur fond clair.
+   */
 }
 
 @layer base {

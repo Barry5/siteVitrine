@@ -27,6 +27,7 @@ import {
   trackingStage,
 } from '../lib/tracking';
 import type { TrackedParcel } from '../types';
+import { SectionEyebrow } from './SectionEyebrow';
 
 const WHATSAPP_NUMBER = '224611835683';
 const whatsappLink = (message: string) =>
@@ -37,7 +38,7 @@ const whatsappLink = (message: string) =>
  * (GET /api/tracking/:numero). Un lien du type colisthiaguil.com/?suivi=NUMÉRO
  * lance directement la recherche.
  */
-export const TrackingSection: React.FC = () => {
+export const TrackingSection: React.FC<{ number?: string }> = ({ number }) => {
   const { activeTrackedItem, activeSearchCode, trackingError, trackingLoading, searchPackage, clearTracking, language } =
     useApp();
   const t = translations[language].tracking;
@@ -68,32 +69,29 @@ export const TrackingSection: React.FC = () => {
     <section
       id="suivi"
       ref={sectionRef}
-      className="py-14 sm:py-18 bg-slate-50/70 border-b border-slate-200 scroll-mt-20"
+      className="py-14 sm:py-18 bg-stone-50/70 border-b border-stone-200 scroll-mt-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center space-y-2.5 mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
-            <Package className="w-3.5 h-3.5" />
-            <span>{t.badge}</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">{t.title}</h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">{t.subtitle}</p>
+          <SectionEyebrow number={number} label={translations[language].sections.tracking} />
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">{t.title}</h2>
+          <p className="text-stone-600 text-sm sm:text-base max-w-xl mx-auto">{t.subtitle}</p>
         </div>
 
         {activeTrackedItem ? (
           <TrackingResult parcel={activeTrackedItem} onReset={clearTracking} />
         ) : (
-          <div className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 text-brand flex items-center justify-center mx-auto border border-red-100">
+          <div className="max-w-3xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 text-center">
+            <div className="w-14 h-14 rounded-xl bg-red-50 text-brand flex items-center justify-center mx-auto border border-red-100">
               <Package className="w-7 h-7" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-bold text-slate-900 text-lg sm:text-xl">{t.emptyTitle}</h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">{t.emptySubtitle}</p>
+              <h3 className="font-bold text-stone-900 text-lg sm:text-xl">{t.emptyTitle}</h3>
+              <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto">{t.emptySubtitle}</p>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 max-w-md mx-auto">
+            <div className="pt-3 border-t border-stone-100 max-w-md mx-auto">
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <label htmlFor="tracking-code" className="sr-only">
                   {t.inputPlaceholder}
@@ -107,12 +105,12 @@ export const TrackingSection: React.FC = () => {
                   autoComplete="off"
                   autoCapitalize="characters"
                   spellCheck={false}
-                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm font-mono rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm font-mono rounded-lg border border-stone-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={trackingLoading}
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                  className="px-4 py-2.5 rounded-lg bg-ink hover:bg-ink-2 text-white text-sm font-bold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
                   {t.inputButton}
                 </button>
@@ -120,7 +118,7 @@ export const TrackingSection: React.FC = () => {
             </div>
 
             {trackingLoading && (
-              <p role="status" aria-live="polite" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <p role="status" aria-live="polite" className="inline-flex items-center gap-2 text-sm font-semibold text-stone-600">
                 <RefreshCcw className="w-4 h-4 animate-spin text-brand" />
                 {t.loading}
               </p>
@@ -129,7 +127,7 @@ export const TrackingSection: React.FC = () => {
             {trackingError && !trackingLoading && (
               <div
                 role="alert"
-                className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
+                className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
               >
                 <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="space-y-2">
@@ -181,11 +179,11 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
   const meta: { label: string; value: string; icon: React.ReactNode }[] = [
     { label: t.origin, value: origin, icon: <MapPin className="w-3.5 h-3.5 text-brand" /> },
     { label: t.destination, value: destination, icon: <MapPin className="w-3.5 h-3.5 text-emerald-600" /> },
-    { label: t.transport, value: transportLabel, icon: <TransportIcon className="w-3.5 h-3.5 text-blue-600" /> },
+    { label: t.transport, value: transportLabel, icon: <TransportIcon className="w-3.5 h-3.5 text-stone-700" /> },
     {
       label: t.weight,
       value: parcel.weightKg !== null ? `${parcel.weightKg.toLocaleString(language === 'fr' ? 'fr-FR' : 'en-GB')} kg` : '',
-      icon: <Weight className="w-3.5 h-3.5 text-slate-700" />,
+      icon: <Weight className="w-3.5 h-3.5 text-stone-700" />,
     },
     {
       label: t.estimatedDelivery,
@@ -195,7 +193,7 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
     {
       label: t.registeredOn,
       value: formatTrackingDate(parcel.createdAt, language),
-      icon: <Clock className="w-3.5 h-3.5 text-slate-700" />,
+      icon: <Clock className="w-3.5 h-3.5 text-stone-700" />,
     },
   ].filter((item) => item.value);
 
@@ -205,14 +203,14 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
       ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
       : isAwaitingPickup(parcel.status)
         ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-        : 'bg-blue-50 text-blue-900 border-blue-200';
+        : 'bg-sand/15 text-sand border-sand/40';
 
   return (
-    <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl animate-fadeIn">
+    <div className="max-w-4xl mx-auto bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-xl animate-fadeIn">
       {/* En-tête : numéro, statut, expéditeur → destinataire */}
-      <div className="bg-slate-900 text-white p-5 sm:p-8 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-4">
+      <div className="bg-ink text-white p-5 sm:p-8 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-4">
         <div className="space-y-2 min-w-0">
-          <span className="block font-mono text-lg sm:text-2xl font-extrabold tracking-wider text-amber-300 break-all">
+          <span className="block font-mono text-lg sm:text-2xl font-extrabold tracking-wider text-sand break-all">
             {parcel.trackingNumber}
           </span>
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold border ${badgeClass}`}>
@@ -249,7 +247,7 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center justify-center min-h-10 min-w-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+            className="inline-flex items-center justify-center min-h-10 min-w-10 rounded-lg bg-ink-2 hover:bg-ink-line text-slate-300 hover:text-white transition-colors cursor-pointer border border-ink-line"
             title={t.printReceipt}
             aria-label={t.printReceipt}
           >
@@ -258,7 +256,7 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1.5 min-h-10 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-700"
+            className="inline-flex items-center gap-1.5 min-h-10 px-3 rounded-lg bg-ink-2 hover:bg-ink-line text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer border border-ink-line"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             {t.searchAnother}
@@ -275,12 +273,12 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
             return (
               <li key={label} className="flex flex-col items-center text-center gap-2" aria-current={current ? 'step' : undefined}>
                 <span
-                  className={`h-1.5 w-full rounded-full ${done ? (current ? 'bg-brand' : 'bg-slate-900') : 'bg-slate-200'}`}
+                  className={`h-1.5 w-full rounded-full ${done ? (current ? 'bg-brand' : 'bg-ink') : 'bg-stone-200'}`}
                   aria-hidden="true"
                 />
                 <span
-                  className={`text-[10px] sm:text-xs leading-tight font-bold ${
-                    current ? 'text-brand' : done ? 'text-slate-900' : 'text-slate-500'
+                  className={`text-xs sm:text-xs leading-tight font-bold ${
+                    current ? 'text-brand' : done ? 'text-stone-900' : 'text-stone-500'
                   }`}
                 >
                   {label}
@@ -292,7 +290,7 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
       )}
 
       {problem && (
-        <div role="alert" className="mx-4 sm:mx-8 mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
+        <div role="alert" className="mx-4 sm:mx-8 mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-2 text-sm">
             <p className="font-bold">{t.problemTitle}</p>
@@ -312,11 +310,11 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
 
       {/* Informations du colis (seulement celles fournies par ColisBox) */}
       {meta.length > 0 && (
-        <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 m-4 sm:m-8 mb-0 sm:mb-0 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+        <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 m-4 sm:m-8 mb-0 sm:mb-0 p-4 sm:p-5 rounded-xl bg-stone-50 border border-stone-200 text-xs">
           {meta.map((item) => (
             <div key={item.label} className="space-y-1 min-w-0">
-              <dt className="text-slate-600 uppercase font-bold text-[10px] tracking-wide">{item.label}</dt>
-              <dd className="font-extrabold text-slate-900 text-sm flex items-start gap-1.5 break-words">
+              <dt className="text-stone-600 uppercase font-bold text-xs tracking-wide">{item.label}</dt>
+              <dd className="font-extrabold text-stone-900 text-sm flex items-start gap-1.5 break-words">
                 <span className="mt-0.5 shrink-0">{item.icon}</span>
                 <span className="min-w-0">{item.value}</span>
               </dd>
@@ -328,44 +326,44 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
       {/* Historique */}
       <div className="p-4 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-2">
             <Clock className="w-4 h-4 text-brand" />
             {t.historyTitle}
           </h3>
           {lastEvent && (
-            <span className="text-xs text-slate-600 font-medium">
+            <span className="text-xs text-stone-600 font-medium">
               {t.lastUpdate} : {formatTrackingDate(lastEvent.timestamp, language, true)}
             </span>
           )}
         </div>
 
         {parcel.history.length === 0 ? (
-          <p className="text-sm text-slate-600">{t.noHistory}</p>
+          <p className="text-sm text-stone-600">{t.noHistory}</p>
         ) : (
-          <ol className="relative pl-7 space-y-6 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+          <ol className="relative pl-7 space-y-6 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-stone-200">
             {parcel.history.map((event, idx) => {
               const current = idx === 0;
               return (
                 <li key={`${event.timestamp}-${idx}`} className="relative">
                   <span
                     className={`absolute -left-7 top-0.5 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white ${
-                      current ? 'bg-brand text-white' : 'bg-slate-900 text-white'
+                      current ? 'bg-brand text-white' : 'bg-ink text-white'
                     }`}
                     aria-hidden="true"
                   >
                     <CheckCircle2 className="w-3 h-3" />
                   </span>
-                  <div className={current ? 'bg-red-50/70 p-3 rounded-xl border border-red-200/90 -mt-2' : ''}>
+                  <div className={current ? 'bg-red-50/70 p-3 rounded-lg border border-red-200/90 -mt-2' : ''}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-                      <span className={`font-bold text-sm sm:text-base ${current ? 'text-brand' : 'text-slate-900'}`}>
+                      <span className={`font-bold text-sm sm:text-base ${current ? 'text-brand' : 'text-stone-900'}`}>
                         {t.statuses[event.status] ?? t.unknownStatus}
                       </span>
-                      <time dateTime={event.timestamp} className="text-xs font-semibold text-slate-600">
+                      <time dateTime={event.timestamp} className="text-xs font-semibold text-stone-600">
                         {formatTrackingDate(event.timestamp, language, true)}
                       </time>
                     </div>
                     {event.location && (
-                      <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                      <p className="mt-1 flex items-center gap-1.5 text-xs text-stone-600 font-medium">
                         <MapPin className="w-3 h-3 text-brand shrink-0" />
                         {event.location}
                       </p>
@@ -378,7 +376,7 @@ const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> =
         )}
 
         {isAwaitingPickup(parcel.status) && parcel.destinationBranchName && (
-          <div className="mt-8 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
+          <div className="mt-8 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
               <span className="font-bold uppercase tracking-wide block">{t.pickupPoint}</span>

@@ -16,6 +16,18 @@ export interface Translations {
     sendButton: string;
     assistance: string;
   };
+  /** Nom court de chaque section, affiché au-dessus de son titre (« 01 — Nos services »). */
+  sections: {
+    tracking: string;
+    services: string;
+    calculator: string;
+    destinations: string;
+    howItWorks: string;
+    agencies: string;
+    testimonials: string;
+    faq: string;
+    contact: string;
+  };
   trustStats: {
     badge: string;
     localAgencies: string;
@@ -150,6 +162,8 @@ export interface Translations {
     askQuote: string;
     /** {kg} = poids minimum facturé de la ligne. */
     minWeightNote: string;
+    /** Aucun départ publié vers cette destination. */
+    nextFlightTba: string;
   };
   faq: {
     badge: string;
@@ -308,6 +322,17 @@ export const translations: Record<Language, Translations> = {
       trackButton: 'Suivre un colis',
       sendButton: 'Envoyer un colis',
       assistance: 'Assistance',
+    },
+    sections: {
+      tracking: 'Suivi de colis',
+      services: 'Nos services',
+      calculator: 'Tarifs',
+      destinations: 'Destinations',
+      howItWorks: 'Comment ça marche',
+      agencies: 'Nos agences',
+      testimonials: 'Avis clients',
+      faq: 'Questions fréquentes',
+      contact: 'Contact',
     },
     trustStats: {
       badge: 'En quelques chiffres',
@@ -481,6 +506,7 @@ export const translations: Record<Language, Translations> = {
       onRequestHelp: 'Contactez-nous sur WhatsApp pour obtenir le tarif vers cette destination.',
       askQuote: 'Demander le tarif sur WhatsApp',
       minWeightNote: 'Poids minimum facturé : {kg} kg.',
+      nextFlightTba: 'À annoncer',
     },
     faq: {
       badge: 'Foire Aux Questions',
@@ -655,6 +681,17 @@ export const translations: Record<Language, Translations> = {
       sendButton: 'Ship a Parcel',
       assistance: 'Support',
     },
+    sections: {
+      tracking: 'Parcel tracking',
+      services: 'Our services',
+      calculator: 'Rates',
+      destinations: 'Destinations',
+      howItWorks: 'How it works',
+      agencies: 'Our branches',
+      testimonials: 'Customer reviews',
+      faq: 'FAQ',
+      contact: 'Contact',
+    },
     trustStats: {
       badge: 'At a glance',
       localAgencies: 'Branches in Guinea',
@@ -827,6 +864,7 @@ export const translations: Record<Language, Translations> = {
       onRequestHelp: 'Contact us on WhatsApp to get the price for this destination.',
       askQuote: 'Ask for the price on WhatsApp',
       minWeightNote: 'Minimum billed weight: {kg} kg.',
+      nextFlightTba: 'To be announced',
     },
     faq: {
       badge: 'Frequently Asked Questions',

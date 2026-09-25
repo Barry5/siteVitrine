@@ -19,7 +19,22 @@ import { LegalPage } from './components/LegalPage';
 import { Analytics } from './components/Analytics';
 
 const MainLayout: React.FC = () => {
-  const { currentView } = useApp();
+  const { currentView, testimonials } = useApp();
+
+  // Numéro affiché au-dessus du titre de chaque section (« 01 — Nos services »).
+  // La section Avis n'apparaît que s'il y a des avis : la numérotation suit.
+  const sectionOrder = [
+    'tracking',
+    'services',
+    'calculator',
+    'destinations',
+    'howItWorks',
+    'agencies',
+    ...(testimonials.length > 0 ? ['testimonials'] : []),
+    'faq',
+    'contact',
+  ];
+  const sectionNumber = (id: string) => String(sectionOrder.indexOf(id) + 1).padStart(2, '0');
 
   if (currentView === 'admin') {
     return <AdminPortal />;
@@ -32,7 +47,7 @@ const MainLayout: React.FC = () => {
 
   if (isLegalPage) {
     return (
-      <div className="min-h-screen flex flex-col bg-canvas text-slate-900 selection:bg-brand selection:text-white">
+      <div className="min-h-screen flex flex-col bg-canvas text-stone-900 selection:bg-brand selection:text-white">
         <Header />
         <main className="flex-1">
           <LegalPage page={currentView} />
@@ -44,7 +59,7 @@ const MainLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas text-slate-900 selection:bg-brand selection:text-white">
+    <div className="min-h-screen flex flex-col bg-canvas text-stone-900 selection:bg-brand selection:text-white">
       {/* Modern navigation bar with logo, links and admin access */}
       <Header />
 
@@ -57,31 +72,31 @@ const MainLayout: React.FC = () => {
         <TrustStatsStrip />
 
         {/* Live Parcel Tracking Module */}
-        <TrackingSection />
+        <TrackingSection number={sectionNumber('tracking')} />
 
         {/* Services & Package Typologies */}
-        <ServicesSection />
+        <ServicesSection number={sectionNumber('services')} />
 
         {/* Interactive Shipping Rate Calculator */}
-        <ShippingCalculator />
+        <ShippingCalculator number={sectionNumber('calculator')} />
 
         {/* International Destinations & Local Hubs */}
-        <DestinationsSection />
+        <DestinationsSection number={sectionNumber('destinations')} />
 
         {/* 4-Step Operational Flow */}
-        <HowItWorks />
+        <HowItWorks number={sectionNumber('howItWorks')} />
 
         {/* Agencies & Local Network */}
-        <AgenciesSection />
+        <AgenciesSection number={sectionNumber('agencies')} />
 
         {/* Verified Customer Testimonials */}
-        <TestimonialsSection />
+        <TestimonialsSection number={sectionNumber('testimonials')} />
 
         {/* Frequently Asked Questions (FAQ Accordion) */}
-        <FAQSection />
+        <FAQSection number={sectionNumber('faq')} />
 
         {/* Direct Contact & Quote Form */}
-        <ContactSection />
+        <ContactSection number={sectionNumber('contact')} />
       </main>
 
       {/* Full-featured Footer */}

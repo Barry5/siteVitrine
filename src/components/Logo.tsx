@@ -74,7 +74,7 @@ export const Logo: React.FC<LogoProps> = ({
         <div className="flex items-center gap-1">
           <span
             className={`font-display font-extrabold tracking-tight ${titleSizes[size]} ${
-              isDark ? 'text-white' : 'text-slate-900'
+              isDark ? 'text-white' : 'text-stone-900'
             }`}
           >
             THIAGUIL
@@ -83,8 +83,8 @@ export const Logo: React.FC<LogoProps> = ({
         </div>
         {showSubtitle && (
           <span
-            className={`text-[10px] font-bold tracking-widest uppercase ${
-              isDark ? 'text-slate-300' : 'text-slate-600'
+            className={`text-xs font-bold tracking-widest uppercase ${
+              isDark ? 'text-slate-300' : 'text-stone-600'
             }`}
           >
             MULTI-SERVICES

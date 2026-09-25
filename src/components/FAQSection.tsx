@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
+import { SectionEyebrow } from './SectionEyebrow';
 
 interface FAQItem {
   id: string;
@@ -105,7 +106,7 @@ const FAQ_DATA: FAQItem[] = [
   },
 ];
 
-export const FAQSection: React.FC = () => {
+export const FAQSection: React.FC<{ number?: string }> = ({ number }) => {
   const { language } = useApp();
   const t = translations[language].faq;
   const [openId, setOpenId] = useState<string>('delais-vols');
@@ -121,18 +122,15 @@ export const FAQSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-20 bg-white border-b border-slate-200 scroll-mt-20">
+    <section id="faq" className="py-20 bg-white border-b border-stone-200 scroll-mt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>{t.badge}</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <SectionEyebrow number={number} label={translations[language].sections.faq} />
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight">
             {t.title}
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto">
             {t.subtitle}
           </p>
 
@@ -143,8 +141,8 @@ export const FAQSection: React.FC = () => {
               onClick={() => setActiveFilter('all')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeFilter === 'all'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-ink text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
               }`}
             >
               {language === 'fr' ? 'Toutes les questions' : 'All questions'}
@@ -154,8 +152,8 @@ export const FAQSection: React.FC = () => {
               onClick={() => setActiveFilter('delays')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeFilter === 'delays'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-ink text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
               }`}
             >
               {language === 'fr' ? 'Délais & Réception' : 'Transit & Pickup'}
@@ -165,8 +163,8 @@ export const FAQSection: React.FC = () => {
               onClick={() => setActiveFilter('customs')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeFilter === 'customs'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-ink text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
               }`}
             >
               {language === 'fr' ? 'Articles & Douanes' : 'Customs & Items'}
@@ -176,8 +174,8 @@ export const FAQSection: React.FC = () => {
               onClick={() => setActiveFilter('payment')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeFilter === 'payment'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-ink text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
               }`}
             >
               {language === 'fr' ? 'Tarifs & Paiement' : 'Pricing & Payment'}
@@ -192,10 +190,10 @@ export const FAQSection: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className={`border rounded-2xl transition-all overflow-hidden ${
+                className={`border rounded-xl transition-all overflow-hidden ${
                   isOpen
-                    ? 'border-brand/40 bg-slate-50/60 shadow-sm'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-brand/40 bg-stone-50/60 shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-stone-300'
                 }`}
               >
                 <button
@@ -204,14 +202,14 @@ export const FAQSection: React.FC = () => {
                   aria-expanded={isOpen}
                   className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer select-none"
                 >
-                  <span className="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+                  <span className="font-bold text-stone-900 text-sm sm:text-base leading-snug">
                     {language === 'fr' ? item.questionFr : item.questionEn}
                   </span>
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
                       isOpen
                         ? 'bg-red-50 text-brand rotate-180'
-                        : 'bg-slate-100 text-slate-500'
+                        : 'bg-stone-100 text-stone-500'
                     }`}
                   >
                     <ChevronDown className="w-4 h-4" />
@@ -219,7 +217,7 @@ export const FAQSection: React.FC = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100/80 pt-3 animate-fadeIn">
+                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-stone-600 leading-relaxed border-t border-stone-100/80 pt-3 animate-fadeIn">
                     {language === 'fr' ? item.answerFr : item.answerEn}
                   </div>
                 )}
@@ -229,12 +227,12 @@ export const FAQSection: React.FC = () => {
         </div>
 
         {/* Support Prompt Box with Secondary CTA */}
-        <div className="mt-12 p-6 rounded-2xl bg-canvas border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-12 p-6 rounded-xl bg-canvas border border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
-            <h4 className="font-bold text-sm text-slate-900">
+            <h4 className="font-bold text-sm text-stone-900">
               {t.helpPrompt}
             </h4>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-stone-600">
               {language === 'fr'
                 ? 'Nos conseillers logistiques vous répondent directement 7j/7 sur WhatsApp.'
                 : 'Our logistics specialists answer 7 days a week directly on WhatsApp.'}
@@ -245,7 +243,7 @@ export const FAQSection: React.FC = () => {
             href="https://wa.me/224611835683?text=Bonjour,%20j'ai%20une%20question%20sur%20les%20envois%20internationaux"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
           >
             <Phone className="w-3.5 h-3.5 text-brand" />
             <span>{t.contactSupport}</span>
