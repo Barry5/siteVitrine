@@ -1,326 +1,100 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  Search,
-  Package,
-  Plane,
-  MapPin,
+  AlertCircle,
+  Calendar,
   CheckCircle2,
   Clock,
-  AlertCircle,
-  Phone,
+  MapPin,
+  MessageCircle,
+  Package,
+  Plane,
   Printer,
-  Calendar,
-  Weight,
-  ShieldCheck,
+  RefreshCcw,
   RotateCcw,
-  ExternalLink,
+  ShieldCheck,
+  Ship,
+  Truck,
+  Weight,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
+import {
+  TRACKING_STAGE_COUNT,
+  formatTrackingDate,
+  isAwaitingPickup,
+  isProblemStatus,
+  trackingNumberFromUrl,
+  trackingStage,
+} from '../lib/tracking';
+import type { TrackedParcel } from '../types';
 
+const WHATSAPP_NUMBER = '224611835683';
+const whatsappLink = (message: string) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+/**
+ * Suivi de colis : données réelles de ColisBox, via le serveur du site
+ * (GET /api/tracking/:numero). Un lien du type colisthiaguil.com/?suivi=NUMÉRO
+ * lance directement la recherche.
+ */
 export const TrackingSection: React.FC = () => {
-  const {
-    activeTrackedItem,
-    activeSearchCode,
-    trackingError,
-    searchPackage,
-    clearTracking,
-    language,
-  } = useApp();
-
+  const { activeTrackedItem, activeSearchCode, trackingError, trackingLoading, searchPackage, clearTracking, language } =
+    useApp();
   const t = translations[language].tracking;
   const [quickInput, setQuickInput] = useState('');
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (activeSearchCode) {
-      setQuickInput(activeSearchCode);
-    }
+    if (activeSearchCode) setQuickInput(activeSearchCode);
   }, [activeSearchCode]);
 
-  const handleMiniSubmit = (e: React.FormEvent) => {
+  // Lien direct ?suivi=NUMÉRO (par ex. envoyé au client par WhatsApp).
+  useEffect(() => {
+    const code = trackingNumberFromUrl();
+    if (!code) return;
+    searchPackage(code);
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Une seule fois, à l'ouverture de la page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickInput.trim()) return;
     searchPackage(quickInput);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'registered':
-        return {
-          label: language === 'fr' ? 'ENREGISTRÉ EN AGENCE' : 'REGISTERED AT BRANCH',
-          bg: 'bg-amber-100 text-amber-900 border-amber-300',
-          dot: 'bg-amber-500',
-        };
-      case 'in_transit':
-        return {
-          label: language === 'fr' ? 'EN TRANSIT INTERNATIONAL (EN VOL)' : 'IN TRANSIT (AIR FREIGHT)',
-          bg: 'bg-blue-100 text-blue-900 border-blue-300',
-          dot: 'bg-blue-600',
-        };
-      case 'customs':
-        return {
-          label: language === 'fr' ? 'EN COURS DE DÉDOUANEMENT' : 'CUSTOMS CLEARANCE IN PROGRESS',
-          bg: 'bg-purple-100 text-purple-900 border-purple-300',
-          dot: 'bg-purple-600',
-        };
-      case 'ready_for_pickup':
-        return {
-          label: language === 'fr' ? 'DISPONIBLE POUR RETRAIT AU BUREAU' : 'READY FOR PICKUP AT HUB',
-          bg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-          dot: 'bg-emerald-600',
-        };
-      case 'delivered':
-        return {
-          label: language === 'fr' ? 'LIVRÉ AU DESTINATAIRE' : 'DELIVERED TO RECIPIENT',
-          bg: 'bg-emerald-50 text-emerald-950 border-emerald-400',
-          dot: 'bg-emerald-500',
-        };
-      default:
-        return {
-          label: language === 'fr' ? 'TRAITEMENT EN COURS' : 'PROCESSING',
-          bg: 'bg-slate-100 text-slate-800 border-slate-300',
-          dot: 'bg-slate-500',
-        };
-    }
-  };
-
   return (
-    <section id="suivi" className="py-14 sm:py-18 bg-slate-50/70 border-b border-slate-200 scroll-mt-20">
+    <section
+      id="suivi"
+      ref={sectionRef}
+      className="py-14 sm:py-18 bg-slate-50/70 border-b border-slate-200 scroll-mt-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header: Focused on Results display */}
         <div className="max-w-3xl mx-auto text-center space-y-2.5 mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-brand font-bold text-xs uppercase tracking-wider border border-red-200">
             <Package className="w-3.5 h-3.5" />
             <span>{t.badge}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-            {t.title}
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-            {t.subtitle}
-          </p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">{t.title}</h2>
+          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">{t.subtitle}</p>
         </div>
 
-        {/* Tracking Details Result Card */}
         {activeTrackedItem ? (
-          <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl transition-all animate-fadeIn">
-            {/* Top Status Header */}
-            <div className="bg-slate-900 text-white p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <div className="flex flex-wrap items-center gap-3 mb-2">
-                  <span className="font-mono text-xl sm:text-2xl font-extrabold tracking-wider text-amber-300">
-                    {activeTrackedItem.trackingNumber}
-                  </span>
-                  {(() => {
-                    const badge = getStatusBadge(activeTrackedItem.status);
-                    return (
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold border ${badge.bg}`}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${badge.dot} animate-ping`}></span>
-                        <span>{badge.label}</span>
-                      </span>
-                    );
-                  })()}
-                </div>
-                <div className="text-slate-300 text-xs sm:text-sm flex flex-wrap items-center gap-2">
-                  <span>{t.sender} : <strong className="text-white">{activeTrackedItem.senderName}</strong></span>
-                  <span>➔</span>
-                  <span>{t.receiver} : <strong className="text-white">{activeTrackedItem.receiverName}</strong></span>
-                </div>
-              </div>
-
-              {/* Action buttons with strict hierarchy: secondary WhatsApp & print */}
-              <div className="flex items-center gap-2">
-                <a
-                  href={`https://wa.me/224611835683?text=Bonjour,%20je%20suis%20le%20colis%20${activeTrackedItem.trackingNumber}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-2xs"
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>{t.whatsappHelp}</span>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
-                  title={t.printReceipt}
-                  aria-label={t.printReceipt}
-                >
-                  <Printer className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={clearTracking}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-700"
-                  title={t.searchAnother}
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t.searchAnother}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Meta Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 sm:p-6 bg-slate-50 border-b border-slate-200 text-xs">
-              <div className="space-y-1">
-                <span className="text-slate-600 block uppercase font-bold text-[10px]">{t.origin}</span>
-                <span className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-brand" />
-                  {activeTrackedItem.senderCity}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-slate-600 block uppercase font-bold text-[10px]">{t.destination}</span>
-                <span className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
-                  <Plane className="w-3.5 h-3.5 text-blue-600" />
-                  {activeTrackedItem.destinationCity}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-slate-600 block uppercase font-bold text-[10px]">{t.weight}</span>
-                <span className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
-                  <Weight className="w-3.5 h-3.5 text-slate-700" />
-                  {activeTrackedItem.weightKg} kg
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-slate-600 block uppercase font-bold text-[10px]">{t.estimatedDelivery}</span>
-                <span className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                  {activeTrackedItem.estimatedDeliveryDate}
-                </span>
-              </div>
-            </div>
-
-            {/* Timeline Milestones */}
-            <div className="p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-brand" />
-                  {t.historyTitle}
-                </h4>
-                <span className="text-xs text-slate-600 font-medium">
-                  {language === 'fr' ? 'Dernier point de contrôle validé' : 'Latest verified milestone'}
-                </span>
-              </div>
-
-              <div className="relative pl-6 sm:pl-8 space-y-7 before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-                {activeTrackedItem.steps.map((step, idx) => (
-                  <div key={idx} className="relative group">
-                    {/* Circle Node */}
-                    <div
-                      className={`absolute -left-6 sm:-left-8 top-0.5 w-6 sm:w-7 h-6 sm:h-7 rounded-full flex items-center justify-center ring-4 ring-white transition-all ${
-                        step.completed
-                          ? step.current
-                            ? 'bg-brand text-white ring-red-100 shadow-md'
-                            : 'bg-slate-900 text-white'
-                          : 'bg-slate-200 text-slate-600'
-                      }`}
-                    >
-                      {step.completed ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      ) : (
-                        <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                      )}
-                    </div>
-
-                    {/* Step Content */}
-                    <div className={`space-y-1 ${step.current ? 'bg-red-50/70 p-3.5 rounded-xl border border-red-200/90 -mt-2' : ''}`}>
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span
-                          className={`font-bold text-sm sm:text-base ${
-                            step.current ? 'text-brand' : step.completed ? 'text-slate-900' : 'text-slate-600'
-                          }`}
-                        >
-                          {step.title}
-                        </span>
-                        <span className="text-xs font-semibold text-slate-600">
-                          {step.date}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                        <MapPin className="w-3 h-3 text-brand" />
-                        <span>{step.location}</span>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-0.5">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pickup point instruction if ready */}
-              {activeTrackedItem.pickupAgency && (
-                <div className="mt-8 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <div className="text-xs space-y-1">
-                    <span className="font-bold uppercase tracking-wide block">
-                      {language === 'fr' ? 'Point de retrait assigné :' : 'Designated Pickup Hub:'}
-                    </span>
-                    <p className="font-semibold text-sm text-emerald-950">
-                      {activeTrackedItem.pickupAgency}
-                    </p>
-                    <p className="text-emerald-700">
-                      {language === 'fr'
-                        ? "Veuillez vous munir d'une pièce d'identité valide lors du retrait."
-                        : 'Please bring a valid ID and this tracking number when collecting your package.'}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <TrackingResult parcel={activeTrackedItem} onReset={clearTracking} />
         ) : (
-          /* Empty / Initial State: Clean Results Hub with Quick Selectors */
-          <div className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-sm space-y-6 text-center">
+          <div className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-6 text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-50 text-brand flex items-center justify-center mx-auto border border-red-100">
               <Package className="w-7 h-7" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-bold text-slate-900 text-lg sm:text-xl">
-                {t.emptyTitle}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
-                {t.emptySubtitle}
-              </p>
+              <h3 className="font-bold text-slate-900 text-lg sm:text-xl">{t.emptyTitle}</h3>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">{t.emptySubtitle}</p>
             </div>
 
-            {/* Numéro introuvable : message honnête + contact direct de l'agence */}
-            {trackingError && (
-              <div
-                role="alert"
-                className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
-              >
-                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <p className="font-semibold">{t.notFound.replace('{code}', trackingError)}</p>
-                  <p className="text-xs text-amber-800">{t.notFoundHelp}</p>
-                  <a
-                    href={`https://wa.me/224611835683?text=${encodeURIComponent(
-                      t.contactMessage.replace('{code}', trackingError)
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    {t.contactAgency}
-                  </a>
-                </div>
-              </div>
-            )}
-
             <div className="pt-3 border-t border-slate-100 max-w-md mx-auto">
-              <form onSubmit={handleMiniSubmit} className="flex gap-2">
+              <form onSubmit={handleSubmit} className="flex gap-2">
                 <label htmlFor="tracking-code" className="sr-only">
                   {t.inputPlaceholder}
                 </label>
@@ -331,19 +105,289 @@ export const TrackingSection: React.FC = () => {
                   onChange={(e) => setQuickInput(e.target.value)}
                   placeholder={t.inputPlaceholder}
                   autoComplete="off"
-                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  className="flex-1 min-w-0 px-3.5 py-2.5 text-sm font-mono rounded-xl border border-slate-300 focus:border-brand focus:ring-2 focus:ring-red-100 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors cursor-pointer"
+                  disabled={trackingLoading}
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
                   {t.inputButton}
                 </button>
               </form>
             </div>
+
+            {trackingLoading && (
+              <p role="status" aria-live="polite" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600">
+                <RefreshCcw className="w-4 h-4 animate-spin text-brand" />
+                {t.loading}
+              </p>
+            )}
+
+            {trackingError && !trackingLoading && (
+              <div
+                role="alert"
+                className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 text-sm text-left max-w-lg mx-auto"
+              >
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <p className="font-semibold">
+                    {trackingError.kind === 'not_found'
+                      ? t.notFound.replace('{code}', trackingError.code)
+                      : trackingError.kind === 'invalid_number'
+                        ? t.invalidNumber.replace('{code}', trackingError.code)
+                        : trackingError.kind === 'too_many_requests'
+                          ? t.tooManyRequests
+                          : t.unavailable}
+                  </p>
+                  {trackingError.kind === 'not_found' && <p className="text-xs text-amber-800">{t.notFoundHelp}</p>}
+                  <a
+                    href={whatsappLink(t.contactMessage.replace('{code}', trackingError.code))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    {t.contactAgency}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
     </section>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+
+const TrackingResult: React.FC<{ parcel: TrackedParcel; onReset: () => void }> = ({ parcel, onReset }) => {
+  const { language } = useApp();
+  const t = translations[language].tracking;
+
+  const statusLabel = t.statuses[parcel.status] ?? t.unknownStatus;
+  const stage = trackingStage(parcel.status);
+  const problem = isProblemStatus(parcel.status);
+  const lastEvent = parcel.history[0];
+  const transportLabel = parcel.transportMode ? t.transportModes[parcel.transportMode] ?? '' : '';
+  const TransportIcon = parcel.transportMode === 'maritime' ? Ship : parcel.transportMode === 'road' ? Truck : Plane;
+
+  const origin = [parcel.originBranchName, parcel.originCountry].filter(Boolean).join(' · ');
+  const destination = [parcel.destinationCity, parcel.destinationCountry].filter(Boolean).join(' · ');
+
+  const meta: { label: string; value: string; icon: React.ReactNode }[] = [
+    { label: t.origin, value: origin, icon: <MapPin className="w-3.5 h-3.5 text-brand" /> },
+    { label: t.destination, value: destination, icon: <MapPin className="w-3.5 h-3.5 text-emerald-600" /> },
+    { label: t.transport, value: transportLabel, icon: <TransportIcon className="w-3.5 h-3.5 text-blue-600" /> },
+    {
+      label: t.weight,
+      value: parcel.weightKg !== null ? `${parcel.weightKg.toLocaleString(language === 'fr' ? 'fr-FR' : 'en-GB')} kg` : '',
+      icon: <Weight className="w-3.5 h-3.5 text-slate-700" />,
+    },
+    {
+      label: t.estimatedDelivery,
+      value: formatTrackingDate(parcel.estimatedDeliveryDate, language),
+      icon: <Calendar className="w-3.5 h-3.5 text-emerald-600" />,
+    },
+    {
+      label: t.registeredOn,
+      value: formatTrackingDate(parcel.createdAt, language),
+      icon: <Clock className="w-3.5 h-3.5 text-slate-700" />,
+    },
+  ].filter((item) => item.value);
+
+  const badgeClass = problem
+    ? 'bg-amber-100 text-amber-900 border-amber-300'
+    : parcel.status === 'delivered'
+      ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+      : isAwaitingPickup(parcel.status)
+        ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+        : 'bg-blue-50 text-blue-900 border-blue-200';
+
+  return (
+    <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl animate-fadeIn">
+      {/* En-tête : numéro, statut, expéditeur → destinataire */}
+      <div className="bg-slate-900 text-white p-5 sm:p-8 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-4">
+        <div className="space-y-2 min-w-0">
+          <span className="block font-mono text-lg sm:text-2xl font-extrabold tracking-wider text-amber-300 break-all">
+            {parcel.trackingNumber}
+          </span>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold border ${badgeClass}`}>
+            {parcel.status === 'delivered' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <span className="w-2 h-2 rounded-full bg-current" />}
+            {statusLabel}
+          </span>
+          {(parcel.senderName || parcel.recipientName) && (
+            <p className="text-slate-300 text-xs sm:text-sm flex flex-wrap items-center gap-x-2 gap-y-1">
+              {parcel.senderName && (
+                <span>
+                  {t.sender} : <strong className="text-white">{parcel.senderName}</strong>
+                </span>
+              )}
+              {parcel.senderName && parcel.recipientName && <span aria-hidden="true">→</span>}
+              {parcel.recipientName && (
+                <span>
+                  {t.receiver} : <strong className="text-white">{parcel.recipientName}</strong>
+                </span>
+              )}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={whatsappLink(t.whatsAppMessage.replace('{code}', parcel.trackingNumber))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 min-h-10 px-3.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            {t.whatsAppHelp}
+          </a>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center justify-center min-h-10 min-w-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+            title={t.printReceipt}
+            aria-label={t.printReceipt}
+          >
+            <Printer className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 min-h-10 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-700"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            {t.searchAnother}
+          </button>
+        </div>
+      </div>
+
+      {/* Frise des 5 étapes */}
+      {stage !== null && (
+        <ol className="grid grid-cols-5 gap-1 sm:gap-2 px-4 sm:px-8 pt-6 sm:pt-8" aria-label={statusLabel}>
+          {t.stages.slice(0, TRACKING_STAGE_COUNT).map((label, i) => {
+            const done = i <= stage;
+            const current = i === stage;
+            return (
+              <li key={label} className="flex flex-col items-center text-center gap-2" aria-current={current ? 'step' : undefined}>
+                <span
+                  className={`h-1.5 w-full rounded-full ${done ? (current ? 'bg-brand' : 'bg-slate-900') : 'bg-slate-200'}`}
+                  aria-hidden="true"
+                />
+                <span
+                  className={`text-[10px] sm:text-xs leading-tight font-bold ${
+                    current ? 'text-brand' : done ? 'text-slate-900' : 'text-slate-500'
+                  }`}
+                >
+                  {label}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
+      {problem && (
+        <div role="alert" className="mx-4 sm:mx-8 mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-2 text-sm">
+            <p className="font-bold">{t.problemTitle}</p>
+            <p className="text-amber-800">{t.problemBody}</p>
+            <a
+              href={whatsappLink(t.whatsAppMessage.replace('{code}', parcel.trackingNumber))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              {t.contactAgency}
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Informations du colis (seulement celles fournies par ColisBox) */}
+      {meta.length > 0 && (
+        <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 m-4 sm:m-8 mb-0 sm:mb-0 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+          {meta.map((item) => (
+            <div key={item.label} className="space-y-1 min-w-0">
+              <dt className="text-slate-600 uppercase font-bold text-[10px] tracking-wide">{item.label}</dt>
+              <dd className="font-extrabold text-slate-900 text-sm flex items-start gap-1.5 break-words">
+                <span className="mt-0.5 shrink-0">{item.icon}</span>
+                <span className="min-w-0">{item.value}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {/* Historique */}
+      <div className="p-4 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-brand" />
+            {t.historyTitle}
+          </h3>
+          {lastEvent && (
+            <span className="text-xs text-slate-600 font-medium">
+              {t.lastUpdate} : {formatTrackingDate(lastEvent.timestamp, language, true)}
+            </span>
+          )}
+        </div>
+
+        {parcel.history.length === 0 ? (
+          <p className="text-sm text-slate-600">{t.noHistory}</p>
+        ) : (
+          <ol className="relative pl-7 space-y-6 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+            {parcel.history.map((event, idx) => {
+              const current = idx === 0;
+              return (
+                <li key={`${event.timestamp}-${idx}`} className="relative">
+                  <span
+                    className={`absolute -left-7 top-0.5 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white ${
+                      current ? 'bg-brand text-white' : 'bg-slate-900 text-white'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                  </span>
+                  <div className={current ? 'bg-red-50/70 p-3 rounded-xl border border-red-200/90 -mt-2' : ''}>
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                      <span className={`font-bold text-sm sm:text-base ${current ? 'text-brand' : 'text-slate-900'}`}>
+                        {t.statuses[event.status] ?? t.unknownStatus}
+                      </span>
+                      <time dateTime={event.timestamp} className="text-xs font-semibold text-slate-600">
+                        {formatTrackingDate(event.timestamp, language, true)}
+                      </time>
+                    </div>
+                    {event.location && (
+                      <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                        <MapPin className="w-3 h-3 text-brand shrink-0" />
+                        {event.location}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+
+        {isAwaitingPickup(parcel.status) && parcel.destinationBranchName && (
+          <div className="mt-8 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="text-xs space-y-1">
+              <span className="font-bold uppercase tracking-wide block">{t.pickupPoint}</span>
+              <p className="font-semibold text-sm text-emerald-950">{parcel.destinationBranchName}</p>
+              <p className="text-emerald-800">{t.pickupIdRequired}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

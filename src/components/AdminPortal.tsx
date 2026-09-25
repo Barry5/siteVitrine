@@ -46,7 +46,6 @@ export const AdminPortal: React.FC = () => {
     destinations,
     pricingRules,
     testimonials,
-    trackingItems,
     addAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,
