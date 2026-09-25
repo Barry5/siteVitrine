@@ -3,7 +3,7 @@
  * En développement, VITE_API_URL peut pointer vers http://localhost:4000/api ;
  * en production, l'API est généralement servie sous le même domaine, via /api.
  */
-import type { DepartureAnnouncement } from '../types';
+import type { DepartureAnnouncement, TrackedParcel, TrackingErrorKind } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -141,4 +141,33 @@ export async function uploadPoster(file: File): Promise<string> {
     throw new Error(data?.error || "Le téléversement de l'affiche a échoué.");
   }
   return data.posterUrl;
+}
+
+/** Échec d'une recherche de suivi, avec la raison à afficher au visiteur. */
+export class TrackingLookupError extends Error {
+  constructor(public kind: TrackingErrorKind) {
+    super(kind);
+  }
+}
+
+/**
+ * Suivi d'un colis ColisBox via le serveur du site (server/routes/tracking.ts).
+ * Lève TrackingLookupError si le colis est introuvable, le numéro invalide,
+ * trop de recherches ont été faites, ou si ColisBox est injoignable.
+ */
+export async function fetchTracking(trackingNumber: string): Promise<TrackedParcel> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/tracking/${encodeURIComponent(trackingNumber)}`);
+  } catch {
+    throw new TrackingLookupError('unavailable');
+  }
+  const data = await parseJsonSafe(res);
+  if (res.ok && data?.parcel && typeof data.parcel.trackingNumber === 'string') {
+    return data.parcel as TrackedParcel;
+  }
+  if (res.status === 404) throw new TrackingLookupError('not_found');
+  if (res.status === 400) throw new TrackingLookupError('invalid_number');
+  if (res.status === 429) throw new TrackingLookupError('too_many_requests');
+  throw new TrackingLookupError('unavailable');
 }

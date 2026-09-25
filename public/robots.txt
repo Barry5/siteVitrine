@@ -4,5 +4,7 @@ Allow: /
 # Ne pas bloquer tout /api/ : la page charge les départs (/api/announcements)
 # et les affiches (/api/uploads/) depuis cette adresse, Google doit pouvoir les lire.
 Disallow: /api/admin/
+# Résultats de suivi de colis : propres à chaque client, rien à indexer.
+Disallow: /api/tracking/
 
 Sitemap: https://colisthiaguil.com/sitemap.xml

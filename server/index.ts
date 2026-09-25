@@ -8,6 +8,7 @@ import { contactRouter } from './routes/contact.js';
 import { adminRouter } from './routes/admin.js';
 import { publicAnnouncementsRouter, adminAnnouncementsRouter } from './routes/announcements.js';
 import { uploadsRouter } from './routes/uploads.js';
+import { trackingRouter } from './routes/tracking.js';
 import { getDataDir, getSiteDir, getUploadsDir } from './lib/storage.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/contact', contactRouter);
 app.use('/api/announcements', publicAnnouncementsRouter);
+app.use('/api/tracking', trackingRouter);
 app.use('/api/admin/announcements', adminAnnouncementsRouter);
 app.use('/api/admin/uploads', uploadsRouter);
 app.use('/api/admin', adminRouter);

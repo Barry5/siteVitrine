@@ -69,33 +69,42 @@ export interface Translations {
     title: string;
     subtitle: string;
     searchAnother: string;
-    searchButton: string;
-    clear: string;
-    statusRegistered: string;
-    statusInTransit: string;
-    statusCustoms: string;
-    statusReady: string;
-    statusDelivered: string;
-    statusPending: string;
     sender: string;
     receiver: string;
     origin: string;
     destination: string;
     weight: string;
     estimatedDelivery: string;
+    transport: string;
+    registeredOn: string;
     historyTitle: string;
+    lastUpdate: string;
+    noHistory: string;
     pickupPoint: string;
     pickupIdRequired: string;
     whatsAppHelp: string;
+    whatsAppMessage: string;
     printReceipt: string;
     emptyTitle: string;
     emptySubtitle: string;
+    loading: string;
     notFound: string;
     notFoundHelp: string;
+    invalidNumber: string;
+    tooManyRequests: string;
+    unavailable: string;
     contactAgency: string;
     contactMessage: string;
+    problemTitle: string;
+    problemBody: string;
     inputPlaceholder: string;
     inputButton: string;
+    /** Étapes du parcours affichées en frise (5 étapes). */
+    stages: string[];
+    /** Libellés des statuts ColisBox (colisBox2/backend/src/lib/parcel-status.ts). */
+    statuses: Record<string, string>;
+    unknownStatus: string;
+    transportModes: Record<string, string>;
   };
   services: {
     badge: string;
@@ -351,39 +360,71 @@ export const translations: Record<Language, Translations> = {
       agenciesLink: 'Voir les adresses',
     },
     tracking: {
-      badge: 'Traçabilité & Statut en Direct',
-      title: 'Panneau de traçabilité et statut de vos envois',
+      badge: 'Suivi de colis en direct',
+      title: 'Suivez votre colis',
       subtitle:
-        'Consultez en direct l’acheminement de votre colis enregistré en agence (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
-      searchAnother: 'Rechercher un autre bordereau...',
-      searchButton: 'Rechercher',
-      clear: 'Effacer',
-      statusRegistered: 'ENREGISTRÉ EN AGENCE',
-      statusInTransit: 'EN TRANSIT INTERNATIONAL (EN VOL)',
-      statusCustoms: 'EN COURS DE DÉDOUANEMENT',
-      statusReady: 'DISPONIBLE POUR RETRAIT AU BUREAU',
-      statusDelivered: 'LIVRÉ AU DESTINATAIRE',
-      statusPending: 'TRAITEMENT EN COURS',
+        'Consultez l’acheminement de votre colis enregistré dans nos agences (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
+      searchAnother: 'Suivre un autre colis',
       sender: 'Expéditeur',
       receiver: 'Destinataire',
-      origin: 'Origine',
+      origin: 'Départ',
       destination: 'Destination',
-      weight: 'Poids Certifié',
-      estimatedDelivery: 'Livraison Estimée',
-      historyTitle: 'Historique des étapes logistiques',
-      pickupPoint: 'Point de retrait assigné :',
-      pickupIdRequired: "Veuillez vous munir d'une pièce d'identité valide lors du retrait.",
-      whatsAppHelp: 'Aide WhatsApp',
-      printReceipt: 'Imprimer la fiche',
+      weight: 'Poids',
+      estimatedDelivery: 'Arrivée estimée',
+      transport: 'Transport',
+      registeredOn: 'Enregistré le',
+      historyTitle: 'Historique du colis',
+      lastUpdate: 'Dernière mise à jour',
+      noHistory: 'Aucune étape enregistrée pour le moment.',
+      pickupPoint: 'Agence de retrait :',
+      pickupIdRequired: "Munissez-vous d'une pièce d'identité valide et de votre numéro de suivi.",
+      whatsAppHelp: 'Une question ? WhatsApp',
+      whatsAppMessage: 'Bonjour Thiaguil Multi-services, j’ai une question sur mon colis n° {code}.',
+      printReceipt: 'Imprimer',
       emptyTitle: 'Suivez votre colis',
-      emptySubtitle:
-        'Entrez le numéro de suivi inscrit sur votre reçu de dépôt.',
+      emptySubtitle: 'Entrez le numéro de suivi inscrit sur votre reçu de dépôt (ex : GN-EXP-2026-000004-P4WD4).',
+      loading: 'Recherche du colis…',
       notFound: 'Aucun colis trouvé pour le numéro « {code} ».',
       notFoundHelp: "Vérifiez le numéro inscrit sur votre reçu. Si votre colis n'apparaît pas encore en ligne, notre équipe vous répond directement.",
-      contactAgency: "Demander le suivi sur WhatsApp",
+      invalidNumber: "« {code} » n'est pas un numéro de suivi Thiaguil. Il est inscrit sur votre reçu et ressemble à GN-EXP-2026-000004-P4WD4.",
+      tooManyRequests: 'Trop de recherches en peu de temps. Réessayez dans quelques minutes.',
+      unavailable: 'Le suivi en ligne est momentanément indisponible. Réessayez dans quelques minutes ou demandez le suivi sur WhatsApp.',
+      contactAgency: 'Demander le suivi sur WhatsApp',
       contactMessage: 'Bonjour Thiaguil Multi-services, je souhaite suivre mon colis n° {code}.',
+      problemTitle: 'Votre colis demande une attention particulière',
+      problemBody: 'Contactez-nous sur WhatsApp avec votre numéro de suivi : notre équipe vous explique la situation.',
       inputPlaceholder: 'Numéro de suivi',
       inputButton: 'Suivre',
+      stages: ['Enregistré', 'Expédié', 'Arrivé à destination', 'Disponible au retrait', 'Livré'],
+      statuses: {
+        draft: 'Enregistré au guichet',
+        registered: 'Enregistré et pesé',
+        accepted: 'Accepté pour transport',
+        preparing: "En préparation d'expédition",
+        in_collection: 'En cours de collecte',
+        collected: 'Collecté',
+        at_hub: 'Au centre de tri',
+        shipped: 'Expédié',
+        in_transit: "En cours d'acheminement",
+        arrived_destination_country: 'Arrivé au pays de destination',
+        arrived_at_branch: "Arrivé à l'agence",
+        ready_for_pickup: 'Disponible au retrait',
+        out_for_delivery: 'En cours de livraison',
+        delivered: 'Livré',
+        cancelled: 'Annulé',
+        blocked: 'Bloqué',
+        lost: 'Déclaré perdu',
+        damaged: 'Endommagé',
+        returned_to_sender: "Retourné à l'expéditeur",
+        pending_information: 'Informations en attente',
+      },
+      unknownStatus: 'En cours de traitement',
+      transportModes: {
+        air_express: 'Aérien express',
+        air_cargo: 'Fret aérien',
+        maritime: 'Maritime',
+        road: 'Routier',
+      },
     },
     services: {
       badge: "Offres & Typologies d'Envois",
@@ -661,39 +702,71 @@ export const translations: Record<Language, Translations> = {
       agenciesLink: 'See addresses',
     },
     tracking: {
-      badge: 'Live Traceability & Status',
-      title: 'Live Tracking & Status Dashboard',
+      badge: 'Live parcel tracking',
+      title: 'Track your parcel',
       subtitle:
-        'Track the exact real-time journey of your parcel registered at our branches (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
-      searchAnother: 'Search another tracking code...',
-      searchButton: 'Search',
-      clear: 'Clear',
-      statusRegistered: 'REGISTERED AT BRANCH',
-      statusInTransit: 'IN INTERNATIONAL TRANSIT (FLIGHT)',
-      statusCustoms: 'CUSTOMS CLEARANCE IN PROGRESS',
-      statusReady: 'READY FOR PICKUP AT OFFICE',
-      statusDelivered: 'DELIVERED TO RECIPIENT',
-      statusPending: 'PROCESSING',
+        'Follow the journey of your parcel registered at our branches (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
+      searchAnother: 'Track another parcel',
       sender: 'Sender',
       receiver: 'Recipient',
-      origin: 'Origin',
+      origin: 'From',
       destination: 'Destination',
-      weight: 'Certified Weight',
-      estimatedDelivery: 'Estimated Delivery',
-      historyTitle: 'Logistics Milestones & Journey',
-      pickupPoint: 'Assigned Pickup Office:',
-      pickupIdRequired: 'Please present a valid ID card or passport when collecting your parcel.',
-      whatsAppHelp: 'WhatsApp Support',
-      printReceipt: 'Print Receipt',
+      weight: 'Weight',
+      estimatedDelivery: 'Estimated arrival',
+      transport: 'Transport',
+      registeredOn: 'Registered on',
+      historyTitle: 'Parcel history',
+      lastUpdate: 'Last update',
+      noHistory: 'No step recorded yet.',
+      pickupPoint: 'Pickup branch:',
+      pickupIdRequired: 'Please bring a valid ID and your tracking number.',
+      whatsAppHelp: 'Questions? WhatsApp',
+      whatsAppMessage: 'Hello Thiaguil Multi-services, I have a question about my parcel no. {code}.',
+      printReceipt: 'Print',
       emptyTitle: 'Track your parcel',
-      emptySubtitle:
-        'Enter the tracking number printed on your drop-off receipt.',
+      emptySubtitle: 'Enter the tracking number printed on your drop-off receipt (e.g. GN-EXP-2026-000004-P4WD4).',
+      loading: 'Looking up your parcel…',
       notFound: 'No parcel found for number "{code}".',
       notFoundHelp: 'Please check the number printed on your receipt. If your parcel is not online yet, our team will answer you directly.',
+      invalidNumber: '"{code}" is not a Thiaguil tracking number. It is printed on your receipt and looks like GN-EXP-2026-000004-P4WD4.',
+      tooManyRequests: 'Too many searches in a short time. Please try again in a few minutes.',
+      unavailable: 'Online tracking is temporarily unavailable. Please try again in a few minutes or ask for tracking on WhatsApp.',
       contactAgency: 'Ask for tracking on WhatsApp',
       contactMessage: 'Hello Thiaguil Multi-services, I would like to track my parcel no. {code}.',
+      problemTitle: 'Your parcel needs special attention',
+      problemBody: 'Contact us on WhatsApp with your tracking number: our team will explain the situation.',
       inputPlaceholder: 'Tracking number',
       inputButton: 'Track',
+      stages: ['Registered', 'Shipped', 'Arrived at destination', 'Ready for pickup', 'Delivered'],
+      statuses: {
+        draft: 'Registered at the counter',
+        registered: 'Registered and weighed',
+        accepted: 'Accepted for transport',
+        preparing: 'Being prepared for shipping',
+        in_collection: 'Being collected',
+        collected: 'Collected',
+        at_hub: 'At the sorting centre',
+        shipped: 'Shipped',
+        in_transit: 'In transit',
+        arrived_destination_country: 'Arrived in the destination country',
+        arrived_at_branch: 'Arrived at the branch',
+        ready_for_pickup: 'Ready for pickup',
+        out_for_delivery: 'Out for delivery',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled',
+        blocked: 'On hold',
+        lost: 'Reported lost',
+        damaged: 'Damaged',
+        returned_to_sender: 'Returned to sender',
+        pending_information: 'Awaiting information',
+      },
+      unknownStatus: 'Being processed',
+      transportModes: {
+        air_express: 'Air express',
+        air_cargo: 'Air freight',
+        maritime: 'Sea freight',
+        road: 'Road',
+      },
     },
     services: {
       badge: 'Shipping Solutions & Formats',

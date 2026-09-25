@@ -1,30 +1,37 @@
-export type ShipmentType = 'envelope' | 'small_box' | 'large_box' | 'air_freight' | 'sea_freight';
-
-export type TrackingStatus = 'registered' | 'in_transit' | 'customs' | 'ready_for_pickup' | 'delivered';
-
-export interface TrackingStep {
-  title: string;
+/**
+ * Colis suivi, tel que renvoyé par GET /api/tracking/:numero (serveur du site,
+ * server/routes/tracking.ts), à partir des données de ColisBox. Les noms sont
+ * déjà masqués par ColisBox (« Mamadou D. »).
+ */
+export interface TrackingEvent {
+  status: string;
   location: string;
-  date: string;
-  completed: boolean;
-  current: boolean;
-  description: string;
+  /** Date ISO 8601. */
+  timestamp: string;
 }
 
-export interface TrackingItem {
+export interface TrackedParcel {
   trackingNumber: string;
-  senderName: string;
-  receiverName: string;
-  senderCity: string;
+  /** Statut ColisBox (registered, in_transit, ready_for_pickup, delivered…). */
+  status: string;
+  parcelType: string;
+  transportMode: string;
+  originCountry: string;
+  originBranchName: string;
+  destinationCountry: string;
   destinationCity: string;
-  weightKg: number;
-  shipmentType: ShipmentType;
-  departureDate: string;
-  estimatedDeliveryDate: string;
-  status: TrackingStatus;
-  pickupAgency?: string;
-  steps: TrackingStep[];
+  destinationBranchName: string;
+  estimatedDeliveryDate: string | null;
+  weightKg: number | null;
+  createdAt: string | null;
+  senderName: string;
+  recipientName: string;
+  /** Du plus récent au plus ancien. */
+  history: TrackingEvent[];
 }
+
+/** Raison pour laquelle une recherche de suivi n'a pas abouti. */
+export type TrackingErrorKind = 'not_found' | 'invalid_number' | 'too_many_requests' | 'unavailable';
 
 export interface Agency {
   id: string;

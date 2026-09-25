@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
   INITIAL_AGENCIES,
   INITIAL_ANNOUNCEMENTS,
   INITIAL_DESTINATIONS,
   INITIAL_PRICING_RULES,
   INITIAL_TESTIMONIALS,
-  INITIAL_TRACKING_ITEMS,
 } from '../data/initialData';
 import {
   Agency,
@@ -13,7 +12,8 @@ import {
   Destination,
   PricingRule,
   Testimonial,
-  TrackingItem,
+  TrackedParcel,
+  TrackingErrorKind,
 } from '../types';
 import {
   adminLogin,
@@ -22,6 +22,8 @@ import {
   fetchAdminAnnouncements,
   fetchPublicAnnouncements,
   saveAnnouncements,
+  fetchTracking,
+  TrackingLookupError,
 } from '../lib/api';
 
 interface AppContextType {
@@ -30,15 +32,16 @@ interface AppContextType {
   destinations: Destination[];
   pricingRules: PricingRule[];
   testimonials: Testimonial[];
-  trackingItems: Record<string, TrackingItem>;
   currentView: 'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv';
   isAdminAuthenticated: boolean;
   isAdminAuthChecking: boolean;
-  activeTrackedItem: TrackingItem | null;
+  activeTrackedItem: TrackedParcel | null;
   activeSearchCode: string;
-  // Numéro recherché introuvable (null si pas d'erreur) ; le message traduit
-  // est construit par TrackingSection.
-  trackingError: string | null;
+  // Recherche de suivi qui n'a pas abouti (null si pas d'erreur) : numéro
+  // recherché et raison ; le message traduit est construit par TrackingSection.
+  trackingError: { code: string; kind: TrackingErrorKind } | null;
+  // Vrai pendant l'interrogation de ColisBox.
+  trackingLoading: boolean;
   language: 'fr' | 'en';
   setLanguage: (lang: 'fr' | 'en') => void;
 
@@ -48,7 +51,7 @@ interface AppContextType {
   logoutAdmin: () => void;
 
   // Tracking actions
-  searchPackage: (trackingNumber: string) => TrackingItem | null;
+  searchPackage: (trackingNumber: string) => Promise<void>;
   clearTracking: () => void;
 
   // CRUD Announcements — enregistrées sur le serveur (lèvent une erreur si
@@ -120,12 +123,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_TESTIMONIALS;
   });
 
-  // Suivi de colis : aucune source de données réelle n'est encore branchée
-  // (INITIAL_TRACKING_ITEMS est vide). Plus de copie dans le navigateur :
-  // l'ancienne version y enregistrait des colis de démonstration et des
-  // suivis inventés.
-  const [trackingItems, setTrackingItems] = useState<Record<string, TrackingItem>>(INITIAL_TRACKING_ITEMS);
-
   const [currentView, setCurrentView] = useState<
     'public' | 'admin' | 'mentions-legales' | 'confidentialite' | 'cgv'
   >('public');
@@ -141,9 +138,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .finally(() => setIsAdminAuthChecking(false));
   }, []);
 
-  const [activeTrackedItem, setActiveTrackedItem] = useState<TrackingItem | null>(null);
+  // Suivi de colis : données réelles de ColisBox, via le serveur du site
+  // (GET /api/tracking/:numero). Aucun colis n'est stocké dans le navigateur.
+  const [activeTrackedItem, setActiveTrackedItem] = useState<TrackedParcel | null>(null);
   const [activeSearchCode, setActiveSearchCode] = useState<string>('');
-  const [trackingError, setTrackingError] = useState<string | null>(null);
+  const [trackingError, setTrackingError] = useState<{ code: string; kind: TrackingErrorKind } | null>(null);
+  const [trackingLoading, setTrackingLoading] = useState<boolean>(false);
+  // Numéro de la dernière recherche lancée : une réponse plus ancienne,
+  // arrivée après, est ignorée.
+  const latestTrackingSearch = useRef(0);
   const [language, setLanguage] = useState<'fr' | 'en'>(() => {
     return (localStorage.getItem('thg_language') as 'fr' | 'en') || 'fr';
   });
@@ -226,31 +229,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentView('public');
   };
 
-  // Search package — ne renvoie QUE des colis réellement connus. Un numéro
-  // inconnu affiche « aucun colis trouvé » (plus de faux suivi généré).
-  const searchPackage = (trackingNumber: string): TrackingItem | null => {
-    const cleanCode = trackingNumber.trim().toUpperCase();
+  // Suivi de colis — interroge ColisBox via le serveur du site. N'affiche que
+  // des colis réellement enregistrés ; sinon un message honnête (introuvable,
+  // numéro invalide, service indisponible) et le contact WhatsApp.
+  const searchPackage = async (trackingNumber: string): Promise<void> => {
+    const cleanCode = trackingNumber.trim().toUpperCase().replace(/\s+/g, '');
+    const searchId = ++latestTrackingSearch.current;
     setActiveSearchCode(cleanCode);
+    setActiveTrackedItem(null);
+    setTrackingError(null);
 
     if (!cleanCode) {
-      setActiveTrackedItem(null);
-      setTrackingError(null);
-      return null;
+      setTrackingLoading(false);
+      return;
     }
 
-    const item = trackingItems[cleanCode];
-    if (item) {
-      setActiveTrackedItem(item);
-      setTrackingError(null);
-      return item;
+    setTrackingLoading(true);
+    try {
+      const parcel = await fetchTracking(cleanCode);
+      if (searchId !== latestTrackingSearch.current) return;
+      setActiveTrackedItem(parcel);
+    } catch (err) {
+      if (searchId !== latestTrackingSearch.current) return;
+      const kind = err instanceof TrackingLookupError ? err.kind : 'unavailable';
+      setTrackingError({ code: cleanCode, kind });
+    } finally {
+      if (searchId === latestTrackingSearch.current) setTrackingLoading(false);
     }
-
-    setActiveTrackedItem(null);
-    setTrackingError(cleanCode);
-    return null;
   };
 
   const clearTracking = () => {
+    latestTrackingSearch.current++;
+    setTrackingLoading(false);
     setActiveTrackedItem(null);
     setActiveSearchCode('');
     setTrackingError(null);
@@ -358,7 +368,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDestinations(INITIAL_DESTINATIONS);
     setPricingRules(INITIAL_PRICING_RULES);
     setTestimonials(INITIAL_TESTIMONIALS);
-    setTrackingItems(INITIAL_TRACKING_ITEMS);
     localStorage.removeItem('thg_agencies');
     localStorage.removeItem('thg_destinations');
     localStorage.removeItem('thg_pricing');
@@ -374,13 +383,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         destinations,
         pricingRules,
         testimonials,
-        trackingItems,
         currentView,
         isAdminAuthenticated,
         isAdminAuthChecking,
         activeTrackedItem,
         activeSearchCode,
         trackingError,
+        trackingLoading,
         language,
         setLanguage: handleSetLanguage,
         setCurrentView,

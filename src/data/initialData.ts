@@ -1,4 +1,4 @@
-import { Agency, DepartureAnnouncement, Destination, PricingRule, ShipmentService, Testimonial, TrackingItem } from '../types';
+import { Agency, DepartureAnnouncement, Destination, PricingRule, ShipmentService, Testimonial } from '../types';
 
 export const INITIAL_ANNOUNCEMENTS: DepartureAnnouncement[] = [
   {
@@ -342,8 +342,3 @@ export const INITIAL_PRICING_RULES: PricingRule[] = [
 // admin (onglet Témoignages) au fur et à mesure qu'ils arrivent.
 export const INITIAL_TESTIMONIALS: Testimonial[] = [];
 
-// Aucun colis de démonstration : les anciens colis « pilotes » (THG-NY-8910,
-// THG-MTL-2708, THG-KND-0109) étaient fictifs. Le suivi en ligne n'affichera
-// que des colis réels quand une source de données (admin ou serveur) sera
-// branchée ; en attendant, un numéro inconnu renvoie vers WhatsApp.
-export const INITIAL_TRACKING_ITEMS: Record<string, TrackingItem> = {};
