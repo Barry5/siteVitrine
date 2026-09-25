@@ -15,7 +15,7 @@ import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
 
 export const ShippingCalculator: React.FC = () => {
-  const { destinations, agencies, pricingRules, language } = useApp();
+  const { destinations, agencies, pricingRules, exchangeRates, language } = useApp();
   const t = translations[language].calculator;
 
   const [originAgencyId, setOriginAgencyId] = useState(agencies[0]?.id || '');
@@ -26,7 +26,13 @@ export const ShippingCalculator: React.FC = () => {
 
   const selectedDestination = destinations.find((d) => d.id === destinationId) || destinations[0];
   const selectedAgency = agencies.find((a) => a.id === originAgencyId) || agencies[0];
-  const pricing = pricingRules.find((p) => p.destinationId === destinationId) || pricingRules[0];
+  // Pas de repli sur une autre ligne : une destination sans grille tarifaire
+  // affiche « Tarif sur demande » (avant, Bruxelles prenait les prix de New York).
+  const pricing = pricingRules.find((p) => p.destinationId === selectedDestination?.id) ?? null;
+
+  // Poids facturé : jamais moins que le minimum de la ligne (réglé dans l'admin).
+  const minWeightKg = pricing ? (transitMode === 'air' ? pricing.minWeightKgAir : pricing.minWeightKgSea) : 0;
+  const billableWeight = Math.max(weightKg, minWeightKg || 0);
 
   // Price calculations
   const calculateTotalGnf = () => {
@@ -36,18 +42,12 @@ export const ShippingCalculator: React.FC = () => {
       return pricing.envelopePriceGnf;
     }
 
-    if (transitMode === 'air') {
-      const billableWeight = Math.max(weightKg, pricing.minWeightKgAir || 1);
-      return billableWeight * pricing.pricePerKgAirGnf;
-    } else {
-      const billableWeight = Math.max(weightKg, pricing.minWeightKgSea || 10);
-      return billableWeight * pricing.pricePerKgSeaGnf;
-    }
+    return billableWeight * (transitMode === 'air' ? pricing.pricePerKgAirGnf : pricing.pricePerKgSeaGnf);
   };
 
   const totalGnf = calculateTotalGnf();
-  const totalUsd = Math.round(totalGnf / 8600);
-  const totalCad = Math.round(totalGnf / 6300);
+  const totalUsd = Math.round(totalGnf / exchangeRates.usdGnf);
+  const totalCad = Math.round(totalGnf / exchangeRates.cadGnf);
 
   const formatGnf = (amount: number) => {
     return new Intl.NumberFormat(language === 'fr' ? 'fr-GN' : 'en-US').format(amount) + ' GNF';
@@ -60,14 +60,14 @@ export const ShippingCalculator: React.FC = () => {
 - Destination : ${selectedDestination?.name} (${selectedDestination?.country})
 - Type : ${packageType === 'envelope' ? 'Enveloppe express' : `Colis de ${weightKg} kg`}
 - Mode : ${transitMode === 'air' ? 'Fret Aérien Express' : 'Fret Maritime'}
-- Estimation calculée : ~${formatGnf(totalGnf)}
+- ${pricing ? `Estimation calculée : ~${formatGnf(totalGnf)}` : 'Tarif : sur demande'}
 Pouvez-vous me confirmer les modalités de dépôt ?`
       : `Hello Thiaguil Multi-services, I would like to book a shipment:
 - Departure: ${selectedAgency?.name || 'Conakry'}
 - Destination: ${selectedDestination?.name} (${selectedDestination?.country})
 - Type: ${packageType === 'envelope' ? 'Express Envelope' : `Parcel of ${weightKg} kg`}
 - Mode: ${transitMode === 'air' ? 'Air Freight Express' : 'Sea Freight'}
-- Estimated quote: ~${formatGnf(totalGnf)}
+- ${pricing ? `Estimated quote: ~${formatGnf(totalGnf)}` : 'Price: on request'}
 Could you confirm the branch deposit details?`;
 
     return encodeURIComponent(text);
@@ -98,7 +98,7 @@ Could you confirm the branch deposit details?`;
               {/* Type selection: Enveloppe vs Colis (Segmented controls with clean active state) */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                  {t.step1}
+                  {t.stepFormat}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -113,7 +113,7 @@ Could you confirm the branch deposit details?`;
                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <span>{t.typeEnvelope}</span>
+                    <span>{t.envelopeOption}</span>
                   </button>
 
                   <button
@@ -125,7 +125,7 @@ Could you confirm the branch deposit details?`;
                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <span>{t.typeParcel}</span>
+                    <span>{t.parcelOption}</span>
                   </button>
                 </div>
               </div>
@@ -134,7 +134,7 @@ Could you confirm the branch deposit details?`;
               {packageType === 'parcel' && (
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    {t.step2}
+                    {t.stepMode}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -148,10 +148,10 @@ Could you confirm the branch deposit details?`;
                     >
                       <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
                         <Plane className="w-4 h-4 text-brand" />
-                        <span>{t.airFreight}</span>
+                        <span>{t.airModeTitle}</span>
                       </div>
                       <span className="text-[11px] text-slate-600 mt-1 block">
-                        {t.airDelay}
+                        {t.airModeDesc}
                       </span>
                     </button>
 
@@ -166,10 +166,10 @@ Could you confirm the branch deposit details?`;
                     >
                       <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-slate-900">
                         <Ship className="w-4 h-4 text-cyan-600" />
-                        <span>{t.seaFreight}</span>
+                        <span>{t.seaModeTitle}</span>
                       </div>
                       <span className="text-[11px] text-slate-600 mt-1 block">
-                        {t.seaDelay}
+                        {t.seaModeDesc}
                       </span>
                     </button>
                   </div>
@@ -180,7 +180,7 @@ Could you confirm the branch deposit details?`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    {t.originAgency}
+                    {t.originLabel}
                   </label>
                   <select
                     value={originAgencyId}
@@ -199,7 +199,7 @@ Could you confirm the branch deposit details?`;
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    {t.destinationCity}
+                    {t.destLabel}
                   </label>
                   <select
                     value={destinationId}
@@ -221,7 +221,7 @@ Could you confirm the branch deposit details?`;
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                       <Weight className="w-3.5 h-3.5 text-brand" />
-                      {t.estimatedWeight} :
+                      {t.weightLabel}
                     </label>
                     <div className="flex items-center gap-1 bg-red-50 border border-red-200 px-3 py-1 rounded-lg">
                       <input
@@ -274,41 +274,57 @@ Could you confirm the branch deposit details?`;
                   <span className="text-xs font-semibold text-slate-300 block uppercase">
                     {t.estimatedAmount}
                   </span>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
-                    {formatGnf(totalGnf)}
-                  </div>
-                  <div className="text-xs text-amber-300/90 font-medium pt-1 flex justify-center gap-3">
-                    <span>~ {totalUsd} $ USD</span>
-                    <span>•</span>
-                    <span>~ {totalCad} $ CAD</span>
-                  </div>
+                  {pricing ? (
+                    <>
+                      <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
+                        {formatGnf(totalGnf)}
+                      </div>
+                      <div className="text-xs text-amber-300/90 font-medium pt-1 flex justify-center gap-3">
+                        <span>~ {totalUsd} $ USD</span>
+                        <span>•</span>
+                        <span>~ {totalCad} $ CAD</span>
+                      </div>
+                      {packageType === 'parcel' && billableWeight > weightKg && (
+                        <p className="text-[11px] text-slate-300 pt-2">
+                          {t.minWeightNote.replace('{kg}', String(minWeightKg))}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
+                        {t.onRequest}
+                      </div>
+                      <p className="text-xs text-slate-300 pt-1">{t.onRequestHelp}</p>
+                    </>
+                  )}
                 </div>
 
                 {/* Breakdown specs */}
                 <div className="space-y-2.5 text-xs text-slate-300 bg-slate-950/80 p-4 rounded-xl border border-slate-800/80">
                   <div className="flex justify-between">
-                    <span className="text-slate-300">{t.destinationCity} :</span>
+                    <span className="text-slate-300">{t.destLabel} :</span>
                     <span className="text-white font-bold">
                       {selectedDestination?.name} ({selectedDestination?.country})
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">{t.indicativeDelay} :</span>
+                    <span className="text-slate-300">{t.indicativeTransit}</span>
                     <span className="text-emerald-400 font-bold">
                       {transitMode === 'air' ? selectedDestination?.estimatedAirDays : selectedDestination?.estimatedSeaDays}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">{t.nextFlight} :</span>
+                    <span className="text-slate-300">{t.nextFlight}</span>
                     <span className="text-amber-300 font-bold">
                       {selectedDestination?.nextScheduledFlight || (language === 'fr' ? 'Hebdomadaire' : 'Weekly')}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-slate-300">{t.localPickup} :</span>
+                    <span className="text-slate-300">{t.localPickup}</span>
                     <span className="text-white font-bold truncate max-w-[170px]" title={selectedDestination?.localAddress}>
                       {selectedDestination?.localAddress || (language === 'fr' ? 'Bureau local Thiaguil' : 'Local Thiaguil Hub')}
                     </span>
@@ -325,10 +341,10 @@ Could you confirm the branch deposit details?`;
                   className="w-full py-3.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  <span>{t.bookOnWhatsapp}</span>
+                  <span>{pricing ? t.bookWhatsApp : t.askQuote}</span>
                 </a>
                 <p className="text-[10px] text-slate-300 text-center">
-                  {t.disclaimer}
+                  {t.guaranteeNote}
                 </p>
               </div>
             </div>

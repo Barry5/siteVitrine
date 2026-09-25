@@ -41,6 +41,10 @@ export function getAnnouncementsFile(): string {
   return path.join(getDataDir(), 'announcements.json');
 }
 
+export function getPricingFile(): string {
+  return path.join(getDataDir(), 'pricing.json');
+}
+
 /**
  * Format exact des chemins d'affiche acceptés : uniquement des fichiers
  * générés par la route d'upload (UUID + extension image). Empêche d'enregistrer
