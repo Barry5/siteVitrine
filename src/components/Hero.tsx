@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowRight,
   Calculator,
@@ -42,12 +42,16 @@ const MIN_POSTERS_FOR_WALL = 3;
  * agences) sont regroupées dans trois cartes à cheval sur le bas du bandeau.
  */
 export const Hero: React.FC = () => {
-  const { announcements, announcementsLoading, announcementsFromServer, searchPackage, language } = useApp();
+  const { announcements, announcementsLoading, announcementsFromServer, searchPackage, activeSearchCode, language } = useApp();
   const t = translations[language].hero;
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failedPosters, setFailedPosters] = useState<Record<string, boolean>>({});
   const [trackingInput, setTrackingInput] = useState('');
+  // Le champ reflète le numéro recherché (lien ?suivi=…) et se vide avec « Suivre un autre colis ».
+  useEffect(() => {
+    setTrackingInput(activeSearchCode);
+  }, [activeSearchCode]);
   const [motionPaused, setMotionPaused] = useState(false);
 
   const upcoming = getUpcomingDepartures(announcements);
@@ -80,8 +84,8 @@ export const Hero: React.FC = () => {
   const handleTrackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackingInput.trim()) return;
+    // Le résultat s'affiche juste en dessous (TrackingSection), qui fait défiler la page jusqu'à lui.
     searchPackage(trackingInput);
-    document.getElementById('suivi')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -164,7 +168,8 @@ export const Hero: React.FC = () => {
       {/* Trois cartes d'action, à cheval sur le bas du bandeau */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-14 lg:-mt-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-          <div className="bg-white rounded-xl border border-stone-200 shadow-xl shadow-ink/10 p-5 sm:p-6 space-y-3">
+          {/* Le seul champ de suivi du site (ancre #suivi du menu). */}
+          <div id="suivi" className="scroll-mt-28 bg-white rounded-xl border border-stone-200 shadow-xl shadow-ink/10 p-5 sm:p-6 space-y-3">
             <div className="flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-red-50 text-brand flex items-center justify-center shrink-0">
                 <Search className="w-5 h-5" />

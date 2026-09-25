@@ -128,7 +128,7 @@ export const HowItWorks: React.FC<{ number?: string }> = ({ number }) => {
             href="https://wa.me/224611835683?text=Bonjour,%20je%20souhaite%20connaître%20les%20conditions%20d'emballage"
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 px-5 py-2.5 rounded-lg bg-brand hover:bg-brand-dark text-white font-bold text-xs shadow-sm transition-colors whitespace-nowrap"
+            className="shrink-0 inline-flex items-center min-h-11 px-5 rounded-lg border border-white/30 hover:bg-white/10 text-white font-bold text-sm transition-colors whitespace-nowrap"
           >
             {t.commitmentCta}
           </a>

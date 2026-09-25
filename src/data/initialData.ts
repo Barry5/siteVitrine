@@ -248,9 +248,8 @@ export const INITIAL_SERVICES: ShipmentService[] = [
     transitTime: '3 à 6 jours ouvrés',
     features: [
       'Tarif dégressif au kilogramme',
-      'Manutention soignée et étiquetage RFID/Code-barres',
+      'Manutention soignée',
       'Conditionnement renforcé en caisse ou filmage',
-      'Option enlèvement à domicile disponible',
     ],
     icon: 'Boxes',
   },

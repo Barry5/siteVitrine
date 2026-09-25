@@ -81,6 +81,8 @@ export interface Translations {
     title: string;
     subtitle: string;
     searchAnother: string;
+    /** Erreur de suivi : retour au champ de saisie de l'accueil. */
+    fixNumber: string;
     sender: string;
     receiver: string;
     origin: string;
@@ -159,7 +161,6 @@ export interface Translations {
     /** Destination sans grille tarifaire enregistrée dans l'admin. */
     onRequest: string;
     onRequestHelp: string;
-    askQuote: string;
     /** {kg} = poids minimum facturé de la ligne. */
     minWeightNote: string;
     /** Aucun départ publié vers cette destination. */
@@ -274,9 +275,11 @@ export interface Translations {
     linkAgencies: string;
     linkFaq: string;
     linkContact: string;
-    localAgenciesTitle: string;
-    intlOfficesTitle: string;
+    contactTitle: string;
     centralAssistance: string;
+    /** {local} = agences en Guinée, {intl} = bureaux à l'international. */
+    agenciesSummary: string;
+    allAgenciesLink: string;
     copyright: string;
     facebookLink: string;
     backToTop: string;
@@ -396,6 +399,7 @@ export const translations: Record<Language, Translations> = {
       subtitle:
         'Consultez l’acheminement de votre colis enregistré dans nos agences (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
       searchAnother: 'Suivre un autre colis',
+      fixNumber: 'Corriger le numéro',
       sender: 'Expéditeur',
       receiver: 'Destinataire',
       origin: 'Départ',
@@ -500,11 +504,10 @@ export const translations: Record<Language, Translations> = {
       indicativeTransit: 'Délai indicatif :',
       nextFlight: 'Prochain vol prévu :',
       localPickup: 'Retrait sur place :',
-      bookWhatsApp: 'Réserver ce tarif sur WhatsApp',
+      bookWhatsApp: "Réserver l'envoi de mon colis",
       guaranteeNote: 'Tarif final pesé et certifié en agence avant scellement. Pas de frais cachés.',
       onRequest: 'Tarif sur demande',
       onRequestHelp: 'Contactez-nous sur WhatsApp pour obtenir le tarif vers cette destination.',
-      askQuote: 'Demander le tarif sur WhatsApp',
       minWeightNote: 'Poids minimum facturé : {kg} kg.',
       nextFlightTba: 'À annoncer',
     },
@@ -585,7 +588,7 @@ export const translations: Record<Language, Translations> = {
       officeFallback: 'Bureau Thiaguil',
       localPhoneLabel: 'Ligne directe sur place :',
       simulateCta: 'Simuler le prix vers',
-      planCta: 'Planifier un envoi',
+      planCta: "Réserver l'envoi de mon colis",
     },
     contact: {
       badge: 'Contact & Assistance',
@@ -632,9 +635,10 @@ export const translations: Record<Language, Translations> = {
       linkAgencies: 'Toutes les Agences',
       linkFaq: 'Questions fréquentes (FAQ)',
       linkContact: 'Contactez-nous',
-      localAgenciesTitle: 'Agences Locales Guinée',
-      intlOfficesTitle: 'Bureaux Internationaux',
-      centralAssistance: 'Assistance Centrale :',
+      contactTitle: 'Nous joindre',
+      centralAssistance: 'Service client WhatsApp',
+      agenciesSummary: "{local} agences en Guinée · {intl} bureaux à l'international",
+      allAgenciesLink: 'Voir toutes nos adresses',
       copyright: '© {year} Thiaguil Multi-services. Tous droits réservés. Agrément transitaire & fret international.',
       facebookLink: 'Facebook Officiel',
       backToTop: 'Haut de page',
@@ -754,6 +758,7 @@ export const translations: Record<Language, Translations> = {
       subtitle:
         'Follow the journey of your parcel registered at our branches (Hamdallaye, Bentouraya, Kindia, Coyah, Kipé).',
       searchAnother: 'Track another parcel',
+      fixNumber: 'Edit the number',
       sender: 'Sender',
       receiver: 'Recipient',
       origin: 'From',
@@ -858,11 +863,10 @@ export const translations: Record<Language, Translations> = {
       indicativeTransit: 'Estimated transit:',
       nextFlight: 'Next scheduled flight:',
       localPickup: 'On-site pickup:',
-      bookWhatsApp: 'Lock this rate on WhatsApp',
+      bookWhatsApp: 'Book my parcel shipment',
       guaranteeNote: 'Final weight is certified at branch before tamper-proof sealing. No hidden fees.',
       onRequest: 'Price on request',
       onRequestHelp: 'Contact us on WhatsApp to get the price for this destination.',
-      askQuote: 'Ask for the price on WhatsApp',
       minWeightNote: 'Minimum billed weight: {kg} kg.',
       nextFlightTba: 'To be announced',
     },
@@ -943,7 +947,7 @@ export const translations: Record<Language, Translations> = {
       officeFallback: 'Thiaguil Office',
       localPhoneLabel: 'Direct local line:',
       simulateCta: 'Estimate the price to',
-      planCta: 'Schedule a shipment',
+      planCta: 'Book my parcel shipment',
     },
     contact: {
       badge: 'Contact & Support',
@@ -987,9 +991,10 @@ export const translations: Record<Language, Translations> = {
       linkAgencies: 'All Branches',
       linkFaq: 'Frequently Asked Questions',
       linkContact: 'Contact Us',
-      localAgenciesTitle: 'Local Branches in Guinea',
-      intlOfficesTitle: 'International Offices',
-      centralAssistance: 'Central Support:',
+      contactTitle: 'Contact us',
+      centralAssistance: 'WhatsApp customer service',
+      agenciesSummary: '{local} branches in Guinea · {intl} international offices',
+      allAgenciesLink: 'See all our addresses',
       copyright: '© {year} Thiaguil Multi-services. All rights reserved. Licensed freight forwarder & international cargo agent.',
       facebookLink: 'Official Facebook',
       backToTop: 'Back to top',

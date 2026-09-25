@@ -127,11 +127,7 @@ export const ServicesSection: React.FC<{ number?: string }> = ({ number }) => {
               <div className="pt-4 border-t border-stone-100">
                 <a
                   href="#simulateur"
-                  className={`w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    service.highlighted
-                      ? 'bg-brand hover:bg-brand-dark text-white shadow-xs hover:shadow'
-                      : 'border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 shadow-2xs'
-                  }`}
+                  className="w-full min-h-11 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-stone-300 bg-white hover:bg-stone-50 text-stone-800"
                 >
                   <span>{t.calculateRate}</span>
                   <ArrowRight className="w-3.5 h-3.5" />

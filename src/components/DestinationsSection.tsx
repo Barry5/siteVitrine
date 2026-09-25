@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Globe2,
   Plane,
   Ship,
   MapPin,
   Phone,
   ChevronRight,
+  MessageCircle,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../data/translations';
@@ -184,7 +184,7 @@ export const DestinationsSection: React.FC<{ number?: string }> = ({ number }) =
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                   <a
                     href="#simulateur"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs transition-colors"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 font-bold text-sm transition-colors"
                   >
                     <span>{t.simulateCta} {selectedDest.name}</span>
                   </a>
@@ -193,10 +193,10 @@ export const DestinationsSection: React.FC<{ number?: string }> = ({ number }) =
                     href={`https://wa.me/224611835683?text=Bonjour,%20je%20souhaite%20expédier%20un%20colis%20vers%20${selectedDest.name}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-brand hover:bg-brand-dark text-white font-bold text-xs transition-colors shadow-sm"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-lg bg-brand hover:bg-brand-dark text-white font-extrabold text-sm transition-colors"
                   >
+                    <MessageCircle className="w-4 h-4" />
                     <span>{t.planCta}</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>

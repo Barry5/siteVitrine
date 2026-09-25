@@ -22,9 +22,9 @@ const MainLayout: React.FC = () => {
   const { currentView, testimonials } = useApp();
 
   // Numéro affiché au-dessus du titre de chaque section (« 01 — Nos services »).
+  // Le suivi de colis n'est pas numéroté : ce n'est qu'une zone de résultat.
   // La section Avis n'apparaît que s'il y a des avis : la numérotation suit.
   const sectionOrder = [
-    'tracking',
     'services',
     'calculator',
     'destinations',
@@ -72,7 +72,7 @@ const MainLayout: React.FC = () => {
         <TrustStatsStrip />
 
         {/* Live Parcel Tracking Module */}
-        <TrackingSection number={sectionNumber('tracking')} />
+        <TrackingSection />
 
         {/* Services & Package Typologies */}
         <ServicesSection number={sectionNumber('services')} />

@@ -269,7 +269,7 @@ export const ContactSection: React.FC<{ number?: string }> = ({ number }) => {
                 <button
                   type="submit"
                   disabled={status === 'submitting'}
-                  className="w-full py-3.5 px-6 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  className="w-full min-h-12 px-6 rounded-lg border-2 border-white/70 hover:bg-white hover:text-ink disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>{status === 'submitting' ? t.submitting : t.submitButton}</span>

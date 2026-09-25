@@ -84,48 +84,31 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Direct Agency Hubs List */}
-          <div className="lg:col-span-3 space-y-3">
+          {/* Nous joindre : un seul numéro et un lien vers les adresses, au lieu
+              de répéter ici toutes les agences (déjà dans la section Agences). */}
+          <div className="lg:col-span-6 space-y-4">
             <h4 className="font-extrabold uppercase tracking-wider text-white text-xs">
-              {t.localAgenciesTitle}
+              {t.contactTitle}
             </h4>
-            <ul className="space-y-2 text-slate-300 text-xs">
-              {agencies
-                .filter((a) => !a.isInternational)
-                .map((agency) => (
-                  <li key={agency.id}>
-                    <strong className="text-white block">{agency.name} :</strong>
-                    {agency.address} • {agency.phones.join(' / ')}
-                  </li>
-                ))}
-            </ul>
-          </div>
-
-          {/* International Bureaux */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-extrabold uppercase tracking-wider text-white text-xs">
-              {t.intlOfficesTitle}
-            </h4>
-            <div className="space-y-2 text-slate-300 text-xs">
-              {agencies
-                .filter((a) => a.isInternational)
-                .map((agency) => (
-                  <div key={agency.id} className="p-2.5 rounded-lg bg-ink border border-ink-line">
-                    <strong className="text-sand block font-bold">{agency.name} :</strong>
-                    <span>{agency.address}</span>
-                    <span className="block font-mono text-white font-semibold mt-0.5">
-                      {agency.phones.join(' / ')}
-                    </span>
-                  </div>
-                ))}
-            </div>
-
-            <div className="p-3 rounded-lg bg-ink/60 border border-ink-line/80 text-xs text-slate-300">
-              <span className="text-slate-300 font-semibold block mb-0.5">{t.centralAssistance}</span>
-              <a href="tel:+224611835683" className="text-white font-mono font-bold hover:text-red-400 transition-colors">
+            <div className="p-4 rounded-xl bg-ink-2 border border-ink-line space-y-1 max-w-sm">
+              <span className="text-slate-300 font-semibold block">{t.centralAssistance}</span>
+              <a
+                href="https://wa.me/224611835683"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white text-base font-bold hover:text-sand transition-colors"
+              >
                 +224 611 83 56 83
               </a>
             </div>
+            <p className="text-slate-300 text-sm">
+              {t.agenciesSummary
+                .replace('{local}', String(agencies.filter((a) => !a.isInternational).length))
+                .replace('{intl}', String(agencies.filter((a) => a.isInternational).length))}
+            </p>
+            <a href="#agences" className="inline-flex items-center min-h-11 text-sm font-bold text-white underline underline-offset-4 decoration-slate-500 hover:decoration-white">
+              {t.allAgenciesLink}
+            </a>
           </div>
         </div>
 
